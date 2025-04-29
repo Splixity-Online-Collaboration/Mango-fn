@@ -20,4 +20,10 @@
 	  <None Include="Parser.fsp" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Avalonia.Desktop" Version="11.0.0" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0" />
+		<PackageReference Include="Avalonia.FuncUI" Version="1.0.0" />
+	</ItemGroup>
+
 </Project>
