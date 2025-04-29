@@ -1,3 +1,3 @@
-*/bin
-Mango/obj
-*/.vs
+Mango/bin/
+Mango/obj/
+Mango/.vs/
