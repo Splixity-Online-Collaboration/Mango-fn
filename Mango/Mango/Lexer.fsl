@@ -1,0 +1,82 @@
+////////////////////////////////////////////////////////////////////
+// TODO: project task 1 
+//   implement lexer tokens for the new operators: 
+//   multiplication (*), division (/), numerical negation (~), 
+//   logical negation (not), logical and (&&), logical or (||),
+//   boolean literals (true, false), semicolon (;)
+//
+//
+// TODO: project task 2 
+//   implement lexer tokens (keywords) for replicate, filter, scan 
+//
+//
+// TODO: project task 4 
+//   implement the lexer tokens (keywords) for array comprehension 
+////////////////////////////////////////////////////////////////////
+
+
+{
+module Lexer
+
+open System;;
+open FSharp.Text.Lexing;;
+open System.Text;;
+
+(* A lexer definition for Fasto, for use with fslex. *)
+
+(* boilerplate code for all lexer files... *)
+let mutable currentLine = 1
+let mutable lineStartPos = [0]
+
+let rec getLineCol pos line = function
+    |  (p1::ps) ->
+        if pos>=p1
+        then (line, pos-p1)
+        else getLineCol pos (line-1) ps
+    |  [] -> (0,0) (* should not happen *)
+
+let getPos (lexbuf : LexBuffer<'char>) =
+      getLineCol lexbuf.StartPos.pos_cnum
+                 (currentLine)
+                 (lineStartPos)
+
+exception LexicalError of string * (int * int) (* (message, (line, column)) *)
+
+let lexerError lexbuf s =
+     raise (LexicalError (s, getPos lexbuf))
+
+(* This one is language specific, yet very common. Alternative would
+   be to encode every keyword as a regexp. This one is much easier.
+   Note that here we recognize specific keywords, and if none matches
+   then we assume we have found a user-defined identifier (last case).
+*)
+let keyword (s, pos) =
+     match s with
+       | "window"       -> Parser.WINDOW pos
+       | _              -> Parser.ID (s, pos)
+}
+
+rule Token = parse
+    [' ' '\t' '\r']+      { Token lexbuf } (* whitespace *)
+  | ['\n' '\012']         { currentLine  <- currentLine + 1;
+                            lineStartPos <-  lexbuf.StartPos.pos_cnum
+                                             :: lineStartPos;
+                            Token lexbuf } (* newlines *)
+  | "//" [^ '\n' '\012']* { Token lexbuf } (* comment *)
+
+  | '0' | ['1'-'9']['0'-'9']* { Parser.NUM
+                                  ( int (Encoding.UTF8.GetString(lexbuf.Lexeme))
+                                  , getPos lexbuf )
+                              }
+  | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*
+                          { keyword ( Encoding.UTF8.GetString(lexbuf.Lexeme)
+                                    , getPos lexbuf ) }
+  | '"' ( [' ' '!' '#'-'&' '('-'[' ']'-'~'] | '\\' ['n' 't' '\'' '"' '\\'] )* '"'
+                          {
+                            let str0 = Encoding.UTF8.GetString(lexbuf.Lexeme)
+                            let str1 = str0.Substring (1, (String.length str0) - 2)
+                            Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
+                          }
+  | ','                   { Parser.COMMA  (getPos lexbuf) }
+  | eof                   { Parser.EOF    (getPos lexbuf) }
+  | _                     { lexerError lexbuf "Illegal symbol in input" }

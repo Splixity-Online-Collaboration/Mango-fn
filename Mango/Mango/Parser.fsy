@@ -1,0 +1,48 @@
+
+%{
+
+let p0 = (0,0)
+
+open FSharp.Text.Parsing
+open AbSyn
+
+(* parse-error function *)
+let mutable ErrorContextDescriptor : string = ""
+
+let parse_error_rich =
+  Some (fun (ctxt: ParseErrorContext<_>) ->
+    ErrorContextDescriptor <-
+      match ctxt.CurrentToken with
+      | None -> "At beginning of input\n"
+      | Some token -> sprintf "at token %A\n" token
+  )
+
+%}
+
+//information-carrying tokens
+%token <int * Position> NUM
+%token <string * Position> ID STRINGLIT
+//keywords
+%token <Position> WINDOW
+%token <Position> EOF COMMA
+
+%start Prog
+%type <AbSyn.Prog> Prog
+// TODO: Task 1(b): add any new nonterminals here
+
+%%
+
+Prog :    Exps EOF   { $1 }
+;
+
+Exps : Exp COMMA Exps { $1 :: $3 }
+     | Exp            { $1 :: [] }
+;
+
+Exp : NUM            { Constant (fst $1, snd $1) }
+    | STRINGLIT      { StringLit $1 }
+    | ID             { Var (fst $1, snd $1) }
+    | WINDOW STRINGLIT NUM NUM { Window (fst $2, fst $3, fst $4, $1)}
+;
+
+%%

@@ -1,0 +1,152 @@
+------------------------
+states = 
+state 0:  items:    _startProg ->  . Prog
+  actions:    action 'EOF' (noprec):   error
+    action 'COMMA' (noprec):   error
+    action 'WINDOW' (noprec):   shift 10
+    action 'ID' (noprec):   shift 9
+    action 'STRINGLIT' (noprec):   shift 8
+    action 'NUM' (noprec):   shift 7
+    action 'error' (noprec):   error
+    action '#' (noprec):   error
+    action '$$' (noprec):   error
+  immediate action: <none>  gotos:    goto Prog: 1
+    goto Exps: 2
+    goto Exp: 4
+state 1:  items:    _startProg -> Prog . 
+  actions:    action 'EOF' (noprec):   accept
+    action 'COMMA' (noprec):   accept
+    action 'WINDOW' (noprec):   accept
+    action 'ID' (noprec):   accept
+    action 'STRINGLIT' (noprec):   accept
+    action 'NUM' (noprec):   accept
+    action 'error' (noprec):   accept
+    action '#' (noprec):   accept
+    action '$$' (noprec):   accept
+  immediate action:   accept  gotos:state 2:  items:    Prog -> Exps . 'EOF'
+  actions:    action 'EOF' (noprec):   shift 3
+    action 'COMMA' (noprec):   error
+    action 'WINDOW' (noprec):   error
+    action 'ID' (noprec):   error
+    action 'STRINGLIT' (noprec):   error
+    action 'NUM' (noprec):   error
+    action 'error' (noprec):   error
+    action '#' (noprec):   error
+    action '$$' (noprec):   error
+  immediate action: <none>  gotos:state 3:  items:    Prog -> Exps 'EOF' . 
+  actions:    action 'EOF' (noprec):   reduce Prog --> Exps 'EOF'
+    action 'COMMA' (noprec):   reduce Prog --> Exps 'EOF'
+    action 'WINDOW' (noprec):   reduce Prog --> Exps 'EOF'
+    action 'ID' (noprec):   reduce Prog --> Exps 'EOF'
+    action 'STRINGLIT' (noprec):   reduce Prog --> Exps 'EOF'
+    action 'NUM' (noprec):   reduce Prog --> Exps 'EOF'
+    action 'error' (noprec):   reduce Prog --> Exps 'EOF'
+    action '#' (noprec):   reduce Prog --> Exps 'EOF'
+    action '$$' (noprec):   reduce Prog --> Exps 'EOF'
+  immediate action:   reduce Prog --> Exps 'EOF'  gotos:state 4:  items:    Exps -> Exp . 'COMMA' Exps
+    Exps -> Exp . 
+  actions:    action 'EOF' (noprec):   reduce Exps --> Exp
+    action 'COMMA' (noprec):   shift 5
+    action 'WINDOW' (noprec):   reduce Exps --> Exp
+    action 'ID' (noprec):   reduce Exps --> Exp
+    action 'STRINGLIT' (noprec):   reduce Exps --> Exp
+    action 'NUM' (noprec):   reduce Exps --> Exp
+    action 'error' (noprec):   reduce Exps --> Exp
+    action '#' (noprec):   reduce Exps --> Exp
+    action '$$' (noprec):   reduce Exps --> Exp
+  immediate action: <none>  gotos:state 5:  items:    Exps -> Exp 'COMMA' . Exps
+  actions:    action 'EOF' (noprec):   error
+    action 'COMMA' (noprec):   error
+    action 'WINDOW' (noprec):   shift 10
+    action 'ID' (noprec):   shift 9
+    action 'STRINGLIT' (noprec):   shift 8
+    action 'NUM' (noprec):   shift 7
+    action 'error' (noprec):   error
+    action '#' (noprec):   error
+    action '$$' (noprec):   error
+  immediate action: <none>  gotos:    goto Exps: 6
+    goto Exp: 4
+state 6:  items:    Exps -> Exp 'COMMA' Exps . 
+  actions:    action 'EOF' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action 'COMMA' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action 'WINDOW' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action 'ID' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action 'STRINGLIT' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action 'NUM' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action 'error' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action '#' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+    action '$$' (noprec):   reduce Exps --> Exp 'COMMA' Exps
+  immediate action:   reduce Exps --> Exp 'COMMA' Exps  gotos:state 7:  items:    Exp -> 'NUM' . 
+  actions:    action 'EOF' (noprec):   reduce Exp --> 'NUM'
+    action 'COMMA' (noprec):   reduce Exp --> 'NUM'
+    action 'WINDOW' (noprec):   reduce Exp --> 'NUM'
+    action 'ID' (noprec):   reduce Exp --> 'NUM'
+    action 'STRINGLIT' (noprec):   reduce Exp --> 'NUM'
+    action 'NUM' (noprec):   reduce Exp --> 'NUM'
+    action 'error' (noprec):   reduce Exp --> 'NUM'
+    action '#' (noprec):   reduce Exp --> 'NUM'
+    action '$$' (noprec):   reduce Exp --> 'NUM'
+  immediate action:   reduce Exp --> 'NUM'  gotos:state 8:  items:    Exp -> 'STRINGLIT' . 
+  actions:    action 'EOF' (noprec):   reduce Exp --> 'STRINGLIT'
+    action 'COMMA' (noprec):   reduce Exp --> 'STRINGLIT'
+    action 'WINDOW' (noprec):   reduce Exp --> 'STRINGLIT'
+    action 'ID' (noprec):   reduce Exp --> 'STRINGLIT'
+    action 'STRINGLIT' (noprec):   reduce Exp --> 'STRINGLIT'
+    action 'NUM' (noprec):   reduce Exp --> 'STRINGLIT'
+    action 'error' (noprec):   reduce Exp --> 'STRINGLIT'
+    action '#' (noprec):   reduce Exp --> 'STRINGLIT'
+    action '$$' (noprec):   reduce Exp --> 'STRINGLIT'
+  immediate action:   reduce Exp --> 'STRINGLIT'  gotos:state 9:  items:    Exp -> 'ID' . 
+  actions:    action 'EOF' (noprec):   reduce Exp --> 'ID'
+    action 'COMMA' (noprec):   reduce Exp --> 'ID'
+    action 'WINDOW' (noprec):   reduce Exp --> 'ID'
+    action 'ID' (noprec):   reduce Exp --> 'ID'
+    action 'STRINGLIT' (noprec):   reduce Exp --> 'ID'
+    action 'NUM' (noprec):   reduce Exp --> 'ID'
+    action 'error' (noprec):   reduce Exp --> 'ID'
+    action '#' (noprec):   reduce Exp --> 'ID'
+    action '$$' (noprec):   reduce Exp --> 'ID'
+  immediate action:   reduce Exp --> 'ID'  gotos:state 10:  items:    Exp -> 'WINDOW' . 'STRINGLIT' 'NUM' 'NUM'
+  actions:    action 'EOF' (noprec):   error
+    action 'COMMA' (noprec):   error
+    action 'WINDOW' (noprec):   error
+    action 'ID' (noprec):   error
+    action 'STRINGLIT' (noprec):   shift 11
+    action 'NUM' (noprec):   error
+    action 'error' (noprec):   error
+    action '#' (noprec):   error
+    action '$$' (noprec):   error
+  immediate action: <none>  gotos:state 11:  items:    Exp -> 'WINDOW' 'STRINGLIT' . 'NUM' 'NUM'
+  actions:    action 'EOF' (noprec):   error
+    action 'COMMA' (noprec):   error
+    action 'WINDOW' (noprec):   error
+    action 'ID' (noprec):   error
+    action 'STRINGLIT' (noprec):   error
+    action 'NUM' (noprec):   shift 12
+    action 'error' (noprec):   error
+    action '#' (noprec):   error
+    action '$$' (noprec):   error
+  immediate action: <none>  gotos:state 12:  items:    Exp -> 'WINDOW' 'STRINGLIT' 'NUM' . 'NUM'
+  actions:    action 'EOF' (noprec):   error
+    action 'COMMA' (noprec):   error
+    action 'WINDOW' (noprec):   error
+    action 'ID' (noprec):   error
+    action 'STRINGLIT' (noprec):   error
+    action 'NUM' (noprec):   shift 13
+    action 'error' (noprec):   error
+    action '#' (noprec):   error
+    action '$$' (noprec):   error
+  immediate action: <none>  gotos:state 13:  items:    Exp -> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM' . 
+  actions:    action 'EOF' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action 'COMMA' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action 'WINDOW' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action 'ID' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action 'STRINGLIT' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action 'NUM' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action 'error' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action '#' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+    action '$$' (noprec):   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'
+  immediate action:   reduce Exp --> 'WINDOW' 'STRINGLIT' 'NUM' 'NUM'  gotos:
+startStates = 0
+------------------------
+        Output file describing compiled parser placed in Parser.fs and Parser.fsi

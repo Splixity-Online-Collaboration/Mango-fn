@@ -1,23 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+	</PropertyGroup>
 
 	<ItemGroup>
-		<FsYacc Include="Parser.fsp">
-			<OtherFlags>-v --module Parser</OtherFlags>
-		</FsYacc>
-		<FsLex Include="Lexer.fsl">
-			<OtherFlags></OtherFlags>
-		</FsLex>
+    	<PackageReference Include="FsLexYacc" Version="11.2.0" />
+  	</ItemGroup>
+
+	<ItemGroup>
+    	<FsYacc Include="Parser.fsy">
+      		<OtherFlags>-v --module Parser</OtherFlags>
+    	</FsYacc>
+    	<FsLex Include="Lexer.fsl">
+      		<OtherFlags></OtherFlags>
+    	</FsLex>
+		<Compile Include="AbSyn.fs" />
+		<Compile Include="Parser.fs" />
+    	<Compile Include="Lexer.fs" />
+
 		<Compile Include="Program.fs" />
-  </ItemGroup>
-
-	<ItemGroup>
-	  <None Include="Lexer.fsl" />
-	  <None Include="Parser.fsp" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -25,5 +28,4 @@
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0" />
 		<PackageReference Include="Avalonia.FuncUI" Version="1.0.0" />
 	</ItemGroup>
-
 </Project>
