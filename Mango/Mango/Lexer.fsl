@@ -1,26 +1,9 @@
-////////////////////////////////////////////////////////////////////
-// TODO: project task 1 
-//   implement lexer tokens for the new operators: 
-//   multiplication (*), division (/), numerical negation (~), 
-//   logical negation (not), logical and (&&), logical or (||),
-//   boolean literals (true, false), semicolon (;)
-//
-//
-// TODO: project task 2 
-//   implement lexer tokens (keywords) for replicate, filter, scan 
-//
-//
-// TODO: project task 4 
-//   implement the lexer tokens (keywords) for array comprehension 
-////////////////////////////////////////////////////////////////////
-
-
 {
 module Lexer
 
-open System;;
-open FSharp.Text.Lexing;;
-open System.Text;;
+open System
+open FSharp.Text.Lexing
+open System.Text
 
 (* A lexer definition for Fasto, for use with fslex. *)
 

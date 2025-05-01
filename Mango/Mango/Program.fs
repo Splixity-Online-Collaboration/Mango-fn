@@ -48,13 +48,13 @@ let printPos (errString : string) : unit =
     state0 errString (String.length errString - 1)
 
 // Parse program from string.
-let parseString (s : string) : AbSyn.Prog =
+let parseString (s : string) : AbSyn.Exp =
     Parser.Prog Lexer.Token
     <| LexBuffer<_>.FromBytes (Encoding.UTF8.GetBytes s)
 
-let parseFastoFile (filename : string) : AbSyn.Prog =
+let parseMangoFile (filename : string) : AbSyn.Exp =
   let txt = try  // read text from file given as parameter with added extension
-              let inStream = File.OpenText (filename + ".fo")
+              let inStream = File.OpenText (filename + ".mango")
               let txt = inStream.ReadToEnd()
               inStream.Close()
               txt
@@ -68,13 +68,13 @@ let parseFastoFile (filename : string) : AbSyn.Prog =
         | Lexer.LexicalError (info,(line,col)) ->
             printfn "%s at line %d, position %d\n" info line col
             System.Environment.Exit 1
-            []
+            AbSyn.Invalid
         | ex ->
             if ex.Message = "parse error"
             then printPos Parser.ErrorContextDescriptor
             else printfn "%s" ex.Message
             System.Environment.Exit 1
-            []
+            AbSyn.Invalid
     program
   else failwith "Invalid file name or empty file"
 
@@ -117,6 +117,27 @@ type MainWindow() =
         base.Title <- "Counter Example"
         base.Content <- Main.view ()
 
+let rec interpret (window: HostWindow) program : HostWindow =
+    match program with
+    | AbSyn.Window (name, _) -> 
+        window.Title <- name
+        window.Icon <- new WindowIcon("icon.png")
+        window
+    | AbSyn.WindowWithSize (name, width, height, _) ->
+        window.Title <- name
+        window.Width <- width
+        window.Height <- height
+        window.Icon <- new WindowIcon("icon.png")
+        window
+    | AbSyn.WindowWithIcon (name, width, height, iconFilePath, _) ->
+        window.Title <- name
+        window.Width <- width
+        window.Height <- height
+        window.Icon  <- new WindowIcon(iconFilePath)
+        window
+    | _ -> window
+
+
 type App() =
     inherit Application()
 
@@ -125,9 +146,10 @@ type App() =
         this.RequestedThemeVariant <- Styling.ThemeVariant.Dark
 
     override this.OnFrameworkInitializationCompleted() =
+        let absyn = parseMangoFile "examples/window"
         match this.ApplicationLifetime with
         | :? IClassicDesktopStyleApplicationLifetime as desktopLifetime ->
-            desktopLifetime.MainWindow <- MainWindow()
+            desktopLifetime.MainWindow <- interpret (new HostWindow()) absyn
         | _ -> ()
 
 module Program =

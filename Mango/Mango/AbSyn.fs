@@ -32,9 +32,10 @@ let rec ppType = function
 
 
 type Exp =
-    Constant of int * Position
-    | StringLit of string * Position
-    | Var   of string * Position
-    | Window of string * int * int * Position
-
-type Prog = Exp list
+    Constant of int * Position                                  // int_val
+    | StringLit of string * Position                            // string
+    | Var   of string * Position                                // variable_name
+    | Window of string * Position                               // name
+    | WindowWithSize of string * int * int * Position           // name width height
+    | WindowWithIcon of string * int * int * string * Position  // name width height filepathToIcon
+    | Invalid

@@ -1,11 +1,11 @@
 
-# 18 "Lexer.fsl"
+# 1 "Lexer.fsl"
  
 module Lexer
 
-open System;;
-open FSharp.Text.Lexing;;
-open System.Text;;
+open System
+open FSharp.Text.Lexing
+open System.Text
 
 (* A lexer definition for Fasto, for use with fslex. *)
 
@@ -89,12 +89,12 @@ let rec _fslex_dummy () = _fslex_dummy()
 and Token  lexbuf =
   match _fslex_tables.Interpret(0,lexbuf) with
   | 0 -> ( 
-# 60 "Lexer.fsl"
+# 43 "Lexer.fsl"
                                            Token lexbuf 
 # 94 "Lexer.fs"
           )
   | 1 -> ( 
-# 61 "Lexer.fsl"
+# 44 "Lexer.fsl"
                                            currentLine  <- currentLine + 1;
                                            lineStartPos <-  lexbuf.StartPos.pos_cnum
                                                             :: lineStartPos;
@@ -102,12 +102,12 @@ and Token  lexbuf =
 # 102 "Lexer.fs"
           )
   | 2 -> ( 
-# 65 "Lexer.fsl"
+# 48 "Lexer.fsl"
                                            Token lexbuf 
 # 107 "Lexer.fs"
           )
   | 3 -> ( 
-# 67 "Lexer.fsl"
+# 50 "Lexer.fsl"
                                                Parser.NUM
                                                  ( int (Encoding.UTF8.GetString(lexbuf.Lexeme))
                                                  , getPos lexbuf )
@@ -115,13 +115,13 @@ and Token  lexbuf =
 # 115 "Lexer.fs"
           )
   | 4 -> ( 
-# 72 "Lexer.fsl"
+# 55 "Lexer.fsl"
                                            keyword ( Encoding.UTF8.GetString(lexbuf.Lexeme)
                                                    , getPos lexbuf ) 
 # 121 "Lexer.fs"
           )
   | 5 -> ( 
-# 75 "Lexer.fsl"
+# 58 "Lexer.fsl"
                                           
                                            let str0 = Encoding.UTF8.GetString(lexbuf.Lexeme)
                                            let str1 = str0.Substring (1, (String.length str0) - 2)
@@ -130,17 +130,17 @@ and Token  lexbuf =
 # 130 "Lexer.fs"
           )
   | 6 -> ( 
-# 80 "Lexer.fsl"
+# 63 "Lexer.fsl"
                                            Parser.COMMA  (getPos lexbuf) 
 # 135 "Lexer.fs"
           )
   | 7 -> ( 
-# 81 "Lexer.fsl"
+# 64 "Lexer.fsl"
                                            Parser.EOF    (getPos lexbuf) 
 # 140 "Lexer.fs"
           )
   | 8 -> ( 
-# 82 "Lexer.fsl"
+# 65 "Lexer.fsl"
                                            lexerError lexbuf "Illegal symbol in input" 
 # 145 "Lexer.fs"
           )
