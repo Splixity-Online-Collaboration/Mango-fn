@@ -3,14 +3,20 @@ module Parser
 type token = 
   | EOF of (Position)
   | COMMA of (Position)
+  | LEFT_CURLY_BRACKET of (Position)
+  | RIGHT_CURLY_BRACKET of (Position)
   | WINDOW of (Position)
+  | BUTTON of (Position)
   | ID of (string * Position)
   | STRINGLIT of (string * Position)
   | NUM of (int * Position)
 type tokenId = 
     | TOKEN_EOF
     | TOKEN_COMMA
+    | TOKEN_LEFT_CURLY_BRACKET
+    | TOKEN_RIGHT_CURLY_BRACKET
     | TOKEN_WINDOW
+    | TOKEN_BUTTON
     | TOKEN_ID
     | TOKEN_STRINGLIT
     | TOKEN_NUM
@@ -19,7 +25,9 @@ type tokenId =
 type nonTerminalId = 
     | NONTERM__startProg
     | NONTERM_Prog
-    | NONTERM_Exp
+    | NONTERM_Window
+    | NONTERM_UIElements
+    | NONTERM_UIElement
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 
@@ -31,4 +39,4 @@ val prodIdxToNonTerminal: int -> nonTerminalId
 
 /// This function gets the name of a token as a string
 val token_to_string: token -> string
-val Prog : (FSharp.Text.Lexing.LexBuffer<'cty> -> token) -> FSharp.Text.Lexing.LexBuffer<'cty> -> (AbSyn.Exp) 
+val Prog : (FSharp.Text.Lexing.LexBuffer<'cty> -> token) -> FSharp.Text.Lexing.LexBuffer<'cty> -> (AbSyn.Window) 

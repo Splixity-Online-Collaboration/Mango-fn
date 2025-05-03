@@ -35,7 +35,13 @@ type Exp =
     Constant of int * Position                                  // int_val
     | StringLit of string * Position                            // string
     | Var   of string * Position                                // variable_name
-    | Window of string * Position                               // name
-    | WindowWithSize of string * int * int * Position           // name width height
-    | WindowWithIcon of string * int * int * string * Position  // name width height filepathToIcon
+    
+type UIElement = 
+    Button of string * Position
+
+type Window = 
+    Window of string * UIElement list * Position                                 // name
+    | WindowWithSize of string * int * int * UIElement list * Position           // name width height
+    | WindowWithIcon of string * int * int * string * UIElement list * Position  // name width height filepathToIcon
     | Invalid
+

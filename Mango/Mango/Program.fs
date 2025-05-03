@@ -9,10 +9,9 @@ open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
 open Avalonia.Layout
 open System.IO
-open Parser
-open System
 open FSharp.Text.Lexing
 open System.Text
+open Interpreter
 
 exception SyntaxError of int * int
 
@@ -48,11 +47,11 @@ let printPos (errString : string) : unit =
     state0 errString (String.length errString - 1)
 
 // Parse program from string.
-let parseString (s : string) : AbSyn.Exp =
+let parseString (s : string) : AbSyn.Window =
     Parser.Prog Lexer.Token
     <| LexBuffer<_>.FromBytes (Encoding.UTF8.GetBytes s)
 
-let parseMangoFile (filename : string) : AbSyn.Exp =
+let parseMangoFile (filename : string) : AbSyn.Window =
   let txt = try  // read text from file given as parameter with added extension
               let inStream = File.OpenText (filename + ".mango")
               let txt = inStream.ReadToEnd()
@@ -117,33 +116,12 @@ type MainWindow() =
         base.Title <- "Counter Example"
         base.Content <- Main.view ()
 
-let rec interpret (window: HostWindow) program : HostWindow =
-    match program with
-    | AbSyn.Window (name, _) -> 
-        window.Title <- name
-        window.Icon <- new WindowIcon("icon.png")
-        window
-    | AbSyn.WindowWithSize (name, width, height, _) ->
-        window.Title <- name
-        window.Width <- width
-        window.Height <- height
-        window.Icon <- new WindowIcon("icon.png")
-        window
-    | AbSyn.WindowWithIcon (name, width, height, iconFilePath, _) ->
-        window.Title <- name
-        window.Width <- width
-        window.Height <- height
-        window.Icon  <- new WindowIcon(iconFilePath)
-        window
-    | _ -> window
-
 
 type App() =
     inherit Application()
 
     override this.Initialize() =
         this.Styles.Add (FluentTheme())
-        this.RequestedThemeVariant <- Styling.ThemeVariant.Dark
 
     override this.OnFrameworkInitializationCompleted() =
         let absyn = parseMangoFile "examples/window"

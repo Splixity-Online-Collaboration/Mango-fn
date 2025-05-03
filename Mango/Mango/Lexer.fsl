@@ -36,6 +36,7 @@ let lexerError lexbuf s =
 let keyword (s, pos) =
      match s with
        | "window"       -> Parser.WINDOW pos
+       | "button"       -> Parser.BUTTON pos
        | _              -> Parser.ID (s, pos)
 }
 
@@ -61,5 +62,7 @@ rule Token = parse
                             Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
                           }
   | ','                   { Parser.COMMA  (getPos lexbuf) }
+  | '{'                   { Parser.LEFT_CURLY_BRACKET (getPos lexbuf) }
+  | '}'                   { Parser.RIGHT_CURLY_BRACKET (getPos lexbuf) }
   | eof                   { Parser.EOF    (getPos lexbuf) }
   | _                     { lexerError lexbuf "Illegal symbol in input" }
