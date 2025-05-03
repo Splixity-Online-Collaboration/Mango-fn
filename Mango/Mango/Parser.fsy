@@ -36,6 +36,7 @@ let add_ui_elements window elements =
 %type <AbSyn.Window> Prog
 %type <AbSyn.Window> Window
 %type <AbSyn.UIElement list> UIElements
+%type <AbSyn.UIElement> UIElement
 
 %%
 

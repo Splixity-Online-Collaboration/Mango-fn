@@ -161,10 +161,10 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 42 "Parser.fsy"
+# 43 "Parser.fsy"
                                               _1 
                    )
-# 42 "Parser.fsy"
+# 43 "Parser.fsy"
                  : AbSyn.Window));
 # 169 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
@@ -173,10 +173,10 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 45 "Parser.fsy"
+# 46 "Parser.fsy"
                                                   Window (fst _2, [], _1) 
                    )
-# 45 "Parser.fsy"
+# 46 "Parser.fsy"
                  : AbSyn.Window));
 # 181 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
@@ -187,10 +187,10 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 46 "Parser.fsy"
+# 47 "Parser.fsy"
                                                       WindowWithSize (fst _2, fst _3, fst _4, [], _1) 
                    )
-# 46 "Parser.fsy"
+# 47 "Parser.fsy"
                  : AbSyn.Window));
 # 195 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
@@ -202,10 +202,10 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 47 "Parser.fsy"
+# 48 "Parser.fsy"
                                                                 WindowWithIcon (fst _2, fst _3, fst _4, fst _5, [], _1) 
                    )
-# 47 "Parser.fsy"
+# 48 "Parser.fsy"
                  : AbSyn.Window));
 # 210 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
@@ -216,33 +216,33 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 48 "Parser.fsy"
+# 49 "Parser.fsy"
                                                                                       add_ui_elements _1 _3 
                    )
-# 48 "Parser.fsy"
+# 49 "Parser.fsy"
                  : AbSyn.Window));
 # 224 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = parseState.GetInput(1) :?> 'gentype_UIElement in
+            let _1 = parseState.GetInput(1) :?> AbSyn.UIElement in
             let _2 = parseState.GetInput(2) :?> AbSyn.UIElement list in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 51 "Parser.fsy"
+# 52 "Parser.fsy"
                                                                _1 :: _2 
                    )
-# 51 "Parser.fsy"
+# 52 "Parser.fsy"
                  : AbSyn.UIElement list));
 # 236 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = parseState.GetInput(1) :?> 'gentype_UIElement in
+            let _1 = parseState.GetInput(1) :?> AbSyn.UIElement in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 52 "Parser.fsy"
+# 53 "Parser.fsy"
                                                                _1 :: [] 
                    )
-# 52 "Parser.fsy"
+# 53 "Parser.fsy"
                  : AbSyn.UIElement list));
 # 247 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
@@ -251,11 +251,11 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 55 "Parser.fsy"
+# 56 "Parser.fsy"
                                                     Button (fst _2, _1) 
                    )
-# 55 "Parser.fsy"
-                 : 'gentype_UIElement));
+# 56 "Parser.fsy"
+                 : AbSyn.UIElement));
 |]
 # 260 "Parser.fs"
 let tables : FSharp.Text.Parsing.Tables<_> = 

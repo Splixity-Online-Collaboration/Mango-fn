@@ -22,7 +22,7 @@
     	<Compile Include="Lexer.fs" />
 		<Compile Include="Interpreter.fs" />
 
-		<Compile Include="Program.fs" />
+		<Compile Include="Mango.fs" />
 	</ItemGroup>
 
 	<ItemGroup>
