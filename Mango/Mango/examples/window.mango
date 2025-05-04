@@ -1,4 +1,12 @@
 window "mango!" 600 400 "icon.png" {
-    button "test!"
-    button "test2!"
+//    button "test!" {
+//        IsEnabled,
+//
+//    }
+    button "test2!" 
+    checkbox "I possess a mango!"
+    checkbox "I possess two mangos!!"
+    radiobutton "Check me to be as cool as a mango"
+    text "Put any text below here.."
+    textbox "mango sightings of the day"
 }

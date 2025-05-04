@@ -36,8 +36,18 @@ type Exp =
     | StringLit of string * Position                            // string
     | Var   of string * Position                                // variable_name
     
+type ButtonProps =
+    // TODO
+
 type UIElement = 
-    Button of string * Position
+    Button of string * ButtonProps list * Position
+    | TextBlock of string * Position
+    | TextBox of string * Position 
+    | CheckBox of string * Position
+    | RadioButton of string * Position
+    | Calendar of Position
+
+
 
 type Window = 
     Window of string * UIElement list * Position                                 // name

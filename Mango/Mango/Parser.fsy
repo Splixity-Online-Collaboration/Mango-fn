@@ -29,7 +29,8 @@ let add_ui_elements window elements =
 %token <int * Position> NUM
 %token <string * Position> ID STRINGLIT
 //keywords
-%token <Position> WINDOW BUTTON
+%token <Position> WINDOW 
+%token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET
 
 %start Prog
@@ -54,5 +55,8 @@ UIElements : UIElement UIElements       { $1 :: $2 }
 ;
 
 UIElement : BUTTON STRINGLIT { Button (fst $2, $1) }
-
-%%
+          | TEXT STRINGLIT { TextBlock (fst $2, $1) }
+          | TEXTBOX STRINGLIT { TextBox (fst $2, $1) }
+          | CHECKBOX STRINGLIT { CheckBox (fst $2, $1) }
+          | RADIOBUTTON STRINGLIT { RadioButton (fst $2, $1) }
+;

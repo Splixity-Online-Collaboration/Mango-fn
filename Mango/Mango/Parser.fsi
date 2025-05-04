@@ -5,8 +5,12 @@ type token =
   | COMMA of (Position)
   | LEFT_CURLY_BRACKET of (Position)
   | RIGHT_CURLY_BRACKET of (Position)
-  | WINDOW of (Position)
   | BUTTON of (Position)
+  | TEXT of (Position)
+  | TEXTBOX of (Position)
+  | CHECKBOX of (Position)
+  | RADIOBUTTON of (Position)
+  | WINDOW of (Position)
   | ID of (string * Position)
   | STRINGLIT of (string * Position)
   | NUM of (int * Position)
@@ -15,8 +19,12 @@ type tokenId =
     | TOKEN_COMMA
     | TOKEN_LEFT_CURLY_BRACKET
     | TOKEN_RIGHT_CURLY_BRACKET
-    | TOKEN_WINDOW
     | TOKEN_BUTTON
+    | TOKEN_TEXT
+    | TOKEN_TEXTBOX
+    | TOKEN_CHECKBOX
+    | TOKEN_RADIOBUTTON
+    | TOKEN_WINDOW
     | TOKEN_ID
     | TOKEN_STRINGLIT
     | TOKEN_NUM

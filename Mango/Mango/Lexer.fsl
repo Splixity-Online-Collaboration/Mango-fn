@@ -37,6 +37,10 @@ let keyword (s, pos) =
      match s with
        | "window"       -> Parser.WINDOW pos
        | "button"       -> Parser.BUTTON pos
+       | "text"         -> Parser.TEXT pos
+       | "textbox"      -> Parser.TEXTBOX pos
+       | "checkbox"     -> Parser.CHECKBOX pos
+       | "radiobutton"  -> Parser.RADIOBUTTON pos
        | _              -> Parser.ID (s, pos)
 }
 

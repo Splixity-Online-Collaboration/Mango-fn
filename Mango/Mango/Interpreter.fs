@@ -50,4 +50,22 @@ and convertUIElementToIView element =
     | AbSyn.Button (label, _) ->
         Button.create [
             Button.content label
+            // Button.isVisible false TODO: implement this in mango
         ]
+    | AbSyn.TextBlock (label, _) ->
+        TextBlock.create [
+            TextBlock.text label
+        ]
+    | AbSyn.TextBox (label, _) ->
+        TextBox.create [
+            TextBox.text label
+        ]
+    | AbSyn.CheckBox (label, _) ->
+        CheckBox.create [
+            CheckBox.content label
+        ]
+    | AbSyn.RadioButton (label, _) ->
+        RadioButton.create [
+            RadioButton.content label
+        ]
+    
