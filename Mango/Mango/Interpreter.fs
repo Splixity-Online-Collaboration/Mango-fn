@@ -47,10 +47,15 @@ let rec interpret (window: HostWindow) program : HostWindow =
 
 and convertUIElementToIView element =
     match element with
-    | AbSyn.Button (label, _) ->
+    | AbSyn.Button (label,props, _) ->
+        let isVisibleProp = List.map (fun elem ->
+            match elem with
+            | AbSyn.IsVisible (v, _) -> v
+        )
+        let v = isVisibleProp props
         Button.create [
             Button.content label
-            // Button.isVisible false TODO: implement this in mango
+            Button.isVisible v.Head
         ]
     | AbSyn.TextBlock (label, _) ->
         TextBlock.create [
@@ -68,4 +73,5 @@ and convertUIElementToIView element =
         RadioButton.create [
             RadioButton.content label
         ]
+    | AbSyn.Calendar _ -> Calendar.create []
     

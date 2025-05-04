@@ -31,13 +31,16 @@ let add_ui_elements window elements =
 //keywords
 %token <Position> WINDOW 
 %token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON
-%token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET
+%token <Position> IS_VISIBILE TRUE FALSE
+%token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON
 
 %start Prog
 %type <AbSyn.Window> Prog
 %type <AbSyn.Window> Window
 %type <AbSyn.UIElement list> UIElements
 %type <AbSyn.UIElement> UIElement
+%type <AbSyn.ButtonProp list> ButtonProps
+%type <AbSyn.ButtonProp> ButtonProp
 
 %%
 
@@ -54,9 +57,19 @@ UIElements : UIElement UIElements       { $1 :: $2 }
            | UIElement                  { $1 :: [] }
 ;
 
-UIElement : BUTTON STRINGLIT { Button (fst $2, $1) }
+ButtonProps : ButtonProp ButtonProps    { $1 :: $2 }
+            | ButtonProp                { $1 :: $2 }
+;
+
+UIElement : BUTTON STRINGLIT { Button (fst $2, [], $1) }
+          | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET {  (fst $2, $4, $1) }
           | TEXT STRINGLIT { TextBlock (fst $2, $1) }
           | TEXTBOX STRINGLIT { TextBox (fst $2, $1) }
           | CHECKBOX STRINGLIT { CheckBox (fst $2, $1) }
           | RADIOBUTTON STRINGLIT { RadioButton (fst $2, $1) }
+;
+
+ButtonProp : 
+  IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
+  IS_VISIBILE COLON FALSE { IsVisible (false, $1) }
 ;

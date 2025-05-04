@@ -37,7 +37,7 @@ type Exp =
     | Var   of string * Position                                // variable_name
     
 type ButtonProps =
-    // TODO
+    IsVisible of bool * Position
 
 type UIElement = 
     Button of string * ButtonProps list * Position
