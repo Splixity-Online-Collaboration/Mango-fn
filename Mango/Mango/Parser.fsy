@@ -23,6 +23,8 @@ let add_ui_elements window elements =
   | WindowWithIcon (name, width, height, iconPath, _, pos) -> WindowWithIcon (name, width, height, iconPath, elements, pos)
   | Invalid -> Invalid
 
+let default_button_props pos = [IsVisible (true, pos) ]
+
 %}
 
 //information-carrying tokens
@@ -58,18 +60,17 @@ UIElements : UIElement UIElements       { $1 :: $2 }
 ;
 
 ButtonProps : ButtonProp ButtonProps    { $1 :: $2 }
-            | ButtonProp                { $1 :: $2 }
+            | ButtonProp                { $1 :: [] }
 ;
 
-UIElement : BUTTON STRINGLIT { Button (fst $2, [], $1) }
-          | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET {  (fst $2, $4, $1) }
+UIElement : BUTTON STRINGLIT { Button (fst $2, default_button_props $1, $1) }
+          | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET {  Button (fst $2, $4, $1) }
           | TEXT STRINGLIT { TextBlock (fst $2, $1) }
           | TEXTBOX STRINGLIT { TextBox (fst $2, $1) }
           | CHECKBOX STRINGLIT { CheckBox (fst $2, $1) }
           | RADIOBUTTON STRINGLIT { RadioButton (fst $2, $1) }
 ;
 
-ButtonProp : 
-  IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
-  IS_VISIBILE COLON FALSE { IsVisible (false, $1) }
+ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
+  | IS_VISIBILE COLON FALSE { IsVisible (false, $1) }
 ;

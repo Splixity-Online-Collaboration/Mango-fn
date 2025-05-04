@@ -5,6 +5,10 @@ type token =
   | COMMA of (Position)
   | LEFT_CURLY_BRACKET of (Position)
   | RIGHT_CURLY_BRACKET of (Position)
+  | COLON of (Position)
+  | IS_VISIBILE of (Position)
+  | TRUE of (Position)
+  | FALSE of (Position)
   | BUTTON of (Position)
   | TEXT of (Position)
   | TEXTBOX of (Position)
@@ -19,6 +23,10 @@ type tokenId =
     | TOKEN_COMMA
     | TOKEN_LEFT_CURLY_BRACKET
     | TOKEN_RIGHT_CURLY_BRACKET
+    | TOKEN_COLON
+    | TOKEN_IS_VISIBILE
+    | TOKEN_TRUE
+    | TOKEN_FALSE
     | TOKEN_BUTTON
     | TOKEN_TEXT
     | TOKEN_TEXTBOX
@@ -35,7 +43,9 @@ type nonTerminalId =
     | NONTERM_Prog
     | NONTERM_Window
     | NONTERM_UIElements
+    | NONTERM_ButtonProps
     | NONTERM_UIElement
+    | NONTERM_ButtonProp
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 
