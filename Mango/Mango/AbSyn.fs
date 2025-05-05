@@ -45,9 +45,9 @@ type UIElement =
     | TextBox of string * Position 
     | CheckBox of string * Position
     | RadioButton of string * Position
+    | ToggleSwitch of string * Position
     | Calendar of Position
-
-
+    | ToggleButton of Position
 
 type Window = 
     Window of string * UIElement list * Position                                 // name

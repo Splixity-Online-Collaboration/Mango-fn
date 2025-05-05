@@ -69,9 +69,16 @@ and convertUIElementToIView element =
         CheckBox.create [
             CheckBox.content label
         ]
+        
     | AbSyn.RadioButton (label, _) ->
         RadioButton.create [
             RadioButton.content label
         ]
+    | AbSyn.ToggleSwitch (label, _) ->
+        ToggleSwitch.create [
+            ToggleSwitch.content label
+        ]
     | AbSyn.Calendar _ -> Calendar.create []
+    | AbSyn.ToggleButton _ -> ToggleButton.create []
+
     

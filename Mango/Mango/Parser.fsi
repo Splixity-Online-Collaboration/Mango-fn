@@ -14,6 +14,9 @@ type token =
   | TEXTBOX of (Position)
   | CHECKBOX of (Position)
   | RADIOBUTTON of (Position)
+  | CALENDAR of (Position)
+  | TOGGLEBUTTON of (Position)
+  | TOGGLESWITCH of (Position)
   | WINDOW of (Position)
   | ID of (string * Position)
   | STRINGLIT of (string * Position)
@@ -32,6 +35,9 @@ type tokenId =
     | TOKEN_TEXTBOX
     | TOKEN_CHECKBOX
     | TOKEN_RADIOBUTTON
+    | TOKEN_CALENDAR
+    | TOKEN_TOGGLEBUTTON
+    | TOKEN_TOGGLESWITCH
     | TOKEN_WINDOW
     | TOKEN_ID
     | TOKEN_STRINGLIT
