@@ -23,38 +23,13 @@ let rec interpret (window: HostWindow) program : HostWindow =
 
 and convertUIElementToIView element =
     match element with
-    | AbSyn.Button (label,props, _) ->
-        let isVisibleProp = List.map (fun elem ->
-            match elem with
-            | AbSyn.IsVisible (v, _) -> v
-        )
-        let v = isVisibleProp props
-        Button.create [
-            Button.content label
-            Button.isVisible v.Head
-        ]
-    | AbSyn.TextBlock (label, _) ->
-        TextBlock.create [
-            TextBlock.text label
-        ]
-    | AbSyn.TextBox (label, _) ->
-        TextBox.create [
-            TextBox.text label
-        ]
-    | AbSyn.CheckBox (label, _) ->
-        CheckBox.create [
-            CheckBox.content label
-        ]
-        
-    | AbSyn.RadioButton (label, _) ->
-        RadioButton.create [
-            RadioButton.content label
-        ]
-    | AbSyn.ToggleSwitch (label, _) ->
-        ToggleSwitch.create [
-            ToggleSwitch.content label
-        ]
-    | AbSyn.Calendar _ -> Calendar.create []
-    | AbSyn.ToggleButton _ -> ToggleButton.create []
+    | AbSyn.Button (label,props, _) -> createButton label props
+    | AbSyn.TextBlock (label, _) -> createTextBlock label
+    | AbSyn.TextBox (label, _) -> createTextBox label
+    | AbSyn.CheckBox (label, _) -> createCheckbox label
+    | AbSyn.RadioButton (label, _) -> createRadioButton label
+    | AbSyn.ToggleSwitch (label, _) -> createToggleSwitch label
+    | AbSyn.Calendar _ -> createCalendar
+    | AbSyn.ToggleButton _ -> createToggleButton
 
     

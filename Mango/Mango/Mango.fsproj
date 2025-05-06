@@ -10,7 +10,6 @@
   	</ItemGroup>
 
 	<ItemGroup>
-    	<Compile Include="AvaloniaHelpers.fs" />
     	<FsYacc Include="Parser.fsy">
       		<OtherFlags>-v --module Parser</OtherFlags>
     	</FsYacc>
@@ -20,6 +19,7 @@
 		<Compile Include="AbSyn.fs" />
 		<Compile Include="Parser.fs" />
     	<Compile Include="Lexer.fs" />
+		<Compile Include="AvaloniaHelpers.fs" />
 		<Compile Include="Interpreter.fs" />
 
 		<Compile Include="Mango.fs" />

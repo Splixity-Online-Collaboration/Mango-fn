@@ -12,7 +12,7 @@ let fromCString (s : string) : string =
     Seq.toList s |> unescape |> System.String.Concat
 
 (* position: (line, column) *)
-type Position = int * int                                                       // row column
+type Position = int * int                                                  // row column
 
 type Exp =
     Constant of int * Position                                                  // int_val
