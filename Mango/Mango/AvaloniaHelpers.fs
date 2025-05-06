@@ -10,8 +10,8 @@ let setWindowIcon (icon: string option) (window: HostWindow) =
     | None -> window
 
 let setWindowWidthAndHeight width height (window: HostWindow) =
-    match (width, height) with
-    | (Some w, Some h) ->
+    match width, height with
+    | Some w, Some h ->
         window.Width <- float w
         window.Height <- float h
         window

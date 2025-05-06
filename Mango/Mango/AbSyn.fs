@@ -32,9 +32,5 @@ type UIElement =
     | Calendar of Position
     | ToggleButton of Position
 
-type Window = 
-    Window of string * UIElement list * Position                                 // name
-    | WindowWithSize of string * int * int * UIElement list * Position           // name width height
-    | WindowWithIcon of string * int * int * string * UIElement list * Position  // name width height filepathToIcon
-    | Invalid
+type Window = Window of string * int option * int option * string option * UIElement list * Position  // name width height filepathToIcon
 
