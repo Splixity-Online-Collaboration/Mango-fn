@@ -29,7 +29,7 @@ let default_button_props pos = [IsVisible (true, pos) ]
 %token <string * Position> ID STRINGLIT
 //keywords
 %token <Position> WINDOW 
-%token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON
+%token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
 %token <Position> IS_VISIBILE TRUE FALSE
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON
 
@@ -61,11 +61,14 @@ ButtonProps : ButtonProp ButtonProps    { $1 :: $2 }
 ;
 
 UIElement : BUTTON STRINGLIT { Button (fst $2, default_button_props $1, $1) }
-          | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET {  Button (fst $2, $4, $1) }
+          | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET { Button (fst $2, $4, $1) }
           | TEXT STRINGLIT { TextBlock (fst $2, $1) }
           | TEXTBOX STRINGLIT { TextBox (fst $2, $1) }
           | CHECKBOX STRINGLIT { CheckBox (fst $2, $1) }
           | RADIOBUTTON STRINGLIT { RadioButton (fst $2, $1) }
+          | TOGGLESWITCH STRINGLIT { ToggleSwitch (fst $2, $1) }
+          | CALENDAR { Calendar $1 }
+          | TOGGLEBUTTON { ToggleButton $1 }
 ;
 
 ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }

@@ -41,6 +41,9 @@ let keyword (s, pos) =
        | "textbox"      -> Parser.TEXTBOX pos
        | "checkbox"     -> Parser.CHECKBOX pos
        | "radiobutton"  -> Parser.RADIOBUTTON pos
+       | "toggleswitch"  -> Parser.TOGGLESWITCH pos
+       | "calendar"     -> Parser.CALENDAR pos
+       | "togglebutton" -> Parser.TOGGLEBUTTON pos
        | "isVisible"    -> Parser.IS_VISIBILE pos
        | "true"         -> Parser.TRUE pos
        | "false"        -> Parser.FALSE pos

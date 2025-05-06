@@ -23,12 +23,18 @@ type ButtonProp =
     IsVisible of bool * Position                                                // is_visible?
 
 type UIElement = 
-    Button of string * ButtonProp list * Position                               // label properties
-    | TextBlock of string * Position                                            // text
-    | TextBox of string * Position                                              // text
-    | CheckBox of string * Position                                             // label
-    | RadioButton of string * Position                                          // label
-    | Calendar of Position                                                      // 
+    Button of string * ButtonProp list * Position
+    | TextBlock of string * Position
+    | TextBox of string * Position 
+    | CheckBox of string * Position
+    | RadioButton of string * Position
+    | ToggleSwitch of string * Position
+    | Calendar of Position
+    | ToggleButton of Position
 
-type Window = Window of string * int option * int option * string option * UIElement list * Position  // name width height filepathToIcon
+type Window = 
+    Window of string * UIElement list * Position                                 // name
+    | WindowWithSize of string * int * int * UIElement list * Position           // name width height
+    | WindowWithIcon of string * int * int * string * UIElement list * Position  // name width height filepathToIcon
+    | Invalid
 

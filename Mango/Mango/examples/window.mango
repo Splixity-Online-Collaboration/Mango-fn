@@ -8,4 +8,7 @@ window "mango!" 600 400 "icon.png" {
     radiobutton "Check me to be as cool as a mango"
     text "Put any text below here.."
     textbox "mango sightings of the day"
+    calendar
+    togglebutton
+    toggleswitch "just a string for now"
 }
