@@ -7,37 +7,13 @@ open Avalonia.Controls
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
 open Avalonia.Layout
+open AvaloniaHelpers
 
 let rec interpret (window: HostWindow) program : HostWindow =
     match program with
-    | AbSyn.Window (name,elements, _) -> 
-        window.Title <- name
-        window.Icon <- new WindowIcon("icon.png")
-        window.Content <- 
-            Component(fun _ ->
-                DockPanel.create [
-                    DockPanel.children (List.map convertUIElementToIView elements)
-                ]
-        )
-        window
-    | AbSyn.WindowWithSize (name, width, height, elements, _) ->
-        window.Title <- name
-        window.Width <- width
-        window.Height <- height
-        window.Icon <- new WindowIcon("icon.png")
-        window.Content <- 
-            Component(fun _ ->
-                DockPanel.create [
-                    DockPanel.children (List.map convertUIElementToIView elements)
-                ]
-        )
-        window
-    | AbSyn.WindowWithIcon (name, width, height, iconFilePath, elements, _) ->
-        window.Title <- name
-        window.Width <- width
-        window.Height <- height
-        window.Icon  <- new WindowIcon(iconFilePath)
-        window.Content <- 
+    | AbSyn.Window (name,width, height, icon, elements, _) -> 
+        let newWindow = setWindowProperties window name width height icon
+        newWindow.Content <- 
             Component(fun _ ->
                 DockPanel.create [
                     DockPanel.children (List.map convertUIElementToIView elements)

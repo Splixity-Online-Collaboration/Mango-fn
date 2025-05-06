@@ -4,10 +4,6 @@ open Avalonia
 open Avalonia.Controls.ApplicationLifetimes
 open Avalonia.Themes.Fluent
 open Avalonia.FuncUI.Hosts
-open Avalonia.Controls
-open Avalonia.FuncUI
-open Avalonia.FuncUI.DSL
-open Avalonia.Layout
 open System.IO
 open FSharp.Text.Lexing
 open System.Text
@@ -46,76 +42,37 @@ let printPos (errString : string) : unit =
 
     state0 errString (String.length errString - 1)
 
-// Parse program from string.
-let parseString (s : string) : AbSyn.Window =
-    Parser.Prog Lexer.Token
-    <| LexBuffer<_>.FromBytes (Encoding.UTF8.GetBytes s)
-
-let parseMangoFile (filename : string) : AbSyn.Window =
-  let txt = try  // read text from file given as parameter with added extension
-              let inStream = File.OpenText (filename + ".mango")
-              let txt = inStream.ReadToEnd()
-              inStream.Close()
-              txt
-            with  // or return empty string
-              | ex -> ""
-  if txt <> "" then // valid file content
-    let program =
-      try
-        parseString txt
-      with
+/// <summary> Lexes and parses a mango file</summary>
+/// <param name="s">string representing mango file</param>
+/// <returns>Abstract Syntax tree or error message</returns>
+let parseString (s : string) =
+    try 
+        Ok (Parser.Prog Lexer.Token <| LexBuffer<_>.FromBytes (Encoding.UTF8.GetBytes s))
+    with 
         | Lexer.LexicalError (info,(line,col)) ->
-            printfn "%s at line %d, position %d\n" info line col
-            System.Environment.Exit 1
-            AbSyn.Invalid
-        | ex ->
-            if ex.Message = "parse error"
-            then printPos Parser.ErrorContextDescriptor
-            else printfn "%s" ex.Message
-            System.Environment.Exit 1
-            AbSyn.Invalid
-    program
-  else failwith "Invalid file name or empty file"
+            Error (sprintf "%s at line %d, position %d\n" info line col)
+        | ex -> Error ex.Message
 
-module Main =
+/// <summary>Read the file at the path given as parameter and return the result</summary>
+/// <param name="path">Path to mango program</param>
+/// <returns>Result containing string of the read file or IO error</returns>
+let readContent path = 
+    try // read text from file given as parameter with added extension
+        let inStream = File.OpenText (path + ".mango")
+        let txt = inStream.ReadToEnd()
+        inStream.Close()
+        Ok txt
+    with // or return the exception
+        | ex -> Error ex
 
-    let view () =
-        Component(fun ctx ->
-            let state = ctx.useState 0
-
-            DockPanel.create [
-                DockPanel.children [
-                    Button.create [
-                        Button.dock Dock.Bottom
-                        Button.onClick (fun _ -> state.Set(state.Current - 1))
-                        Button.content "-"
-                        Button.horizontalAlignment HorizontalAlignment.Stretch
-                        Button.horizontalContentAlignment HorizontalAlignment.Center
-                    ]
-                    Button.create [
-                        Button.dock Dock.Bottom
-                        Button.onClick (fun _ -> state.Set(state.Current + 1))
-                        Button.content "+"
-                        Button.horizontalAlignment HorizontalAlignment.Stretch
-                        Button.horizontalContentAlignment HorizontalAlignment.Center
-                    ]
-                    TextBlock.create [
-                        TextBlock.dock Dock.Top
-                        TextBlock.fontSize 48.0
-                        TextBlock.verticalAlignment VerticalAlignment.Center
-                        TextBlock.horizontalAlignment HorizontalAlignment.Center
-                        TextBlock.text (string state.Current)
-                    ]
-                ]
-            ]
-        )
-
-type MainWindow() =
-    inherit HostWindow()
-    do
-        base.Title <- "Counter Example"
-        base.Content <- Main.view ()
-
+/// <summary>Open file and perform lexing and parsing on the mango file</summary>
+/// <param name="filename">Path to mango file</param>
+/// <returns> The abstract syntax tree or an error message</returns>
+let parseMangoFile (filename : string) =
+  let txt = readContent filename
+  match txt with
+  | Ok content -> parseString content
+  | Error error -> Error error.Message
 
 type App() =
     inherit Application()
@@ -125,10 +82,14 @@ type App() =
 
     override this.OnFrameworkInitializationCompleted() =
         let absyn = parseMangoFile "examples/window"
-        match this.ApplicationLifetime with
-        | :? IClassicDesktopStyleApplicationLifetime as desktopLifetime ->
-            desktopLifetime.MainWindow <- interpret (new HostWindow()) absyn
-        | _ -> ()
+
+        match absyn with
+        | Ok syntax_tree ->
+            match this.ApplicationLifetime with
+            | :? IClassicDesktopStyleApplicationLifetime as desktopLifetime ->
+                desktopLifetime.MainWindow <- interpret (new HostWindow()) syntax_tree
+            | _ -> ()
+        | Error message -> failwith message
 
 module Program =
 

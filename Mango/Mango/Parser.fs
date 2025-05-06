@@ -24,15 +24,12 @@ let parse_error_rich =
 
 let add_ui_elements window elements = 
   match window with
-  | Window (name, _, pos) -> Window (name, elements, pos)
-  | WindowWithSize (name, width, height, _, pos) -> WindowWithSize (name, width, height, elements, pos)
-  | WindowWithIcon (name, width, height, iconPath, _, pos) -> WindowWithIcon (name, width, height, iconPath, elements, pos)
-  | Invalid -> Invalid
+  | Window (name, width, height, icon, _, pos) -> Window (name, width, height, icon, elements, pos)
 
 let default_button_props pos = [IsVisible (true, pos) ]
 
 
-# 35 "Parser.fs"
+# 32 "Parser.fs"
 // This type is the type of tokens accepted by the parser
 type token = 
   | EOF of (Position)
@@ -206,7 +203,7 @@ let _fsyacc_reductionSymbolCounts = [|1us;2us;2us;4us;5us;4us;2us;1us;2us;1us;2u
 let _fsyacc_productionToNonTerminalTable = [|0us;1us;2us;2us;2us;2us;3us;3us;4us;4us;5us;5us;5us;5us;5us;5us;6us;6us;|]
 let _fsyacc_immediateActions = [|65535us;49152us;65535us;16385us;65535us;65535us;65535us;65535us;16388us;65535us;65535us;16389us;65535us;16390us;65535us;16392us;65535us;65535us;65535us;65535us;16395us;65535us;16396us;65535us;16397us;65535us;16398us;65535us;16399us;65535us;65535us;16400us;16401us;|]
 let _fsyacc_reductions = lazy [|
-# 209 "Parser.fs"
+# 206 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Window in
             Microsoft.FSharp.Core.Operators.box
@@ -215,31 +212,31 @@ let _fsyacc_reductions = lazy [|
                       raise (FSharp.Text.Parsing.Accept(Microsoft.FSharp.Core.Operators.box _1))
                    )
                  : 'gentype__startProg));
-# 218 "Parser.fs"
+# 215 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Window in
             let _2 = parseState.GetInput(2) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 49 "Parser.fsy"
+# 46 "Parser.fsy"
                                               _1 
                    )
-# 49 "Parser.fsy"
+# 46 "Parser.fsy"
                  : AbSyn.Window));
-# 230 "Parser.fs"
+# 227 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 52 "Parser.fsy"
-                                                  Window (fst _2, [], _1) 
+# 49 "Parser.fsy"
+                                                  Window (fst _2, None, None, None, [], _1) 
                    )
-# 52 "Parser.fsy"
+# 49 "Parser.fsy"
                  : AbSyn.Window));
-# 242 "Parser.fs"
+# 239 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -248,12 +245,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 53 "Parser.fsy"
-                                                      WindowWithSize (fst _2, fst _3, fst _4, [], _1) 
+# 50 "Parser.fsy"
+                                                      Window (fst _2, Some (fst _3), Some (fst _4), None, [], _1) 
                    )
-# 53 "Parser.fsy"
+# 50 "Parser.fsy"
                  : AbSyn.Window));
-# 256 "Parser.fs"
+# 253 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -263,12 +260,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 54 "Parser.fsy"
-                                                                WindowWithIcon (fst _2, fst _3, fst _4, fst _5, [], _1) 
+# 51 "Parser.fsy"
+                                                                Window (fst _2, Some (fst _3), Some (fst _4), Some (fst _5), [], _1) 
                    )
-# 54 "Parser.fsy"
+# 51 "Parser.fsy"
                  : AbSyn.Window));
-# 271 "Parser.fs"
+# 268 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Window in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -277,70 +274,70 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 55 "Parser.fsy"
+# 52 "Parser.fsy"
                                                                                       add_ui_elements _1 _3 
                    )
-# 55 "Parser.fsy"
+# 52 "Parser.fsy"
                  : AbSyn.Window));
-# 285 "Parser.fs"
+# 282 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.UIElement in
             let _2 = parseState.GetInput(2) :?> AbSyn.UIElement list in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 58 "Parser.fsy"
+# 55 "Parser.fsy"
                                                                _1 :: _2 
                    )
-# 58 "Parser.fsy"
+# 55 "Parser.fsy"
                  : AbSyn.UIElement list));
-# 297 "Parser.fs"
+# 294 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.UIElement in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 59 "Parser.fsy"
+# 56 "Parser.fsy"
                                                                _1 :: [] 
                    )
-# 59 "Parser.fsy"
+# 56 "Parser.fsy"
                  : AbSyn.UIElement list));
-# 308 "Parser.fs"
+# 305 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.ButtonProp in
             let _2 = parseState.GetInput(2) :?> AbSyn.ButtonProp list in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 62 "Parser.fsy"
+# 59 "Parser.fsy"
                                                                _1 :: _2 
                    )
-# 62 "Parser.fsy"
+# 59 "Parser.fsy"
                  : AbSyn.ButtonProp list));
-# 320 "Parser.fs"
+# 317 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.ButtonProp in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 63 "Parser.fsy"
+# 60 "Parser.fsy"
                                                                _1 :: [] 
                    )
-# 63 "Parser.fsy"
+# 60 "Parser.fsy"
                  : AbSyn.ButtonProp list));
-# 331 "Parser.fs"
+# 328 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 66 "Parser.fsy"
+# 63 "Parser.fsy"
                                                     Button (fst _2, default_button_props _1, _1) 
                    )
-# 66 "Parser.fsy"
+# 63 "Parser.fsy"
                  : AbSyn.UIElement));
-# 343 "Parser.fs"
+# 340 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -350,60 +347,60 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 67 "Parser.fsy"
+# 64 "Parser.fsy"
                                                                                                         Button (fst _2, _4, _1) 
                    )
-# 67 "Parser.fsy"
+# 64 "Parser.fsy"
                  : AbSyn.UIElement));
-# 358 "Parser.fs"
+# 355 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 68 "Parser.fsy"
+# 65 "Parser.fsy"
                                                   TextBlock (fst _2, _1) 
                    )
-# 68 "Parser.fsy"
+# 65 "Parser.fsy"
                  : AbSyn.UIElement));
-# 370 "Parser.fs"
+# 367 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 69 "Parser.fsy"
+# 66 "Parser.fsy"
                                                      TextBox (fst _2, _1) 
                    )
-# 69 "Parser.fsy"
+# 66 "Parser.fsy"
                  : AbSyn.UIElement));
-# 382 "Parser.fs"
+# 379 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 70 "Parser.fsy"
+# 67 "Parser.fsy"
                                                       CheckBox (fst _2, _1) 
                    )
-# 70 "Parser.fsy"
+# 67 "Parser.fsy"
                  : AbSyn.UIElement));
-# 394 "Parser.fs"
+# 391 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 71 "Parser.fsy"
+# 68 "Parser.fsy"
                                                          RadioButton (fst _2, _1) 
                    )
-# 71 "Parser.fsy"
+# 68 "Parser.fsy"
                  : AbSyn.UIElement));
-# 406 "Parser.fs"
+# 403 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -411,12 +408,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 74 "Parser.fsy"
+# 71 "Parser.fsy"
                                                            IsVisible (true, _1) 
                    )
-# 74 "Parser.fsy"
+# 71 "Parser.fsy"
                  : AbSyn.ButtonProp));
-# 419 "Parser.fs"
+# 416 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -424,13 +421,13 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 75 "Parser.fsy"
+# 72 "Parser.fsy"
                                                    IsVisible (false, _1) 
                    )
-# 75 "Parser.fsy"
+# 72 "Parser.fsy"
                  : AbSyn.ButtonProp));
 |]
-# 433 "Parser.fs"
+# 430 "Parser.fs"
 let tables : FSharp.Text.Parsing.Tables<_> = 
   { reductions = _fsyacc_reductions.Value;
     endOfInputTag = _fsyacc_endOfInputTag;

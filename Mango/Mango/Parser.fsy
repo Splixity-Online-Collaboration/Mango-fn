@@ -18,10 +18,7 @@ let parse_error_rich =
 
 let add_ui_elements window elements = 
   match window with
-  | Window (name, _, pos) -> Window (name, elements, pos)
-  | WindowWithSize (name, width, height, _, pos) -> WindowWithSize (name, width, height, elements, pos)
-  | WindowWithIcon (name, width, height, iconPath, _, pos) -> WindowWithIcon (name, width, height, iconPath, elements, pos)
-  | Invalid -> Invalid
+  | Window (name, width, height, icon, _, pos) -> Window (name, width, height, icon, elements, pos)
 
 let default_button_props pos = [IsVisible (true, pos) ]
 
@@ -49,9 +46,9 @@ let default_button_props pos = [IsVisible (true, pos) ]
 Prog :    Window EOF   { $1 }
 ;
 
-Window :  WINDOW STRINGLIT { Window (fst $2, [], $1) }
-    | WINDOW STRINGLIT NUM NUM { WindowWithSize (fst $2, fst $3, fst $4, [], $1) }
-    | WINDOW STRINGLIT NUM NUM STRINGLIT { WindowWithIcon (fst $2, fst $3, fst $4, fst $5, [], $1) }
+Window :  WINDOW STRINGLIT { Window (fst $2, None, None, None, [], $1) }
+    | WINDOW STRINGLIT NUM NUM { Window (fst $2, Some (fst $3), Some (fst $4), None, [], $1) }
+    | WINDOW STRINGLIT NUM NUM STRINGLIT { Window (fst $2, Some (fst $3), Some (fst $4), Some (fst $5), [], $1) }
     | Window LEFT_CURLY_BRACKET UIElements RIGHT_CURLY_BRACKET { add_ui_elements $1 $3 }
 ;
 

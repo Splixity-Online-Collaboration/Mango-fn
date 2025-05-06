@@ -1,16 +1,5 @@
 module AbSyn
 
-(*** Helper Functions ***)
-let toCString (s : string) : string =
-    let escape c =
-        match c with
-            | '\\' -> "\\\\"
-            | '"'  -> "\\\""
-            | '\n' -> "\\n"
-            | '\t' -> "\\t"
-            | _    -> System.String.Concat [c]
-    String.collect escape s
-
 // Doesn't actually support all escapes.  Too badefacilliteter.
 let fromCString (s : string) : string =
     let rec unescape l: char list =
@@ -23,35 +12,23 @@ let fromCString (s : string) : string =
     Seq.toList s |> unescape |> System.String.Concat
 
 (* position: (line, column) *)
-type Position = int * int
-
-let rec ppType = function
-  | Int      -> "int"
-  | Char     -> "char"
-  | Bool     -> "bool"
-
+type Position = int * int                                                       // row column
 
 type Exp =
-    Constant of int * Position                                  // int_val
-    | StringLit of string * Position                            // string
-    | Var   of string * Position                                // variable_name
+    Constant of int * Position                                                  // int_val
+    | StringLit of string * Position                                            // string
+    | Var   of string * Position                                                // variable_name
     
 type ButtonProp =
-    IsVisible of bool * Position
+    IsVisible of bool * Position                                                // is_visible?
 
 type UIElement = 
-    Button of string * ButtonProp list * Position
-    | TextBlock of string * Position
-    | TextBox of string * Position 
-    | CheckBox of string * Position
-    | RadioButton of string * Position
-    | Calendar of Position
+    Button of string * ButtonProp list * Position                               // label properties
+    | TextBlock of string * Position                                            // text
+    | TextBox of string * Position                                              // text
+    | CheckBox of string * Position                                             // label
+    | RadioButton of string * Position                                          // label
+    | Calendar of Position                                                      // 
 
-
-
-type Window = 
-    Window of string * UIElement list * Position                                 // name
-    | WindowWithSize of string * int * int * UIElement list * Position           // name width height
-    | WindowWithIcon of string * int * int * string * UIElement list * Position  // name width height filepathToIcon
-    | Invalid
+type Window = Window of string * int option * int option * string option * UIElement list * Position  // name width height filepathToIcon
 
