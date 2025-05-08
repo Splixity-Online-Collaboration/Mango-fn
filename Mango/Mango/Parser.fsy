@@ -30,7 +30,7 @@ let default_button_props pos = [IsVisible (true, pos) ]
 //keywords
 %token <Position> WINDOW 
 %token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
-%token <Position> IS_VISIBILE TRUE FALSE
+%token <Position> IS_VISIBILE TRUE FALSE WIDTH HEIGHT
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON
 
 %start Prog
@@ -73,4 +73,6 @@ UIElement : BUTTON STRINGLIT { Button (fst $2, default_button_props $1, $1) }
 
 ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
   | IS_VISIBILE COLON FALSE { IsVisible (false, $1) }
+  | WIDTH COLON NUM { Width (fst $3, $1) }
+  | HEIGHT COLON NUM { Height (fst $3, $1) }
 ;

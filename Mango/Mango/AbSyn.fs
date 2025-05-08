@@ -21,6 +21,56 @@ type Exp =
     
 type ButtonProp =
     IsVisible of bool * Position                                                // is_visible?
+    | Width of int * Position
+    | Height of int * Position
+
+type FontStyle =
+    Italic
+    | StrikeThrough
+    | Underline
+
+type PredefinedColor = 
+    | Blue 
+    | Red
+    | Yellow
+    | Pink
+    | Green
+
+type HexCode = uint8 * uint8 * uint8 * uint8
+
+type Colour =
+    ColorName of PredefinedColor * Position
+    | Hex of HexCode * Position
+
+type TextWrap =
+    | Overflow
+    | Wrap
+    | ForceWrap
+
+type TextAlignT =
+    | Center
+    | Left 
+    | Right
+
+type TextTrimT =
+    | Word
+    | Character
+    | NoTrim
+
+type TextBlockProp =
+    Colour of Colour * Position
+    // Font Settings
+    | FontFamily of string * Position
+    | FontSize of  int
+    | FontWeight of int
+    | FontStyle of FontStyle list
+    // Padding
+    | Padding
+    // Formatting
+    | LineHeight
+    | TextWrap of TextWrap
+    | TextAlign of TextAlignT
+    | TextTrim of TextTrimT
 
 type UIElement = 
     Button of string * ButtonProp list * Position
@@ -33,4 +83,3 @@ type UIElement =
     | ToggleButton of Position
 
 type Window = Window of string * int option * int option * string option * UIElement list * Position  // name width height filepathToIcon
-

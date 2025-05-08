@@ -9,6 +9,8 @@ type token =
   | IS_VISIBILE of (Position)
   | TRUE of (Position)
   | FALSE of (Position)
+  | WIDTH of (Position)
+  | HEIGHT of (Position)
   | BUTTON of (Position)
   | TEXT of (Position)
   | TEXTBOX of (Position)
@@ -30,6 +32,8 @@ type tokenId =
     | TOKEN_IS_VISIBILE
     | TOKEN_TRUE
     | TOKEN_FALSE
+    | TOKEN_WIDTH
+    | TOKEN_HEIGHT
     | TOKEN_BUTTON
     | TOKEN_TEXT
     | TOKEN_TEXTBOX

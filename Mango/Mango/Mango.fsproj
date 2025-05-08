@@ -19,7 +19,9 @@
 		<Compile Include="AbSyn.fs" />
 		<Compile Include="Parser.fs" />
     	<Compile Include="Lexer.fs" />
-		<Compile Include="AvaloniaHelpers.fs" />
+		<Compile Include="AvaloniaHelpers/AvaloniaButtonHelpers.fs" />
+		<Compile Include="AvaloniaHelpers/AvaloniaTextBlockHelpers.fs" />
+		<Compile Include="AvaloniaHelpers/AvaloniaHelpers.fs" />
 		<Compile Include="Interpreter.fs" />
 
 		<Compile Include="Mango.fs" />

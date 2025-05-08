@@ -1,13 +1,11 @@
-﻿module AvaloniaHelpers
-open Avalonia
-open Avalonia.Controls.ApplicationLifetimes
-open Avalonia.Themes.Fluent
+﻿module AvaloniaHelpers.AvaloniaHelpers
 open Avalonia.FuncUI.Hosts
 open Avalonia.Controls
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
-open Avalonia.Layout
 open AbSyn
+open AvaloniaButtonHelpers
+open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
@@ -30,28 +28,10 @@ let setWindowName name (window: HostWindow) =
     window
 
 let setWindowProperties name width height icon (window: HostWindow) =
-    window |>
-    setWindowName name |>
-    setWindowWidthAndHeight width height |>
-    setWindowIcon icon
-
-let extractFirstIsVisible (props: ButtonProp list) =
-    props
-    |> List.tryPick (function
-        | IsVisible (b, _) -> Some b
-        | _ -> None)
-    |> Option.defaultValue false
-
-let createButton (label: string) (props: ButtonProp list) : IView = 
-    Button.create [
-        Button.content label
-        Button.isVisible (extractFirstIsVisible props)
-    ]
-
-let createTextBlock text : IView = 
-    TextBlock.create [
-        TextBlock.text text
-    ]
+    window
+    |> setWindowName name
+    |> setWindowWidthAndHeight width height
+    |> setWindowIcon icon
 
 let createTextBox text : IView = 
     TextBox.create [
