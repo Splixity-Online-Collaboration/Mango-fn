@@ -1,5 +1,6 @@
 window "mango!" 600 400 "icon.png" {
     button "test!" {
+        isVisible: false
         width: 32
         height: 32    
     }

@@ -4,32 +4,32 @@ open Avalonia.FuncUI.Types
 open Avalonia.Controls
 open AbSyn
 
-let applyIsVisible (props: ButtonProp list) (applied: IAttr<Button> list) : IAttr<Button> list =
+let applyProp props applied tryExtract =
     props
-    |> List.tryPick (function
-        | IsVisible (b, _) -> Some (List.append applied [ Button.isVisible b ])
-        | _ -> None)
+    |> List.tryPick tryExtract
+    |> Option.map (fun attr -> applied @ [attr])
     |> Option.defaultValue applied
 
-let applyWidth (props: ButtonProp list) (applied: IAttr<Button> list) : IAttr<Button> list =
-    props
-    |> List.tryPick (function
-        | Width (num, _) -> Some (List.append applied [ Button.width num ])
+let applyIsVisible props applied =
+    applyProp props applied (function
+        | IsVisible (b, _) -> Some (Button.isVisible b)
         | _ -> None)
-    |> Option.defaultValue applied
 
-let applyHeight (props: ButtonProp list) (applied: IAttr<Button> list) : IAttr<Button> list =
-    props
-    |> List.tryPick (function
-        | Height (num, _) -> Some (List.append applied [ Button.height num ])
+let applyWidth props applied =
+    applyProp props applied (function
+        | Width (num, _) -> Some (Button.width num)
         | _ -> None)
-    |> Option.defaultValue applied
 
-let applyButtonProperties props = 
+let applyHeight props applied =
+    applyProp props applied (function
+        | Height (num, _) -> Some (Button.height num)
+        | _ -> None)
+
+let applyButtonProperties props =
     []
     |> applyIsVisible props
     |> applyWidth props
     |> applyHeight props
 
-let createButton (label: string) (props: ButtonProp list) : IView = 
-    Button.create (List.append [ Button.content label] (applyButtonProperties props))
+let createButton (label: string) (props: ButtonProp list) : IView =
+    Button.create ([ Button.content label ] @ applyButtonProperties props)
