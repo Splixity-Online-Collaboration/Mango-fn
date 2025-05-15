@@ -6,11 +6,16 @@ type token =
   | LEFT_CURLY_BRACKET of (Position)
   | RIGHT_CURLY_BRACKET of (Position)
   | COLON of (Position)
+  | LEFT_PAR of (Position)
+  | RIGHT_PAR of (Position)
+  | EQUAL of (Position)
   | IS_VISIBILE of (Position)
   | TRUE of (Position)
   | FALSE of (Position)
   | WIDTH of (Position)
   | HEIGHT of (Position)
+  | FUNCTION of (Position)
+  | LET of (Position)
   | BUTTON of (Position)
   | TEXT of (Position)
   | TEXTBOX of (Position)
@@ -29,11 +34,16 @@ type tokenId =
     | TOKEN_LEFT_CURLY_BRACKET
     | TOKEN_RIGHT_CURLY_BRACKET
     | TOKEN_COLON
+    | TOKEN_LEFT_PAR
+    | TOKEN_RIGHT_PAR
+    | TOKEN_EQUAL
     | TOKEN_IS_VISIBILE
     | TOKEN_TRUE
     | TOKEN_FALSE
     | TOKEN_WIDTH
     | TOKEN_HEIGHT
+    | TOKEN_FUNCTION
+    | TOKEN_LET
     | TOKEN_BUTTON
     | TOKEN_TEXT
     | TOKEN_TEXTBOX
@@ -56,6 +66,10 @@ type nonTerminalId =
     | NONTERM_ButtonProps
     | NONTERM_UIElement
     | NONTERM_ButtonProp
+    | NONTERM_Function
+    | NONTERM_Statements
+    | NONTERM_Stmt
+    | NONTERM_Exp
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 

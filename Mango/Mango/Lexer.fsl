@@ -49,6 +49,9 @@ let keyword (s, pos) =
        | "height"         -> Parser.HEIGHT pos
        | "true"           -> Parser.TRUE pos
        | "false"          -> Parser.FALSE pos
+
+       | "let"            -> Parser.LET pos
+       | "function"       -> Parser.FUNCTION pos
        | _                -> Parser.ID (s, pos)
 }
 
@@ -76,6 +79,9 @@ rule Token = parse
   | ','                   { Parser.COMMA  (getPos lexbuf) }
   | '{'                   { Parser.LEFT_CURLY_BRACKET (getPos lexbuf) }
   | '}'                   { Parser.RIGHT_CURLY_BRACKET (getPos lexbuf) }
+  | '('                   { Parser.LEFT_PAR (getPos lexbuf) }
+  | ')'                   { Parser.RIGHT_PAR (getPos lexbuf) }
   | ':'                   { Parser.COLON (getPos lexbuf) }
+  | '='                   { Parser.EQUAL (getPos lexbuf) }
   | eof                   { Parser.EOF    (getPos lexbuf) }
   | _                     { lexerError lexbuf "Illegal symbol in input" }

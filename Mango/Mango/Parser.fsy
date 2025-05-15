@@ -30,8 +30,8 @@ let default_button_props pos = [IsVisible (true, pos) ]
 //keywords
 %token <Position> WINDOW 
 %token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
-%token <Position> IS_VISIBILE TRUE FALSE WIDTH HEIGHT
-%token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON
+%token <Position> IS_VISIBILE TRUE FALSE WIDTH HEIGHT FUNCTION LET
+%token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON LEFT_PAR RIGHT_PAR EQUAL
 
 %start Prog
 %type <AbSyn.Window> Prog
@@ -40,6 +40,10 @@ let default_button_props pos = [IsVisible (true, pos) ]
 %type <AbSyn.UIElement> UIElement
 %type <AbSyn.ButtonProp list> ButtonProps
 %type <AbSyn.ButtonProp> ButtonProp
+%type <AbSyn.FunctionT> Function
+%type <AbSyn.Stmt list> Statements
+%type <AbSyn.Stmt> Stmt
+%type <AbSyn.Exp> Exp
 
 %%
 
@@ -75,4 +79,21 @@ ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
   | IS_VISIBILE COLON FALSE { IsVisible (false, $1) }
   | WIDTH COLON NUM { Width (fst $3, $1) }
   | HEIGHT COLON NUM { Height (fst $3, $1) }
+;
+
+Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { Function (fst $2, $6, $1) }
+;
+
+Statements : Stmt Statements { $1 :: $2 }
+           | Stmt { $1 :: [] }
+;
+
+Stmt : LET ID EQUAL Exp { Let (fst $2, $4, $1) }
+;
+
+Exp : NUM     { Constant (Int (fst $1), snd $1) }
+  | STRINGLIT { Constant (String (fst $1), snd $1) }
+  | ID        { Var $1 }
+  | TRUE      { Constant (Bool true, $1) }
+  | FALSE     { Constant (Bool false, $1) }
 ;

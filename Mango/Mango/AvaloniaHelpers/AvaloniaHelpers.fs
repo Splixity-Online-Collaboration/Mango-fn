@@ -60,7 +60,7 @@ let createToggleButton = ToggleButton.create []
 let convertUIElementToIView element =
     match element with
     | Button (label,props, _) -> createButton label props
-    | TextBlock (label, _) -> createTextBlock label
+    | TextBlock (label, props, _) -> createTextBlock label props
     | TextBox (label, _) -> createTextBox label
     | CheckBox (label, _) -> createCheckbox label
     | RadioButton (label, _) -> createRadioButton label

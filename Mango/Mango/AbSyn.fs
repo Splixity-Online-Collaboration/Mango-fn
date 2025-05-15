@@ -14,17 +14,27 @@ let fromCString (s : string) : string =
 (* position: (line, column) *)
 type Position = int * int                                                  // row column
 
+type Value =
+    Int of int
+    | Real of float
+    | String of string
+    | Bool of bool
+
 type Exp =
-    Constant of int * Position                                                  // int_val
-    | StringLit of string * Position                                            // string
-    | Var   of string * Position                                                // variable_name
+    Constant of Value * Position                                                  // int_val
+    | Var of string * Position                                                // variable_name
     
+type Stmt = 
+    Let of string * Exp * Position
+
+type FunctionT = Function of string * Stmt list * Position
+
 type ButtonProp =
     IsVisible of bool * Position                                                // is_visible?
     | Width of int * Position
     | Height of int * Position
 
-type FontStyle =
+type FontStyleT =
     Italic
     | StrikeThrough
     | Underline
@@ -36,13 +46,14 @@ type PredefinedColor =
     | Pink
     | Green
 
-type HexCode = uint8 * uint8 * uint8 * uint8
 
-type Colour =
+type HexCode = byte * byte * byte * byte
+
+type ColorT =
     ColorName of PredefinedColor * Position
     | Hex of HexCode * Position
 
-type TextWrap =
+type TextWrapT =
     | Overflow
     | Wrap
     | ForceWrap
@@ -58,23 +69,23 @@ type TextTrimT =
     | NoTrim
 
 type TextBlockProp =
-    Colour of Colour * Position
+    Color of ColorT * Position
     // Font Settings
     | FontFamily of string * Position
     | FontSize of  int
     | FontWeight of int
-    | FontStyle of FontStyle list
+    | FontStyle of FontStyleT list
     // Padding
     | Padding
     // Formatting
     | LineHeight
-    | TextWrap of TextWrap
+    | TextWrap of TextWrapT
     | TextAlign of TextAlignT
     | TextTrim of TextTrimT
 
 type UIElement = 
     Button of string * ButtonProp list * Position
-    | TextBlock of string * Position
+    | TextBlock of string * TextblockProp list * Position
     | TextBox of string * Position 
     | CheckBox of string * Position
     | RadioButton of string * Position
