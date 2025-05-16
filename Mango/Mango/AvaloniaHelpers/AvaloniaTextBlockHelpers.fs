@@ -1,35 +1,38 @@
 module AvaloniaHelpers.AvaloniaTextBlockHelpers
+
+open AvaloniaHelpers.ViewHelpers
 open Avalonia.FuncUI.DSL
 open Avalonia.FuncUI.Types
 open Avalonia.Controls
 open AbSyn
-open Avalonia.Media
+open AvaloniaHelpers.ColorConverter
 
-let applyProp props applied tryExtract =
-    props
-    |> List.tryPick tryExtract
-    |> Option.map (fun attr -> applied @ [attr])
-    |> Option.defaultValue applied
-
-let applyColor props applied =
+let applyForeGround props applied =
     applyProp props applied (function
-        | Color (color, _) ->
-            match color with 
-            | ColorName (name, _) ->
-                match name with
-                    | Red -> Some (TextBlock.foreground "red")                     
-                    | Blue -> Some (TextBlock.foreground "blue")
-                    | Yellow -> Some (TextBlock.foreground "yellow")
-                    | Pink -> Some (TextBlock.foreground "pink")
-                    | Green -> Some (TextBlock.foreground "green")            
-            | Hex((a,r,g,b), _) ->
-                Some (TextBlock.foreground (SolidColorBrush (Color.FromArgb (a, r, g, b), 1.0)))
+        | ForeGround (c, _) -> Some (TextBlock.foreground (fromColor c))
         | _ -> None)
 
+let applyBackGround props applied =
+    applyProp props applied (function
+        | BackGround (c, _) -> Some (TextBlock.background (fromColor c))
+        | _ -> None)
 
-let applyTextBlockProperties props : IAttr<TextBlock> list =
+let applyFontFamily props applied =
+    applyProp props applied (function
+        | FontFamily (s, _) -> Some (TextBlock.fontFamily s)
+        | _ -> None)
+
+let applyFontSize props applied =
+    applyProp props applied (function
+        | FontSize i -> Some (TextBlock.fontSize (float i))
+        | _ -> None)
+
+let applyTextBlockProperties props =
     []
-    |> applyColor props
+    |> applyForeGround props
+    |> applyFontFamily props
+    |> applyFontSize props
 
-let createTextBlock (text: string) (props: TextBlockProp list) : IView = 
-    TextBlock.create  ([ TextBlock.text text ] @ applyTextBlockProperties props)
+let createTextBlock (text: string) (props: TextBlockProp list) : IView =
+    TextBlock.create ([ TextBlock.text text ] @ applyTextBlockProperties props)
+

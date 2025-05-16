@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -19,6 +19,8 @@
 		<Compile Include="AbSyn.fs" />
 		<Compile Include="Parser.fs" />
     	<Compile Include="Lexer.fs" />
+		<Compile Include="AvaloniaHelpers/ColorConverter.fs" />
+		<Compile Include="AvaloniaHelpers/ViewHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaButtonHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaTextBlockHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaHelpers.fs" />

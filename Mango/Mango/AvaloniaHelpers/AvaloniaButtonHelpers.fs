@@ -1,15 +1,10 @@
 module AvaloniaHelpers.AvaloniaButtonHelpers
+
 open Avalonia.FuncUI.DSL
 open Avalonia.FuncUI.Types
 open Avalonia.Controls
 open AbSyn
-
-let applyProp props applied tryExtract =
-    props
-    |> List.tryPick tryExtract
-    |> Option.map (fun attr -> applied @ [attr])
-    |> Option.defaultValue applied
-
+open ViewHelpers
 let applyIsVisible props applied =
     applyProp props applied (function
         | IsVisible (b, _) -> Some (Button.isVisible b)

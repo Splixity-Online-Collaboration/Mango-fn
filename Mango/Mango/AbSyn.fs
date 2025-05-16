@@ -46,7 +46,6 @@ type PredefinedColor =
     | Pink
     | Green
 
-
 type HexCode = byte * byte * byte * byte
 
 type ColorT =
@@ -69,7 +68,8 @@ type TextTrimT =
     | NoTrim
 
 type TextBlockProp =
-    Color of ColorT * Position
+    ForeGround of ColorT * Position
+    | BackGround of ColorT * Position
     // Font Settings
     | FontFamily of string * Position
     | FontSize of  int
@@ -85,7 +85,7 @@ type TextBlockProp =
 
 type UIElement = 
     Button of string * ButtonProp list * Position
-    | TextBlock of string * TextblockProp list * Position
+    | TextBlock of string * TextBlockProp list * Position
     | TextBox of string * Position 
     | CheckBox of string * Position
     | RadioButton of string * Position

@@ -40,6 +40,8 @@ let default_button_props pos = [IsVisible (true, pos) ]
 %type <AbSyn.UIElement> UIElement
 %type <AbSyn.ButtonProp list> ButtonProps
 %type <AbSyn.ButtonProp> ButtonProp
+%type <AbSyn.TextBlockProp> TextProp
+%type <AbSyn.TextBlockProp list> TextProps
 %type <AbSyn.FunctionT> Function
 %type <AbSyn.Stmt list> Statements
 %type <AbSyn.Stmt> Stmt
@@ -64,9 +66,13 @@ ButtonProps : ButtonProp ButtonProps    { $1 :: $2 }
             | ButtonProp                { $1 :: [] }
 ;
 
+TextProps : TextProp TextProps          { $1 :: $2 }
+          | TextProp                    { $1 :: [] }
+
+
 UIElement : BUTTON STRINGLIT { Button (fst $2, default_button_props $1, $1) }
           | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET { Button (fst $2, $4, $1) }
-          | TEXT STRINGLIT { TextBlock (fst $2, $1) }
+          | TEXT STRINGLIT LEFT_CURLY_BRACKET  Text{ TextBlock (fst $2, $1) }
           | TEXTBOX STRINGLIT { TextBox (fst $2, $1) }
           | CHECKBOX STRINGLIT { CheckBox (fst $2, $1) }
           | RADIOBUTTON STRINGLIT { RadioButton (fst $2, $1) }
@@ -80,6 +86,24 @@ ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
   | WIDTH COLON NUM { Width (fst $3, $1) }
   | HEIGHT COLON NUM { Height (fst $3, $1) }
 ;
+
+TextProp : FOREGROUND COLON COLOR {}
+// TODO: figure out how to make color type here aswelll as all these props:
+    ForeGround of ColorT * Position
+    | BackGround of ColorT * Position
+    // Font Settings
+    | FontFamily of string * Position
+    | FontSize of  int
+    | FontWeight of int
+    | FontStyle of FontStyleT list
+    // Padding
+    | Padding
+    // Formatting
+    | LineHeight
+    | TextWrap of TextWrapT
+    | TextAlign of TextAlignT
+    | TextTrim of TextTrimT
+
 
 Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { Function (fst $2, $6, $1) }
 ;
