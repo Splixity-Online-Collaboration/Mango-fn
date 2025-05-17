@@ -22,11 +22,26 @@ let add_ui_elements window elements =
 
 let default_button_props pos = [IsVisible (true, pos) ]
 
+let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
+    let hex = if s.StartsWith("#") then s.Substring(1) else s
+    let tryByte i = System.Byte.TryParse(hex.Substring(i,2), System.Globalization.NumberStyles.HexNumber, null)
+    match hex.Length with
+    | 6 ->
+        let (rOk, r), (gOk, g), (bOk, b) =
+            tryByte 0, tryByte 2, tryByte 4
+        if rOk && gOk && bOk then Some (r, g, b, 255uy) else None
+    | 8 ->
+        let (rOk, r), (gOk, g), (bOk, b), (aOk, a) =
+            tryByte 0, tryByte 2, tryByte 4, tryByte 6
+        if rOk && gOk && bOk && aOk then Some (r, g, b, a) else None
+    | _ -> None
+
 %}
 
 //information-carrying tokens
 %token <int * Position> NUM
 %token <string * Position> ID STRINGLIT
+%token <strin * Position> HEXCOLOR
 //keywords
 %token <Position> WINDOW 
 %token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
@@ -36,12 +51,16 @@ let default_button_props pos = [IsVisible (true, pos) ]
 %start Prog
 %type <AbSyn.Window> Prog
 %type <AbSyn.Window> Window
+
 %type <AbSyn.UIElement list> UIElements
 %type <AbSyn.UIElement> UIElement
 %type <AbSyn.ButtonProp list> ButtonProps
 %type <AbSyn.ButtonProp> ButtonProp
 %type <AbSyn.TextBlockProp> TextProp
 %type <AbSyn.TextBlockProp list> TextProps
+%type <AbSyn.ColorT> Color
+
+
 %type <AbSyn.FunctionT> Function
 %type <AbSyn.Stmt list> Statements
 %type <AbSyn.Stmt> Stmt
@@ -87,10 +106,24 @@ ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
   | HEIGHT COLON NUM { Height (fst $3, $1) }
 ;
 
-TextProp : FOREGROUND COLON COLOR {}
-// TODO: figure out how to make color type here aswelll as all these props:
-    ForeGround of ColorT * Position
-    | BackGround of ColorT * Position
+Color : HEXCOLOR { match parse_hex_code (fst $1) with
+        | Some rgba -> Hex (rgba, snd $1)
+        | None -> failwithf "Invalid hex color: %s" (fst $1) }
+      | COLORNAME { match System.String.ToLower fst $1 with
+        | "red" -> ColorName (Red, snd $1)
+        | "blue" -> ColorName (Blue, snd $1)
+        | "yellow" -> ColorName (Yellow, snd $1)
+        | "pink" -> ColorName (Pink, snd $1)
+        | "green" -> ColorName (Green, snd $1)
+      | _ -> failwithf "Unknown color name: %s" fst $1}
+;
+
+TextProp : FOREGROUND COLON Color { ForeGround ($3, $1) }
+         | BACKGROUND COLON Color { BackGround ($3, $1) }
+         | ...
+;
+
+(* TODO
     // Font Settings
     | FontFamily of string * Position
     | FontSize of  int
@@ -103,7 +136,7 @@ TextProp : FOREGROUND COLON COLOR {}
     | TextWrap of TextWrapT
     | TextAlign of TextAlignT
     | TextTrim of TextTrimT
-
+*)
 
 Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { Function (fst $2, $6, $1) }
 ;
