@@ -1,5 +1,11 @@
 # Mango-fn
 
+# Code Structure
+The code is mostly build using module-based code structuring. The project is build as an fsharp project with the source code relying inside the innermost "Mango" folder.
+
+## Namespaces
+- AvaloniaHelpers - Helper functions for interpreting and constructing UI using Avalonia UI.
+
 # Design Principles
 ## 1. Joy of Creation First
 "It should feel fun, not technical."

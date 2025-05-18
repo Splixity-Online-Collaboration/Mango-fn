@@ -13,7 +13,11 @@ window "mango!" 600 400 "icon.png" {
     calendar
     togglebutton
     toggleswitch "just a string for now"
-
+    text "hello" {
+        foreground: red
+        fontstyle: italic
+        fontweight: 100
+    }
     function test() {
         let test1 = 3
         let test2 = "hello world"

@@ -40,8 +40,7 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
 
 //information-carrying tokens
 %token <int * Position> NUM
-%token <string * Position> ID STRINGLIT
-%token <strin * Position> HEXCOLOR
+%token <string * Position> ID STRINGLIT HEXCOLOR COLORNAME
 //keywords
 %token <Position> WINDOW 
 %token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
@@ -106,6 +105,8 @@ ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
   | HEIGHT COLON NUM { Height (fst $3, $1) }
 ;
 
+
+// TODO: lex the colornames as keywords
 Color : HEXCOLOR { match parse_hex_code (fst $1) with
         | Some rgba -> Hex (rgba, snd $1)
         | None -> failwithf "Invalid hex color: %s" (fst $1) }
@@ -120,8 +121,18 @@ Color : HEXCOLOR { match parse_hex_code (fst $1) with
 
 TextProp : FOREGROUND COLON Color { ForeGround ($3, $1) }
          | BACKGROUND COLON Color { BackGround ($3, $1) }
-         | ...
+         | FONTFAMILY COLON STRINGLIT { FontFamily ($3, fst $1)}
+         | FONTSIZE COLON NUM { FontSize ($3, fst $1) }
+         | FONTWEIGHT COLON NUM { FontWeight ($3, fst $1)}
+         | FONTSTYLE COLON FontStyle
 ;
+
+// TODO: lex those styles as keywords
+FontStyle: FONTSTYLE { match fst $1 with 
+           | "italic" -> Italic
+           | "strikethrough" -> StrikeThrough
+           | "underline" -> Underline
+           | _ -> failwithf "Unknown fontstyle: %s" fst $1}
 
 (* TODO
     // Font Settings

@@ -15,13 +15,13 @@ let fromCString (s : string) : string =
 type Position = int * int                                                  // row column
 
 type Value =
-    Int of int
+    | Int of int
     | Real of float
     | String of string
     | Bool of bool
 
 type Exp =
-    Constant of Value * Position                                                  // int_val
+    | Constant of Value * Position                                                  // int_val
     | Var of string * Position                                                // variable_name
     
 type Stmt = 
@@ -30,12 +30,12 @@ type Stmt =
 type FunctionT = Function of string * Stmt list * Position
 
 type ButtonProp =
-    IsVisible of bool * Position                                                // is_visible?
+    | IsVisible of bool * Position                                                // is_visible?
     | Width of int * Position
     | Height of int * Position
 
-type FontStyleT =
-    Italic
+type FontStyleT = 
+    | Italic
     | StrikeThrough
     | Underline
 
@@ -49,7 +49,7 @@ type PredefinedColor =
 type HexCode = byte * byte * byte * byte
 
 type ColorT =
-    ColorName of PredefinedColor * Position
+    | ColorName of PredefinedColor * Position
     | Hex of HexCode * Position
 
 type TextWrapT =
@@ -67,24 +67,28 @@ type TextTrimT =
     | Character
     | NoTrim
 
+type PaddingT =
+  | Uniform of int * int * int * int
+  | Symmetric of int * int
+
 type TextBlockProp =
-    ForeGround of ColorT * Position
+    | ForeGround of ColorT * Position
     | BackGround of ColorT * Position
     // Font Settings
     | FontFamily of string * Position
-    | FontSize of  int
-    | FontWeight of int
-    | FontStyle of FontStyleT list
+    | FontSize of  int * Position
+    | FontWeight of int * Position
+    | FontStyle of FontStyleT list * Position
     // Padding
-    | Padding
+    | Padding of PaddingT * Position
     // Formatting
-    | LineHeight
-    | TextWrap of TextWrapT
-    | TextAlign of TextAlignT
-    | TextTrim of TextTrimT
+    | LineHeight of int * Position
+    | TextWrap of TextWrapT * Position
+    | TextAlign of TextAlignT * Position
+    | TextTrim of TextTrimT * Position
 
 type UIElement = 
-    Button of string * ButtonProp list * Position
+    | Button of string * ButtonProp list * Position
     | TextBlock of string * TextBlockProp list * Position
     | TextBox of string * Position 
     | CheckBox of string * Position
