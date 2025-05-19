@@ -9,7 +9,35 @@ type token =
   | LEFT_PAR of (Position)
   | RIGHT_PAR of (Position)
   | EQUAL of (Position)
-  | IS_VISIBILE of (Position)
+  | WORD of (Position)
+  | CHARACTER of (Position)
+  | NOTRIM of (Position)
+  | OVERFLOW of (Position)
+  | WRAP of (Position)
+  | FORCEWRAP of (Position)
+  | CENTER of (Position)
+  | LEFT of (Position)
+  | RIGHT of (Position)
+  | RED of (Position)
+  | BLUE of (Position)
+  | GREEN of (Position)
+  | YELLOW of (Position)
+  | PINK of (Position)
+  | ITALIC of (Position)
+  | UNDERLINE of (Position)
+  | STRIKETHROUGH of (Position)
+  | FOREGROUND of (Position)
+  | BACKGROUND of (Position)
+  | FONTFAMILY of (Position)
+  | FONTSIZE of (Position)
+  | FONTWEIGHT of (Position)
+  | FONTSTYLE of (Position)
+  | PADDING of (Position)
+  | LINEHEIGHT of (Position)
+  | TEXTALIGN of (Position)
+  | TEXTWRAP of (Position)
+  | TEXTTRIM of (Position)
+  | IS_VISIBLE of (Position)
   | TRUE of (Position)
   | FALSE of (Position)
   | WIDTH of (Position)
@@ -27,6 +55,7 @@ type token =
   | WINDOW of (Position)
   | ID of (string * Position)
   | STRINGLIT of (string * Position)
+  | HEXCOLOR of (string * Position)
   | NUM of (int * Position)
 type tokenId = 
     | TOKEN_EOF
@@ -37,7 +66,35 @@ type tokenId =
     | TOKEN_LEFT_PAR
     | TOKEN_RIGHT_PAR
     | TOKEN_EQUAL
-    | TOKEN_IS_VISIBILE
+    | TOKEN_WORD
+    | TOKEN_CHARACTER
+    | TOKEN_NOTRIM
+    | TOKEN_OVERFLOW
+    | TOKEN_WRAP
+    | TOKEN_FORCEWRAP
+    | TOKEN_CENTER
+    | TOKEN_LEFT
+    | TOKEN_RIGHT
+    | TOKEN_RED
+    | TOKEN_BLUE
+    | TOKEN_GREEN
+    | TOKEN_YELLOW
+    | TOKEN_PINK
+    | TOKEN_ITALIC
+    | TOKEN_UNDERLINE
+    | TOKEN_STRIKETHROUGH
+    | TOKEN_FOREGROUND
+    | TOKEN_BACKGROUND
+    | TOKEN_FONTFAMILY
+    | TOKEN_FONTSIZE
+    | TOKEN_FONTWEIGHT
+    | TOKEN_FONTSTYLE
+    | TOKEN_PADDING
+    | TOKEN_LINEHEIGHT
+    | TOKEN_TEXTALIGN
+    | TOKEN_TEXTWRAP
+    | TOKEN_TEXTTRIM
+    | TOKEN_IS_VISIBLE
     | TOKEN_TRUE
     | TOKEN_FALSE
     | TOKEN_WIDTH
@@ -55,6 +112,7 @@ type tokenId =
     | TOKEN_WINDOW
     | TOKEN_ID
     | TOKEN_STRINGLIT
+    | TOKEN_HEXCOLOR
     | TOKEN_NUM
     | TOKEN_end_of_input
     | TOKEN_error
@@ -64,8 +122,17 @@ type nonTerminalId =
     | NONTERM_Window
     | NONTERM_UIElements
     | NONTERM_ButtonProps
+    | NONTERM_TextProps
     | NONTERM_UIElement
     | NONTERM_ButtonProp
+    | NONTERM_Color
+    | NONTERM_FontStyle
+    | NONTERM_FontStyles
+    | NONTERM_TextAlign
+    | NONTERM_TextWrap
+    | NONTERM_TextTrim
+    | NONTERM_Padding
+    | NONTERM_TextProp
     | NONTERM_Function
     | NONTERM_Statements
     | NONTERM_Stmt

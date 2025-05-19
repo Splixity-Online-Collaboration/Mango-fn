@@ -44,11 +44,38 @@ let keyword (s, pos) =
        | "toggleswitch"   -> Parser.TOGGLESWITCH pos
        | "calendar"       -> Parser.CALENDAR pos
        | "togglebutton"   -> Parser.TOGGLEBUTTON pos
-       | "isVisible"      -> Parser.IS_VISIBILE pos
+       | "isVisible"      -> Parser.IS_VISIBLE pos
        | "width"          -> Parser.WIDTH pos
        | "height"         -> Parser.HEIGHT pos
        | "true"           -> Parser.TRUE pos
        | "false"          -> Parser.FALSE pos
+
+       // FontStyle
+       | "italic"         -> Parser.ITALIC pos 
+       | "underline"      -> Parser.UNDERLINE pos
+       | "strikethrough"  -> Parser.STRIKETHROUGH pos
+
+       // TextAlign
+       | "center"         -> Parser.CENTER pos
+       | "left"           -> Parser.LEFT pos
+       | "right"          -> Parser.RIGHT pos
+
+       // TextWrap
+       | "overflow"       -> Parser.OVERFLOW pos
+       | "wrap"           -> Parser.WRAP pos
+       | "forcewrap"      -> Parser.FORCEWRAP pos
+
+       // TextTrim
+       | "word"           -> Parser.WORD pos
+       | "character"      -> Parser.CHARACTER pos
+       | "notrim"         -> Parser.NOTRIM pos
+
+       // ColorT
+       | "red"            -> Parser.RED pos 
+       | "blue"           -> Parser.BLUE pos 
+       | "green"          -> Parser.GREEN pos 
+       | "yellow"         -> Parser.YELLOW pos 
+       | "pink"           -> Parser.PINK pos 
 
        | "let"            -> Parser.LET pos
        | "function"       -> Parser.FUNCTION pos
@@ -76,7 +103,7 @@ rule Token = parse
                             let str1 = str0.Substring (1, (String.length str0) - 2)
                             Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
                           }
-  | '#' ['0'-'9' 'a'-'f' 'A'-'F']{6,8}
+  | '#' ['0'-'9' 'a'-'f' 'A'-'F']
                           {
                             let str = Encoding.UTF8.GetString(lexbuf.Lexeme)
                             Parser.HEXCOLOR (str, getPos lexbuf)

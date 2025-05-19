@@ -24,7 +24,7 @@ let applyFontFamily props applied =
 
 let applyFontSize props applied =
     applyProp props applied (function
-        | FontSize i -> Some (TextBlock.fontSize (float i))
+        | FontSize (i,_) -> Some (TextBlock.fontSize (float i))
         | _ -> None)
 
 let applyTextBlockProperties props =

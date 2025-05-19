@@ -21,6 +21,8 @@ let add_ui_elements window elements =
   | Window (name, width, height, icon, _, pos) -> Window (name, width, height, icon, elements, pos)
 
 let default_button_props pos = [IsVisible (true, pos) ]
+let default_text_props pos = [ForeGround (Hex (HexCode(byte 255,byte 255,byte 255,byte 255), pos), pos) ]
+
 
 let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
     let hex = if s.StartsWith("#") then s.Substring(1) else s
@@ -40,11 +42,17 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
 
 //information-carrying tokens
 %token <int * Position> NUM
-%token <string * Position> ID STRINGLIT HEXCOLOR COLORNAME
+%token <string * Position> ID STRINGLIT HEXCOLOR
 //keywords
 %token <Position> WINDOW 
 %token <Position> BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
-%token <Position> IS_VISIBILE TRUE FALSE WIDTH HEIGHT FUNCTION LET
+%token <Position> IS_VISIBLE TRUE FALSE WIDTH HEIGHT FUNCTION LET
+%token <Position> FOREGROUND BACKGROUND FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE PADDING LINEHEIGHT TEXTALIGN TEXTWRAP TEXTTRIM
+%token <Position> ITALIC UNDERLINE STRIKETHROUGH
+%token <Position> RED BLUE GREEN YELLOW PINK
+%token <Position> CENTER LEFT RIGHT
+%token <Position> OVERFLOW WRAP FORCEWRAP
+%token <Position> WORD CHARACTER NOTRIM
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON LEFT_PAR RIGHT_PAR EQUAL
 
 %start Prog
@@ -87,10 +95,10 @@ ButtonProps : ButtonProp ButtonProps    { $1 :: $2 }
 TextProps : TextProp TextProps          { $1 :: $2 }
           | TextProp                    { $1 :: [] }
 
-
 UIElement : BUTTON STRINGLIT { Button (fst $2, default_button_props $1, $1) }
           | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET { Button (fst $2, $4, $1) }
-          | TEXT STRINGLIT LEFT_CURLY_BRACKET  Text{ TextBlock (fst $2, $1) }
+          | TEXT STRINGLIT { TextBlock (fst $2, default_text_props $1 ,$1) }
+          | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET { TextBlock (fst $2, $4, $1) }
           | TEXTBOX STRINGLIT { TextBox (fst $2, $1) }
           | CHECKBOX STRINGLIT { CheckBox (fst $2, $1) }
           | RADIOBUTTON STRINGLIT { RadioButton (fst $2, $1) }
@@ -99,55 +107,74 @@ UIElement : BUTTON STRINGLIT { Button (fst $2, default_button_props $1, $1) }
           | TOGGLEBUTTON { ToggleButton $1 }
 ;
 
-ButtonProp : IS_VISIBILE COLON TRUE { IsVisible (true, $1) }
-  | IS_VISIBILE COLON FALSE { IsVisible (false, $1) }
+ButtonProp : IS_VISIBLE COLON TRUE { IsVisible (true, $1) }
+  | IS_VISIBLE COLON FALSE { IsVisible (false, $1) }
   | WIDTH COLON NUM { Width (fst $3, $1) }
   | HEIGHT COLON NUM { Height (fst $3, $1) }
 ;
 
+Color :
+  | HEXCOLOR {
+      match parse_hex_code (fst $1) with
+      | Some rgba -> Hex (rgba, snd $1)
+      | None -> failwithf "Invalid hex color: %s" (fst $1)
+    }
+  | RED    { ColorName (Red, $1) }
+  | BLUE   { ColorName (Blue, $1) }
+  | GREEN  { ColorName (Green, $1) }
+  | YELLOW { ColorName (Yellow, $1) }
+  | PINK   { ColorName (Pink, $1) }
+;
 
-// TODO: lex the colornames as keywords
-Color : HEXCOLOR { match parse_hex_code (fst $1) with
-        | Some rgba -> Hex (rgba, snd $1)
-        | None -> failwithf "Invalid hex color: %s" (fst $1) }
-      | COLORNAME { match System.String.ToLower fst $1 with
-        | "red" -> ColorName (Red, snd $1)
-        | "blue" -> ColorName (Blue, snd $1)
-        | "yellow" -> ColorName (Yellow, snd $1)
-        | "pink" -> ColorName (Pink, snd $1)
-        | "green" -> ColorName (Green, snd $1)
-      | _ -> failwithf "Unknown color name: %s" fst $1}
+FontStyle:
+    ITALIC         { Italic }
+  | UNDERLINE      { Underline }
+  | STRIKETHROUGH  { StrikeThrough }
+;
+
+FontStyles : FontStyle FontStyles       { $1 :: $2 }
+           | FontStyle                  { $1 :: [] }
+;
+
+TextAlign :
+    CENTER { Center }
+  | LEFT { Left }
+  | RIGHT { Right }
+;
+
+TextWrap :
+    OVERFLOW { Overflow }
+  | WRAP { Wrap }
+  | FORCEWRAP { ForceWrap }
+;
+
+TextTrim :
+    WORD { Word }
+  | CHARACTER { Character }
+  | NOTRIM { NoTrim }
+;
+
+Padding :
+    NUM COMMA NUM COMMA NUM COMMA NUM {
+      Uniform (fst $1, fst $3, fst $5, fst $7)
+    }
+  | NUM COMMA NUM {
+      Symmetric (fst $1, fst $3)
+    }
 ;
 
 TextProp : FOREGROUND COLON Color { ForeGround ($3, $1) }
          | BACKGROUND COLON Color { BackGround ($3, $1) }
-         | FONTFAMILY COLON STRINGLIT { FontFamily ($3, fst $1)}
-         | FONTSIZE COLON NUM { FontSize ($3, fst $1) }
-         | FONTWEIGHT COLON NUM { FontWeight ($3, fst $1)}
-         | FONTSTYLE COLON FontStyle
+         | FONTFAMILY COLON STRINGLIT { FontFamily (fst $3, $1)}
+         | FONTSIZE COLON NUM { FontSize (fst $3, $1) }
+         | FONTWEIGHT COLON NUM { FontWeight (fst $3, $1)}
+         | FONTSTYLE COLON FontStyles { FontStyle (List.rev $3, $1)}
+         | PADDING COLON Padding { Padding ($3, $1) }
+         | LINEHEIGHT COLON NUM { LineHeight (fst $3, $1)}
+         | TEXTALIGN COLON TextAlign { TextAlign($3, $1) }
+         | TEXTWRAP COLON TextWrap { TextWrap($3, $1) }
+         | TEXTTRIM COLON TextTrim { TextTrim($3, $1) }
 ;
-
-// TODO: lex those styles as keywords
-FontStyle: FONTSTYLE { match fst $1 with 
-           | "italic" -> Italic
-           | "strikethrough" -> StrikeThrough
-           | "underline" -> Underline
-           | _ -> failwithf "Unknown fontstyle: %s" fst $1}
-
-(* TODO
-    // Font Settings
-    | FontFamily of string * Position
-    | FontSize of  int
-    | FontWeight of int
-    | FontStyle of FontStyleT list
-    // Padding
-    | Padding
-    // Formatting
-    | LineHeight
-    | TextWrap of TextWrapT
-    | TextAlign of TextAlignT
-    | TextTrim of TextTrimT
-*)
 
 Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { Function (fst $2, $6, $1) }
 ;

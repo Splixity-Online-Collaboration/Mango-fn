@@ -1,25 +1,25 @@
 window "mango!" 600 400 "icon.png" {
     button "test!" {
-        isVisible: false
-        width: 32
-        height: 32    
+         isVisible: false
+         width: 32
+         height: 32    
     }
     button "test2!"
     checkbox "I possess a mango!"
     checkbox "I possess two mangos!!"
     radiobutton "Check me to be as cool as a mango"
-    text "Put any text below here.."
+    // text "Put any text below here.."
     textbox "mango sightings of the day"
     calendar
     togglebutton
     toggleswitch "just a string for now"
-    text "hello" {
-        foreground: red
-        fontstyle: italic
-        fontweight: 100
-    }
-    function test() {
-        let test1 = 3
-        let test2 = "hello world"
-    }
+    // text "hello" {
+    //  foreground: red
+    //  fontstyle: italic
+    //  fontweight: 100
+    //}
+    // function test() {
+    //      let test1 = 3
+    //      let test2 = "hello world"
+    // }
 }
