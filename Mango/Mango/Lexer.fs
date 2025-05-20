@@ -7,83 +7,93 @@ open System
 open FSharp.Text.Lexing
 open System.Text
 
-(* A lexer definition for Fasto, for use with fslex. *)
-
-(* boilerplate code for all lexer files... *)
+(* Boilerplate tracking for position handling *)
 let mutable currentLine = 1
 let mutable lineStartPos = [0]
 
 let rec getLineCol pos line = function
-    |  (p1::ps) ->
-        if pos>=p1
-        then (line, pos-p1)
-        else getLineCol pos (line-1) ps
-    |  [] -> (0,0) (* should not happen *)
+    | p1 :: ps ->
+        if pos >= p1 then (line, pos - p1)
+        else getLineCol pos (line - 1) ps
+    | [] -> (0, 0) // Should not happen
 
-let getPos (lexbuf : LexBuffer<'char>) =
-      getLineCol lexbuf.StartPos.pos_cnum
-                 (currentLine)
-                 (lineStartPos)
+let getPos (lexbuf: LexBuffer<'char>) =
+    getLineCol lexbuf.StartPos.pos_cnum currentLine lineStartPos
 
-exception LexicalError of string * (int * int) (* (message, (line, column)) *)
+exception LexicalError of string * (int * int) // (message, (line, column))
 
 let lexerError lexbuf s =
-     raise (LexicalError (s, getPos lexbuf))
+    raise (LexicalError (s, getPos lexbuf))
 
-(* This one is language specific, yet very common. Alternative would
-   be to encode every keyword as a regexp. This one is much easier.
-   Note that here we recognize specific keywords, and if none matches
-   then we assume we have found a user-defined identifier (last case).
-*)
+(* Recognize keywords or treat as identifier *)
 let keyword (s, pos) =
-     match s with
-       | "window"         -> Parser.WINDOW pos
-       | "button"         -> Parser.BUTTON pos
-       | "text"           -> Parser.TEXT pos
-       | "textbox"        -> Parser.TEXTBOX pos
-       | "checkbox"       -> Parser.CHECKBOX pos
-       | "radiobutton"    -> Parser.RADIOBUTTON pos
-       | "toggleswitch"   -> Parser.TOGGLESWITCH pos
-       | "calendar"       -> Parser.CALENDAR pos
-       | "togglebutton"   -> Parser.TOGGLEBUTTON pos
-       | "isVisible"      -> Parser.IS_VISIBLE pos
-       | "width"          -> Parser.WIDTH pos
-       | "height"         -> Parser.HEIGHT pos
-       | "true"           -> Parser.TRUE pos
-       | "false"          -> Parser.FALSE pos
+    match s with
+    // Elements
+    | "window"        -> Parser.WINDOW pos
+    | "button"        -> Parser.BUTTON pos
+    | "text"          -> Parser.TEXT pos
+    | "textbox"       -> Parser.TEXTBOX pos
+    | "checkbox"      -> Parser.CHECKBOX pos
+    | "radiobutton"   -> Parser.RADIOBUTTON pos
+    | "toggleswitch"  -> Parser.TOGGLESWITCH pos
+    | "calendar"      -> Parser.CALENDAR pos
+    | "togglebutton"  -> Parser.TOGGLEBUTTON pos
 
-       // FontStyle
-       | "italic"         -> Parser.ITALIC pos 
-       | "underline"      -> Parser.UNDERLINE pos
-       | "strikethrough"  -> Parser.STRIKETHROUGH pos
+    // Boolean & Dimensions
+    | "true"          -> Parser.TRUE pos
+    | "false"         -> Parser.FALSE pos
+    | "isvisible"     -> Parser.IS_VISIBLE pos
+    | "width"         -> Parser.WIDTH pos
+    | "height"        -> Parser.HEIGHT pos
 
-       // TextAlign
-       | "center"         -> Parser.CENTER pos
-       | "left"           -> Parser.LEFT pos
-       | "right"          -> Parser.RIGHT pos
+    // Text Props
+    | "foreground"    -> Parser.FOREGROUND pos
+    | "background"    -> Parser.BACKGROUND pos
+    | "fontfamily"    -> Parser.FONTFAMILY pos
+    | "fontsize"      -> Parser.FONTSIZE pos
+    | "fontweight"    -> Parser.FONTWEIGHT pos
+    | "fontstyle"     -> Parser.FONTSTYLE pos
+    | "padding"       -> Parser.PADDING pos
+    | "lineheight"    -> Parser.LINEHEIGHT pos
+    | "textalign"     -> Parser.TEXTALIGN pos
+    | "textwrap"      -> Parser.TEXTWRAP pos
+    | "texttrim"      -> Parser.TEXTTRIM pos
 
-       // TextWrap
-       | "overflow"       -> Parser.OVERFLOW pos
-       | "wrap"           -> Parser.WRAP pos
-       | "forcewrap"      -> Parser.FORCEWRAP pos
+    // Fontstyle Values
+    | "italic"        -> Parser.ITALIC pos
+    | "underline"     -> Parser.UNDERLINE pos
+    | "strikethrough" -> Parser.STRIKETHROUGH pos
 
-       // TextTrim
-       | "word"           -> Parser.WORD pos
-       | "character"      -> Parser.CHARACTER pos
-       | "notrim"         -> Parser.NOTRIM pos
+    // Textalign Values
+    | "center"        -> Parser.CENTER pos
+    | "left"          -> Parser.LEFT pos
+    | "right"         -> Parser.RIGHT pos
 
-       // ColorT
-       | "red"            -> Parser.RED pos 
-       | "blue"           -> Parser.BLUE pos 
-       | "green"          -> Parser.GREEN pos 
-       | "yellow"         -> Parser.YELLOW pos 
-       | "pink"           -> Parser.PINK pos 
+    // Textwrap Values
+    | "overflow"      -> Parser.OVERFLOW pos
+    | "wrap"          -> Parser.WRAP pos
+    | "forcewrap"     -> Parser.FORCEWRAP pos
 
-       | "let"            -> Parser.LET pos
-       | "function"       -> Parser.FUNCTION pos
-       | _                -> Parser.ID (s, pos)
+    // Texttrim Values
+    | "word"          -> Parser.WORD pos
+    | "character"     -> Parser.CHARACTER pos
+    | "notrim"        -> Parser.NOTRIM pos
 
-# 86 "Lexer.fs"
+    // Color Constants
+    | "red"           -> Parser.RED pos
+    | "blue"          -> Parser.BLUE pos
+    | "green"         -> Parser.GREEN pos
+    | "yellow"        -> Parser.YELLOW pos
+    | "pink"          -> Parser.PINK pos
+
+    // General Language Keywords
+    | "let"           -> Parser.LET pos
+    | "function"      -> Parser.FUNCTION pos
+
+    // Fallback
+    | _               -> Parser.ID (s, pos)
+
+# 96 "Lexer.fs"
 let trans : uint16[] array = 
     [| 
    (* State 0 *)
@@ -148,98 +158,105 @@ let rec _fslex_dummy () = _fslex_dummy()
 and Token  lexbuf =
   match _fslex_tables.Interpret(0,lexbuf) with
   | 0 -> ( 
-# 86 "Lexer.fsl"
-                                           Token lexbuf 
-# 153 "Lexer.fs"
+# 96 "Lexer.fsl"
+                                             Token lexbuf 
+# 163 "Lexer.fs"
           )
   | 1 -> ( 
-# 87 "Lexer.fsl"
-                                           currentLine  <- currentLine + 1;
-                                           lineStartPos <-  lexbuf.StartPos.pos_cnum
-                                                            :: lineStartPos;
-                                           Token lexbuf 
-# 161 "Lexer.fs"
+# 98 "Lexer.fsl"
+                                            
+                                             currentLine <- currentLine + 1
+                                             lineStartPos <- lexbuf.StartPos.pos_cnum :: lineStartPos
+                                             Token lexbuf
+                                           
+# 172 "Lexer.fs"
           )
   | 2 -> ( 
-# 91 "Lexer.fsl"
-                                           Token lexbuf 
-# 166 "Lexer.fs"
+# 104 "Lexer.fsl"
+                                             Token lexbuf 
+# 177 "Lexer.fs"
           )
   | 3 -> ( 
-# 93 "Lexer.fsl"
-                                               Parser.NUM
-                                                 ( int (Encoding.UTF8.GetString(lexbuf.Lexeme))
-                                                 , getPos lexbuf )
-                                             
-# 174 "Lexer.fs"
+# 106 "Lexer.fsl"
+                                              
+                                             Parser.NUM (
+                                                 int (Encoding.UTF8.GetString lexbuf.Lexeme),
+                                                 getPos lexbuf
+                                             )
+                                           
+# 187 "Lexer.fs"
           )
   | 4 -> ( 
-# 98 "Lexer.fsl"
-                                           keyword ( Encoding.UTF8.GetString(lexbuf.Lexeme)
-                                                   , getPos lexbuf ) 
-# 180 "Lexer.fs"
-          )
-  | 5 -> ( 
-# 101 "Lexer.fsl"
-                                          
-                                           let str0 = Encoding.UTF8.GetString(lexbuf.Lexeme)
-                                           let str1 = str0.Substring (1, (String.length str0) - 2)
-                                           Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
-                                         
-# 189 "Lexer.fs"
-          )
-  | 6 -> ( 
-# 107 "Lexer.fsl"
-                                          
-                                           let str = Encoding.UTF8.GetString(lexbuf.Lexeme)
-                                           Parser.HEXCOLOR (str, getPos lexbuf)
-                                         
+# 113 "Lexer.fsl"
+                                                                    
+                                             keyword (
+                                                 Encoding.UTF8.GetString lexbuf.Lexeme,
+                                                 getPos lexbuf
+                                             )
+                                           
 # 197 "Lexer.fs"
           )
+  | 5 -> ( 
+# 123 "Lexer.fsl"
+                             
+                                             let str0 = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             let str1 = str0.Substring(1, str0.Length - 2)
+                                             Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
+                                           
+# 206 "Lexer.fs"
+          )
+  | 6 -> ( 
+# 129 "Lexer.fsl"
+                                                  
+                                             let str = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             Parser.HEXCOLOR (str, getPos lexbuf)
+                                           
+# 214 "Lexer.fs"
+          )
   | 7 -> ( 
-# 111 "Lexer.fsl"
-                                           Parser.COMMA  (getPos lexbuf) 
-# 202 "Lexer.fs"
+# 134 "Lexer.fsl"
+                                             Parser.COMMA (getPos lexbuf) 
+# 219 "Lexer.fs"
           )
   | 8 -> ( 
-# 112 "Lexer.fsl"
-                                           Parser.LEFT_CURLY_BRACKET (getPos lexbuf) 
-# 207 "Lexer.fs"
+# 135 "Lexer.fsl"
+                                             Parser.LEFT_CURLY_BRACKET (getPos lexbuf) 
+# 224 "Lexer.fs"
           )
   | 9 -> ( 
-# 113 "Lexer.fsl"
-                                           Parser.RIGHT_CURLY_BRACKET (getPos lexbuf) 
-# 212 "Lexer.fs"
+# 136 "Lexer.fsl"
+                                             Parser.RIGHT_CURLY_BRACKET (getPos lexbuf) 
+# 229 "Lexer.fs"
           )
   | 10 -> ( 
-# 114 "Lexer.fsl"
-                                           Parser.LEFT_PAR (getPos lexbuf) 
-# 217 "Lexer.fs"
+# 137 "Lexer.fsl"
+                                             Parser.LEFT_PAR (getPos lexbuf) 
+# 234 "Lexer.fs"
           )
   | 11 -> ( 
-# 115 "Lexer.fsl"
-                                           Parser.RIGHT_PAR (getPos lexbuf) 
-# 222 "Lexer.fs"
+# 138 "Lexer.fsl"
+                                             Parser.RIGHT_PAR (getPos lexbuf) 
+# 239 "Lexer.fs"
           )
   | 12 -> ( 
-# 116 "Lexer.fsl"
-                                           Parser.COLON (getPos lexbuf) 
-# 227 "Lexer.fs"
+# 139 "Lexer.fsl"
+                                             Parser.COLON (getPos lexbuf) 
+# 244 "Lexer.fs"
           )
   | 13 -> ( 
-# 117 "Lexer.fsl"
-                                           Parser.EQUAL (getPos lexbuf) 
-# 232 "Lexer.fs"
+# 140 "Lexer.fsl"
+                                             Parser.EQUAL (getPos lexbuf) 
+# 249 "Lexer.fs"
           )
   | 14 -> ( 
-# 118 "Lexer.fsl"
-                                           Parser.EOF    (getPos lexbuf) 
-# 237 "Lexer.fs"
+# 141 "Lexer.fsl"
+                                             Parser.EOF (getPos lexbuf) 
+# 254 "Lexer.fs"
           )
   | 15 -> ( 
-# 119 "Lexer.fsl"
-                                           lexerError lexbuf "Illegal symbol in input" 
-# 242 "Lexer.fs"
+# 143 "Lexer.fsl"
+                                             lexerError lexbuf "Illegal symbol in input" 
+# 259 "Lexer.fs"
           )
   | _ -> failwith "Token"
 

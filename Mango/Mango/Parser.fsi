@@ -44,6 +44,7 @@ type token =
   | HEIGHT of (Position)
   | FUNCTION of (Position)
   | LET of (Position)
+  | WINDOW of (Position)
   | BUTTON of (Position)
   | TEXT of (Position)
   | TEXTBOX of (Position)
@@ -52,7 +53,6 @@ type token =
   | CALENDAR of (Position)
   | TOGGLEBUTTON of (Position)
   | TOGGLESWITCH of (Position)
-  | WINDOW of (Position)
   | ID of (string * Position)
   | STRINGLIT of (string * Position)
   | HEXCOLOR of (string * Position)
@@ -101,6 +101,7 @@ type tokenId =
     | TOKEN_HEIGHT
     | TOKEN_FUNCTION
     | TOKEN_LET
+    | TOKEN_WINDOW
     | TOKEN_BUTTON
     | TOKEN_TEXT
     | TOKEN_TEXTBOX
@@ -109,7 +110,6 @@ type tokenId =
     | TOKEN_CALENDAR
     | TOKEN_TOGGLEBUTTON
     | TOKEN_TOGGLESWITCH
-    | TOKEN_WINDOW
     | TOKEN_ID
     | TOKEN_STRINGLIT
     | TOKEN_HEXCOLOR
@@ -121,10 +121,11 @@ type nonTerminalId =
     | NONTERM_Prog
     | NONTERM_Window
     | NONTERM_UIElements
-    | NONTERM_ButtonProps
-    | NONTERM_TextProps
     | NONTERM_UIElement
+    | NONTERM_ButtonProps
     | NONTERM_ButtonProp
+    | NONTERM_TextProps
+    | NONTERM_TextProp
     | NONTERM_Color
     | NONTERM_FontStyle
     | NONTERM_FontStyles
@@ -132,7 +133,6 @@ type nonTerminalId =
     | NONTERM_TextWrap
     | NONTERM_TextTrim
     | NONTERM_Padding
-    | NONTERM_TextProp
     | NONTERM_Function
     | NONTERM_Statements
     | NONTERM_Stmt

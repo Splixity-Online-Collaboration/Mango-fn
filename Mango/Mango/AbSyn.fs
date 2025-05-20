@@ -1,18 +1,18 @@
 module AbSyn
 
-// Doesn't actually support all escapes.  Too badefacilliteter.
+// Doesn't actually support all escapes. Too bad.
 let fromCString (s : string) : string =
     let rec unescape l: char list =
         match l with
-            | []                -> []
-            | '\\' :: 'n' :: l' -> '\n' :: unescape l'
-            | '\\' :: 't' :: l' -> '\t' :: unescape l'
-            | '\\' :: c   :: l' -> c    :: unescape l'
-            | c           :: l' -> c    :: unescape l'
+        | []                -> []
+        | '\\' :: 'n' :: l' -> '\n' :: unescape l'
+        | '\\' :: 't' :: l' -> '\t' :: unescape l'
+        | '\\' :: c   :: l' -> c    :: unescape l'
+        | c           :: l' -> c    :: unescape l'
     Seq.toList s |> unescape |> System.String.Concat
 
 (* position: (line, column) *)
-type Position = int * int                                                  // row column
+type Position = int * int  // row, column
 
 type Value =
     | Int of int
@@ -21,16 +21,17 @@ type Value =
     | Bool of bool
 
 type Exp =
-    | Constant of Value * Position                                                  // int_val
-    | Var of string * Position                                                // variable_name
-    
-type Stmt = 
-    Let of string * Exp * Position
+    | Constant of Value * Position
+    | Var of string * Position
 
-type FunctionT = Function of string * Stmt list * Position
+type Stmt = 
+    | Let of string * Exp * Position
+
+type FunctionT = 
+    | Function of string * Stmt list * Position
 
 type ButtonProp =
-    | IsVisible of bool * Position                                                // is_visible?
+    | IsVisible of bool * Position
     | Width of int * Position
     | Height of int * Position
 
@@ -68,15 +69,15 @@ type TextTrimT =
     | NoTrim
 
 type PaddingT =
-  | Uniform of int * int * int * int
-  | Symmetric of int * int
+    | Uniform of int * int * int * int
+    | Symmetric of int * int
 
 type TextBlockProp =
-    | ForeGround of ColorT * Position
-    | BackGround of ColorT * Position
+    | Foreground of ColorT * Position
+    | Background of ColorT * Position
     // Font Settings
     | FontFamily of string * Position
-    | FontSize of  int * Position
+    | FontSize of int * Position
     | FontWeight of int * Position
     | FontStyle of FontStyleT list * Position
     // Padding
@@ -97,4 +98,5 @@ type UIElement =
     | Calendar of Position
     | ToggleButton of Position
 
-type Window = Window of string * int option * int option * string option * UIElement list * Position  // name width height filepathToIcon
+type Window = 
+    | Window of string * int option * int option * string option * UIElement list * Position

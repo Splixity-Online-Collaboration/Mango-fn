@@ -9,12 +9,12 @@ open AvaloniaHelpers.ColorConverter
 
 let applyForeGround props applied =
     applyProp props applied (function
-        | ForeGround (c, _) -> Some (TextBlock.foreground (fromColor c))
+        | Foreground (c, _) -> Some (TextBlock.foreground (fromColor c))
         | _ -> None)
 
 let applyBackGround props applied =
     applyProp props applied (function
-        | BackGround (c, _) -> Some (TextBlock.background (fromColor c))
+        | Background (c, _) -> Some (TextBlock.background (fromColor c))
         | _ -> None)
 
 let applyFontFamily props applied =
