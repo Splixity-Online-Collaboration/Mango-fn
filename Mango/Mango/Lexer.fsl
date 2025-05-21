@@ -125,12 +125,14 @@ rule Token = parse
                               let str1 = str0.Substring(1, str0.Length - 2)
                               Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
                             }
-
-  | '#' ['0'-'9' 'a'-'f' 'A'-'F'] {
+  | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
                               let str = Encoding.UTF8.GetString lexbuf.Lexeme
                               Parser.HEXCOLOR (str, getPos lexbuf)
                             }
-
+  | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
+                              let str = Encoding.UTF8.GetString lexbuf.Lexeme
+                              Parser.HEXCOLOR (str, getPos lexbuf)
+                            }
   | ','                     { Parser.COMMA (getPos lexbuf) }
   | '{'                     { Parser.LEFT_CURLY_BRACKET (getPos lexbuf) }
   | '}'                     { Parser.RIGHT_CURLY_BRACKET (getPos lexbuf) }
