@@ -121,6 +121,7 @@ type nonTerminalId =
     | NONTERM_Prog
     | NONTERM_Window
     | NONTERM_UIElements
+    | NONTERM_Funcs
     | NONTERM_UIElement
     | NONTERM_ButtonProps
     | NONTERM_ButtonProp
@@ -133,6 +134,7 @@ type nonTerminalId =
     | NONTERM_TextWrap
     | NONTERM_TextTrim
     | NONTERM_Padding
+    | NONTERM_Functions
     | NONTERM_Function
     | NONTERM_Statements
     | NONTERM_Stmt

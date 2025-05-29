@@ -10,6 +10,9 @@
   	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="SymTab.fsi" />
+    	<Compile Include="SymTab.fs" />
+    	
     	<FsYacc Include="Parser.fsy">
       		<OtherFlags>-v --module Parser</OtherFlags>
     	</FsYacc>

@@ -23,9 +23,11 @@ type Value =
 type Exp =
     | Constant of Value * Position
     | Var of string * Position
+    | Call of string * Position
 
 type Stmt = 
     | Let of string * Exp * Position
+    | ExprStmt of Exp * Position
 
 type FunctionT = 
     | Function of string * Stmt list * Position
@@ -99,4 +101,4 @@ type UIElement =
     | ToggleButton of Position
 
 type Window = 
-    | Window of string * int option * int option * string option * UIElement list * Position
+    | Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

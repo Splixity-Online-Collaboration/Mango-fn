@@ -21,9 +21,13 @@ let parse_error_rich =
       | Some token -> sprintf "at token %A\n" token
   )
 
+let construct_window window elements functions = 
+    match window with
+    | Window (name, width, height, icon, _, _, pos) -> Window (name, width, height, icon, elements, functions, pos)
+
 let add_ui_elements window elements = 
   match window with
-  | Window (name, width, height, icon, _, pos) -> Window (name, width, height, icon, elements, pos)
+  | Window (name, width, height, icon, _, functions, pos) -> Window (name, width, height, icon, elements, functions, pos)
 
 let default_button_props pos = [IsVisible (true, pos)]
 let default_text_props pos = [Foreground (Hex (HexCode(byte 255,byte 255,byte 255,byte 255), pos), pos)]
@@ -40,7 +44,7 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
       if rOk && gOk && bOk && aOk then Some (r, g, b, a) else None
   | _ -> None
 
-# 43 "Parser.fs"
+# 47 "Parser.fs"
 // This type is the type of tokens accepted by the parser
 type token = 
   | EOF of (Position)
@@ -165,6 +169,7 @@ type nonTerminalId =
     | NONTERM_Prog
     | NONTERM_Window
     | NONTERM_UIElements
+    | NONTERM_Funcs
     | NONTERM_UIElement
     | NONTERM_ButtonProps
     | NONTERM_ButtonProp
@@ -177,6 +182,7 @@ type nonTerminalId =
     | NONTERM_TextWrap
     | NONTERM_TextTrim
     | NONTERM_Padding
+    | NONTERM_Functions
     | NONTERM_Function
     | NONTERM_Statements
     | NONTERM_Stmt
@@ -314,11 +320,11 @@ let prodIdxToNonTerminal (prodIdx:int) =
     | 3 -> NONTERM_Window 
     | 4 -> NONTERM_Window 
     | 5 -> NONTERM_Window 
-    | 6 -> NONTERM_UIElements 
+    | 6 -> NONTERM_Window 
     | 7 -> NONTERM_UIElements 
-    | 8 -> NONTERM_UIElement 
-    | 9 -> NONTERM_UIElement 
-    | 10 -> NONTERM_UIElement 
+    | 8 -> NONTERM_UIElements 
+    | 9 -> NONTERM_Funcs 
+    | 10 -> NONTERM_Funcs 
     | 11 -> NONTERM_UIElement 
     | 12 -> NONTERM_UIElement 
     | 13 -> NONTERM_UIElement 
@@ -326,17 +332,17 @@ let prodIdxToNonTerminal (prodIdx:int) =
     | 15 -> NONTERM_UIElement 
     | 16 -> NONTERM_UIElement 
     | 17 -> NONTERM_UIElement 
-    | 18 -> NONTERM_ButtonProps 
-    | 19 -> NONTERM_ButtonProps 
-    | 20 -> NONTERM_ButtonProp 
-    | 21 -> NONTERM_ButtonProp 
-    | 22 -> NONTERM_ButtonProp 
+    | 18 -> NONTERM_UIElement 
+    | 19 -> NONTERM_UIElement 
+    | 20 -> NONTERM_UIElement 
+    | 21 -> NONTERM_ButtonProps 
+    | 22 -> NONTERM_ButtonProps 
     | 23 -> NONTERM_ButtonProp 
-    | 24 -> NONTERM_TextProps 
-    | 25 -> NONTERM_TextProps 
-    | 26 -> NONTERM_TextProp 
-    | 27 -> NONTERM_TextProp 
-    | 28 -> NONTERM_TextProp 
+    | 24 -> NONTERM_ButtonProp 
+    | 25 -> NONTERM_ButtonProp 
+    | 26 -> NONTERM_ButtonProp 
+    | 27 -> NONTERM_TextProps 
+    | 28 -> NONTERM_TextProps 
     | 29 -> NONTERM_TextProp 
     | 30 -> NONTERM_TextProp 
     | 31 -> NONTERM_TextProp 
@@ -345,37 +351,44 @@ let prodIdxToNonTerminal (prodIdx:int) =
     | 34 -> NONTERM_TextProp 
     | 35 -> NONTERM_TextProp 
     | 36 -> NONTERM_TextProp 
-    | 37 -> NONTERM_Color 
-    | 38 -> NONTERM_Color 
-    | 39 -> NONTERM_Color 
+    | 37 -> NONTERM_TextProp 
+    | 38 -> NONTERM_TextProp 
+    | 39 -> NONTERM_TextProp 
     | 40 -> NONTERM_Color 
     | 41 -> NONTERM_Color 
     | 42 -> NONTERM_Color 
-    | 43 -> NONTERM_FontStyle 
-    | 44 -> NONTERM_FontStyle 
-    | 45 -> NONTERM_FontStyle 
-    | 46 -> NONTERM_FontStyles 
-    | 47 -> NONTERM_FontStyles 
-    | 48 -> NONTERM_TextAlign 
-    | 49 -> NONTERM_TextAlign 
-    | 50 -> NONTERM_TextAlign 
-    | 51 -> NONTERM_TextWrap 
-    | 52 -> NONTERM_TextWrap 
-    | 53 -> NONTERM_TextWrap 
-    | 54 -> NONTERM_TextTrim 
-    | 55 -> NONTERM_TextTrim 
-    | 56 -> NONTERM_TextTrim 
-    | 57 -> NONTERM_Padding 
-    | 58 -> NONTERM_Padding 
-    | 59 -> NONTERM_Function 
-    | 60 -> NONTERM_Statements 
-    | 61 -> NONTERM_Statements 
-    | 62 -> NONTERM_Stmt 
-    | 63 -> NONTERM_Exp 
-    | 64 -> NONTERM_Exp 
-    | 65 -> NONTERM_Exp 
-    | 66 -> NONTERM_Exp 
-    | 67 -> NONTERM_Exp 
+    | 43 -> NONTERM_Color 
+    | 44 -> NONTERM_Color 
+    | 45 -> NONTERM_Color 
+    | 46 -> NONTERM_FontStyle 
+    | 47 -> NONTERM_FontStyle 
+    | 48 -> NONTERM_FontStyle 
+    | 49 -> NONTERM_FontStyles 
+    | 50 -> NONTERM_FontStyles 
+    | 51 -> NONTERM_TextAlign 
+    | 52 -> NONTERM_TextAlign 
+    | 53 -> NONTERM_TextAlign 
+    | 54 -> NONTERM_TextWrap 
+    | 55 -> NONTERM_TextWrap 
+    | 56 -> NONTERM_TextWrap 
+    | 57 -> NONTERM_TextTrim 
+    | 58 -> NONTERM_TextTrim 
+    | 59 -> NONTERM_TextTrim 
+    | 60 -> NONTERM_Padding 
+    | 61 -> NONTERM_Padding 
+    | 62 -> NONTERM_Functions 
+    | 63 -> NONTERM_Functions 
+    | 64 -> NONTERM_Function 
+    | 65 -> NONTERM_Statements 
+    | 66 -> NONTERM_Statements 
+    | 67 -> NONTERM_Stmt 
+    | 68 -> NONTERM_Stmt 
+    | 69 -> NONTERM_Exp 
+    | 70 -> NONTERM_Exp 
+    | 71 -> NONTERM_Exp 
+    | 72 -> NONTERM_Exp 
+    | 73 -> NONTERM_Exp 
+    | 74 -> NONTERM_Exp 
     | _ -> failwith "prodIdxToNonTerminal: bad production index"
 
 let _fsyacc_endOfInputTag = 58 
@@ -500,18 +513,18 @@ let _fsyacc_dataOfToken (t:token) =
   | STRINGLIT _fsyacc_x -> Microsoft.FSharp.Core.Operators.box _fsyacc_x 
   | HEXCOLOR _fsyacc_x -> Microsoft.FSharp.Core.Operators.box _fsyacc_x 
   | NUM _fsyacc_x -> Microsoft.FSharp.Core.Operators.box _fsyacc_x 
-let _fsyacc_gotos = [| 0us;65535us;1us;65535us;0us;1us;1us;65535us;0us;2us;2us;65535us;9us;10us;12us;13us;2us;65535us;9us;12us;12us;12us;2us;65535us;16us;17us;34us;35us;2us;65535us;16us;34us;34us;34us;2us;65535us;21us;22us;46us;47us;2us;65535us;21us;46us;46us;46us;2us;65535us;49us;50us;52us;53us;2us;65535us;64us;90us;90us;90us;2us;65535us;64us;65us;90us;91us;1us;65535us;73us;74us;1us;65535us;76us;77us;1us;65535us;79us;80us;1us;65535us;67us;68us;0us;65535us;0us;65535us;0us;65535us;0us;65535us;|]
-let _fsyacc_sparseGotoTableRowOffsets = [|0us;1us;3us;5us;8us;11us;14us;17us;20us;23us;26us;29us;32us;34us;36us;38us;40us;41us;42us;43us;|]
-let _fsyacc_stateToProdIdxsTableElements = [| 1us;0us;1us;0us;2us;1us;5us;1us;1us;3us;2us;3us;4us;3us;2us;3us;4us;2us;3us;4us;2us;3us;4us;1us;4us;1us;5us;1us;5us;1us;5us;2us;6us;7us;1us;6us;2us;8us;9us;2us;8us;9us;1us;9us;1us;9us;1us;9us;2us;10us;11us;2us;10us;11us;1us;11us;1us;11us;1us;11us;1us;12us;1us;12us;1us;13us;1us;13us;1us;14us;1us;14us;1us;15us;1us;15us;1us;16us;1us;17us;2us;18us;19us;1us;18us;2us;20us;21us;2us;20us;21us;1us;20us;1us;21us;1us;22us;1us;22us;1us;22us;1us;23us;1us;23us;1us;23us;2us;24us;25us;1us;24us;1us;26us;1us;26us;1us;26us;1us;27us;1us;27us;1us;27us;1us;28us;1us;28us;1us;28us;1us;29us;1us;29us;1us;29us;1us;30us;1us;30us;1us;30us;1us;31us;1us;31us;1us;31us;1us;32us;1us;32us;1us;32us;1us;33us;1us;33us;1us;33us;1us;34us;1us;34us;1us;34us;1us;35us;1us;35us;1us;35us;1us;36us;1us;36us;1us;36us;1us;37us;1us;38us;1us;39us;1us;40us;1us;41us;1us;42us;1us;43us;1us;44us;1us;45us;2us;46us;47us;1us;46us;1us;48us;1us;49us;1us;50us;1us;51us;1us;52us;1us;53us;1us;54us;1us;55us;1us;56us;2us;57us;58us;2us;57us;58us;2us;57us;58us;1us;57us;1us;57us;1us;57us;1us;57us;|]
-let _fsyacc_stateToProdIdxsTableRowOffsets = [|0us;2us;4us;7us;9us;13us;17us;20us;23us;25us;27us;29us;31us;34us;36us;39us;42us;44us;46us;48us;51us;54us;56us;58us;60us;62us;64us;66us;68us;70us;72us;74us;76us;78us;80us;83us;85us;88us;91us;93us;95us;97us;99us;101us;103us;105us;107us;110us;112us;114us;116us;118us;120us;122us;124us;126us;128us;130us;132us;134us;136us;138us;140us;142us;144us;146us;148us;150us;152us;154us;156us;158us;160us;162us;164us;166us;168us;170us;172us;174us;176us;178us;180us;182us;184us;186us;188us;190us;192us;194us;196us;199us;201us;203us;205us;207us;209us;211us;213us;215us;217us;219us;222us;225us;228us;230us;232us;234us;|]
-let _fsyacc_action_rows = 108
-let _fsyacc_actionTableElements = [|1us;32768us;43us;4us;0us;49152us;2us;32768us;0us;3us;2us;9us;0us;16385us;1us;32768us;53us;5us;1us;16386us;55us;6us;1us;32768us;55us;7us;1us;16387us;53us;8us;0us;16388us;8us;32768us;44us;14us;45us;19us;46us;24us;47us;26us;48us;28us;49us;32us;50us;33us;51us;30us;1us;32768us;3us;11us;0us;16389us;8us;16391us;44us;14us;45us;19us;46us;24us;47us;26us;48us;28us;49us;32us;50us;33us;51us;30us;0us;16390us;1us;32768us;53us;15us;1us;16392us;2us;16us;3us;32768us;36us;36us;39us;40us;40us;43us;1us;32768us;3us;18us;0us;16393us;1us;32768us;53us;20us;1us;16394us;2us;21us;11us;32768us;25us;48us;26us;51us;27us;54us;28us;57us;29us;60us;30us;63us;31us;66us;32us;69us;33us;72us;34us;75us;35us;78us;1us;32768us;3us;23us;0us;16395us;1us;32768us;53us;25us;0us;16396us;1us;32768us;53us;27us;0us;16397us;1us;32768us;53us;29us;0us;16398us;1us;32768us;53us;31us;0us;16399us;0us;16400us;0us;16401us;3us;16403us;36us;36us;39us;40us;40us;43us;0us;16402us;1us;32768us;4us;37us;2us;32768us;37us;38us;38us;39us;0us;16404us;0us;16405us;1us;32768us;4us;41us;1us;32768us;55us;42us;0us;16406us;1us;32768us;4us;44us;1us;32768us;55us;45us;0us;16407us;11us;16409us;25us;48us;26us;51us;27us;54us;28us;57us;29us;60us;30us;63us;31us;66us;32us;69us;33us;72us;34us;75us;35us;78us;0us;16408us;1us;32768us;4us;49us;6us;32768us;17us;82us;18us;83us;19us;84us;20us;85us;21us;86us;54us;81us;0us;16410us;1us;32768us;4us;52us;6us;32768us;17us;82us;18us;83us;19us;84us;20us;85us;21us;86us;54us;81us;0us;16411us;1us;32768us;4us;55us;1us;32768us;53us;56us;0us;16412us;1us;32768us;4us;58us;1us;32768us;55us;59us;0us;16413us;1us;32768us;4us;61us;1us;32768us;55us;62us;0us;16414us;1us;32768us;4us;64us;3us;32768us;22us;87us;23us;88us;24us;89us;0us;16415us;1us;32768us;4us;67us;1us;32768us;55us;101us;0us;16416us;1us;32768us;4us;70us;1us;32768us;55us;71us;0us;16417us;1us;32768us;4us;73us;3us;32768us;14us;92us;15us;93us;16us;94us;0us;16418us;1us;32768us;4us;76us;3us;32768us;11us;95us;12us;96us;13us;97us;0us;16419us;1us;32768us;4us;79us;3us;32768us;8us;98us;9us;99us;10us;100us;0us;16420us;0us;16421us;0us;16422us;0us;16423us;0us;16424us;0us;16425us;0us;16426us;0us;16427us;0us;16428us;0us;16429us;3us;16431us;22us;87us;23us;88us;24us;89us;0us;16430us;0us;16432us;0us;16433us;0us;16434us;0us;16435us;0us;16436us;0us;16437us;0us;16438us;0us;16439us;0us;16440us;1us;32768us;1us;102us;1us;32768us;55us;103us;1us;16442us;1us;104us;1us;32768us;55us;105us;1us;32768us;1us;106us;1us;32768us;55us;107us;0us;16441us;|]
-let _fsyacc_actionTableRowOffsets = [|0us;2us;3us;6us;7us;9us;11us;13us;15us;16us;25us;27us;28us;37us;38us;40us;42us;46us;48us;49us;51us;53us;65us;67us;68us;70us;71us;73us;74us;76us;77us;79us;80us;81us;82us;86us;87us;89us;92us;93us;94us;96us;98us;99us;101us;103us;104us;116us;117us;119us;126us;127us;129us;136us;137us;139us;141us;142us;144us;146us;147us;149us;151us;152us;154us;158us;159us;161us;163us;164us;166us;168us;169us;171us;175us;176us;178us;182us;183us;185us;189us;190us;191us;192us;193us;194us;195us;196us;197us;198us;199us;203us;204us;205us;206us;207us;208us;209us;210us;211us;212us;213us;215us;217us;219us;221us;223us;225us;|]
-let _fsyacc_reductionSymbolCounts = [|1us;2us;2us;4us;5us;4us;2us;1us;2us;5us;2us;5us;2us;2us;2us;2us;1us;1us;2us;1us;3us;3us;3us;3us;2us;1us;3us;3us;3us;3us;3us;3us;3us;3us;3us;3us;3us;1us;1us;1us;1us;1us;1us;1us;1us;1us;2us;1us;1us;1us;1us;1us;1us;1us;1us;1us;1us;7us;3us;7us;2us;1us;4us;1us;1us;1us;1us;1us;|]
-let _fsyacc_productionToNonTerminalTable = [|0us;1us;2us;2us;2us;2us;3us;3us;4us;4us;4us;4us;4us;4us;4us;4us;4us;4us;5us;5us;6us;6us;6us;6us;7us;7us;8us;8us;8us;8us;8us;8us;8us;8us;8us;8us;8us;9us;9us;9us;9us;9us;9us;10us;10us;10us;11us;11us;12us;12us;12us;13us;13us;13us;14us;14us;14us;15us;15us;16us;17us;17us;18us;19us;19us;19us;19us;19us;|]
-let _fsyacc_immediateActions = [|65535us;49152us;65535us;16385us;65535us;65535us;65535us;65535us;16388us;65535us;65535us;16389us;65535us;16390us;65535us;65535us;65535us;65535us;16393us;65535us;65535us;65535us;65535us;16395us;65535us;16396us;65535us;16397us;65535us;16398us;65535us;16399us;16400us;16401us;65535us;16402us;65535us;65535us;16404us;16405us;65535us;65535us;16406us;65535us;65535us;16407us;65535us;16408us;65535us;65535us;16410us;65535us;65535us;16411us;65535us;65535us;16412us;65535us;65535us;16413us;65535us;65535us;16414us;65535us;65535us;16415us;65535us;65535us;16416us;65535us;65535us;16417us;65535us;65535us;16418us;65535us;65535us;16419us;65535us;65535us;16420us;16421us;16422us;16423us;16424us;16425us;16426us;16427us;16428us;16429us;65535us;16430us;16432us;16433us;16434us;16435us;16436us;16437us;16438us;16439us;16440us;65535us;65535us;65535us;65535us;65535us;65535us;16441us;|]
+let _fsyacc_gotos = [| 0us;65535us;1us;65535us;0us;1us;1us;65535us;0us;2us;2us;65535us;9us;10us;14us;15us;0us;65535us;2us;65535us;9us;14us;14us;14us;2us;65535us;18us;19us;36us;37us;2us;65535us;18us;36us;36us;36us;2us;65535us;23us;24us;48us;49us;2us;65535us;23us;48us;48us;48us;2us;65535us;51us;52us;54us;55us;2us;65535us;66us;92us;92us;92us;2us;65535us;66us;67us;92us;93us;1us;65535us;75us;76us;1us;65535us;78us;79us;1us;65535us;81us;82us;1us;65535us;69us;70us;2us;65535us;10us;12us;110us;111us;2us;65535us;10us;110us;110us;110us;2us;65535us;116us;117us;119us;120us;2us;65535us;116us;119us;119us;119us;3us;65535us;116us;125us;119us;125us;123us;124us;|]
+let _fsyacc_sparseGotoTableRowOffsets = [|0us;1us;3us;5us;8us;9us;12us;15us;18us;21us;24us;27us;30us;33us;35us;37us;39us;41us;44us;47us;50us;53us;|]
+let _fsyacc_stateToProdIdxsTableElements = [| 1us;0us;1us;0us;3us;1us;5us;6us;1us;1us;3us;2us;3us;4us;3us;2us;3us;4us;2us;3us;4us;2us;3us;4us;1us;4us;2us;5us;6us;2us;5us;6us;1us;5us;1us;6us;1us;6us;2us;7us;8us;1us;7us;2us;11us;12us;2us;11us;12us;1us;12us;1us;12us;1us;12us;2us;13us;14us;2us;13us;14us;1us;14us;1us;14us;1us;14us;1us;15us;1us;15us;1us;16us;1us;16us;1us;17us;1us;17us;1us;18us;1us;18us;1us;19us;1us;20us;2us;21us;22us;1us;21us;2us;23us;24us;2us;23us;24us;1us;23us;1us;24us;1us;25us;1us;25us;1us;25us;1us;26us;1us;26us;1us;26us;2us;27us;28us;1us;27us;1us;29us;1us;29us;1us;29us;1us;30us;1us;30us;1us;30us;1us;31us;1us;31us;1us;31us;1us;32us;1us;32us;1us;32us;1us;33us;1us;33us;1us;33us;1us;34us;1us;34us;1us;34us;1us;35us;1us;35us;1us;35us;1us;36us;1us;36us;1us;36us;1us;37us;1us;37us;1us;37us;1us;38us;1us;38us;1us;38us;1us;39us;1us;39us;1us;39us;1us;40us;1us;41us;1us;42us;1us;43us;1us;44us;1us;45us;1us;46us;1us;47us;1us;48us;2us;49us;50us;1us;49us;1us;51us;1us;52us;1us;53us;1us;54us;1us;55us;1us;56us;1us;57us;1us;58us;1us;59us;2us;60us;61us;2us;60us;61us;2us;60us;61us;1us;60us;1us;60us;1us;60us;1us;60us;2us;62us;63us;1us;62us;1us;64us;1us;64us;1us;64us;1us;64us;1us;64us;1us;64us;1us;64us;2us;65us;66us;1us;65us;1us;67us;1us;67us;1us;67us;1us;67us;1us;68us;1us;69us;1us;70us;2us;71us;74us;1us;72us;1us;73us;1us;74us;1us;74us;|]
+let _fsyacc_stateToProdIdxsTableRowOffsets = [|0us;2us;4us;8us;10us;14us;18us;21us;24us;26us;29us;32us;34us;36us;38us;41us;43us;46us;49us;51us;53us;55us;58us;61us;63us;65us;67us;69us;71us;73us;75us;77us;79us;81us;83us;85us;87us;90us;92us;95us;98us;100us;102us;104us;106us;108us;110us;112us;114us;117us;119us;121us;123us;125us;127us;129us;131us;133us;135us;137us;139us;141us;143us;145us;147us;149us;151us;153us;155us;157us;159us;161us;163us;165us;167us;169us;171us;173us;175us;177us;179us;181us;183us;185us;187us;189us;191us;193us;195us;197us;199us;201us;203us;206us;208us;210us;212us;214us;216us;218us;220us;222us;224us;226us;229us;232us;235us;237us;239us;241us;243us;246us;248us;250us;252us;254us;256us;258us;260us;262us;265us;267us;269us;271us;273us;275us;277us;279us;281us;284us;286us;288us;290us;|]
+let _fsyacc_action_rows = 133
+let _fsyacc_actionTableElements = [|1us;32768us;43us;4us;0us;49152us;2us;32768us;0us;3us;2us;9us;0us;16385us;1us;32768us;53us;5us;1us;16386us;55us;6us;1us;32768us;55us;7us;1us;16387us;53us;8us;0us;16388us;8us;32768us;44us;16us;45us;21us;46us;26us;47us;28us;48us;30us;49us;34us;50us;35us;51us;32us;2us;32768us;3us;11us;41us;112us;0us;16389us;1us;32768us;3us;13us;0us;16390us;8us;16392us;44us;16us;45us;21us;46us;26us;47us;28us;48us;30us;49us;34us;50us;35us;51us;32us;0us;16391us;1us;32768us;53us;17us;1us;16395us;2us;18us;3us;32768us;36us;38us;39us;42us;40us;45us;1us;32768us;3us;20us;0us;16396us;1us;32768us;53us;22us;1us;16397us;2us;23us;11us;32768us;25us;50us;26us;53us;27us;56us;28us;59us;29us;62us;30us;65us;31us;68us;32us;71us;33us;74us;34us;77us;35us;80us;1us;32768us;3us;25us;0us;16398us;1us;32768us;53us;27us;0us;16399us;1us;32768us;53us;29us;0us;16400us;1us;32768us;53us;31us;0us;16401us;1us;32768us;53us;33us;0us;16402us;0us;16403us;0us;16404us;3us;16406us;36us;38us;39us;42us;40us;45us;0us;16405us;1us;32768us;4us;39us;2us;32768us;37us;40us;38us;41us;0us;16407us;0us;16408us;1us;32768us;4us;43us;1us;32768us;55us;44us;0us;16409us;1us;32768us;4us;46us;1us;32768us;55us;47us;0us;16410us;11us;16412us;25us;50us;26us;53us;27us;56us;28us;59us;29us;62us;30us;65us;31us;68us;32us;71us;33us;74us;34us;77us;35us;80us;0us;16411us;1us;32768us;4us;51us;6us;32768us;17us;84us;18us;85us;19us;86us;20us;87us;21us;88us;54us;83us;0us;16413us;1us;32768us;4us;54us;6us;32768us;17us;84us;18us;85us;19us;86us;20us;87us;21us;88us;54us;83us;0us;16414us;1us;32768us;4us;57us;1us;32768us;53us;58us;0us;16415us;1us;32768us;4us;60us;1us;32768us;55us;61us;0us;16416us;1us;32768us;4us;63us;1us;32768us;55us;64us;0us;16417us;1us;32768us;4us;66us;3us;32768us;22us;89us;23us;90us;24us;91us;0us;16418us;1us;32768us;4us;69us;1us;32768us;55us;103us;0us;16419us;1us;32768us;4us;72us;1us;32768us;55us;73us;0us;16420us;1us;32768us;4us;75us;3us;32768us;14us;94us;15us;95us;16us;96us;0us;16421us;1us;32768us;4us;78us;3us;32768us;11us;97us;12us;98us;13us;99us;0us;16422us;1us;32768us;4us;81us;3us;32768us;8us;100us;9us;101us;10us;102us;0us;16423us;0us;16424us;0us;16425us;0us;16426us;0us;16427us;0us;16428us;0us;16429us;0us;16430us;0us;16431us;0us;16432us;3us;16434us;22us;89us;23us;90us;24us;91us;0us;16433us;0us;16435us;0us;16436us;0us;16437us;0us;16438us;0us;16439us;0us;16440us;0us;16441us;0us;16442us;0us;16443us;1us;32768us;1us;104us;1us;32768us;55us;105us;1us;16445us;1us;106us;1us;32768us;55us;107us;1us;32768us;1us;108us;1us;32768us;55us;109us;0us;16444us;1us;16447us;41us;112us;0us;16446us;1us;32768us;52us;113us;1us;32768us;5us;114us;1us;32768us;6us;115us;1us;32768us;2us;116us;6us;32768us;37us;129us;38us;130us;42us;121us;52us;128us;53us;127us;55us;126us;1us;32768us;3us;118us;0us;16448us;6us;16450us;37us;129us;38us;130us;42us;121us;52us;128us;53us;127us;55us;126us;0us;16449us;1us;32768us;52us;122us;1us;32768us;7us;123us;5us;32768us;37us;129us;38us;130us;52us;128us;53us;127us;55us;126us;0us;16451us;0us;16452us;0us;16453us;0us;16454us;1us;16455us;5us;131us;0us;16456us;0us;16457us;1us;32768us;6us;132us;0us;16458us;|]
+let _fsyacc_actionTableRowOffsets = [|0us;2us;3us;6us;7us;9us;11us;13us;15us;16us;25us;28us;29us;31us;32us;41us;42us;44us;46us;50us;52us;53us;55us;57us;69us;71us;72us;74us;75us;77us;78us;80us;81us;83us;84us;85us;86us;90us;91us;93us;96us;97us;98us;100us;102us;103us;105us;107us;108us;120us;121us;123us;130us;131us;133us;140us;141us;143us;145us;146us;148us;150us;151us;153us;155us;156us;158us;162us;163us;165us;167us;168us;170us;172us;173us;175us;179us;180us;182us;186us;187us;189us;193us;194us;195us;196us;197us;198us;199us;200us;201us;202us;203us;207us;208us;209us;210us;211us;212us;213us;214us;215us;216us;217us;219us;221us;223us;225us;227us;229us;230us;232us;233us;235us;237us;239us;241us;248us;250us;251us;258us;259us;261us;263us;269us;270us;271us;272us;273us;275us;276us;277us;279us;|]
+let _fsyacc_reductionSymbolCounts = [|1us;2us;2us;4us;5us;4us;5us;2us;1us;2us;1us;2us;5us;2us;5us;2us;2us;2us;2us;1us;1us;2us;1us;3us;3us;3us;3us;2us;1us;3us;3us;3us;3us;3us;3us;3us;3us;3us;3us;3us;1us;1us;1us;1us;1us;1us;1us;1us;1us;2us;1us;1us;1us;1us;1us;1us;1us;1us;1us;1us;7us;3us;2us;1us;7us;2us;1us;4us;1us;1us;1us;1us;1us;1us;3us;|]
+let _fsyacc_productionToNonTerminalTable = [|0us;1us;2us;2us;2us;2us;2us;3us;3us;4us;4us;5us;5us;5us;5us;5us;5us;5us;5us;5us;5us;6us;6us;7us;7us;7us;7us;8us;8us;9us;9us;9us;9us;9us;9us;9us;9us;9us;9us;9us;10us;10us;10us;10us;10us;10us;11us;11us;11us;12us;12us;13us;13us;13us;14us;14us;14us;15us;15us;15us;16us;16us;17us;17us;18us;19us;19us;20us;20us;21us;21us;21us;21us;21us;21us;|]
+let _fsyacc_immediateActions = [|65535us;49152us;65535us;16385us;65535us;65535us;65535us;65535us;16388us;65535us;65535us;16389us;65535us;16390us;65535us;16391us;65535us;65535us;65535us;65535us;16396us;65535us;65535us;65535us;65535us;16398us;65535us;16399us;65535us;16400us;65535us;16401us;65535us;16402us;16403us;16404us;65535us;16405us;65535us;65535us;16407us;16408us;65535us;65535us;16409us;65535us;65535us;16410us;65535us;16411us;65535us;65535us;16413us;65535us;65535us;16414us;65535us;65535us;16415us;65535us;65535us;16416us;65535us;65535us;16417us;65535us;65535us;16418us;65535us;65535us;16419us;65535us;65535us;16420us;65535us;65535us;16421us;65535us;65535us;16422us;65535us;65535us;16423us;16424us;16425us;16426us;16427us;16428us;16429us;16430us;16431us;16432us;65535us;16433us;16435us;16436us;16437us;16438us;16439us;16440us;16441us;16442us;16443us;65535us;65535us;65535us;65535us;65535us;65535us;16444us;65535us;16446us;65535us;65535us;65535us;65535us;65535us;65535us;16448us;65535us;16449us;65535us;65535us;65535us;16451us;16452us;16453us;16454us;65535us;16456us;16457us;65535us;16458us;|]
 let _fsyacc_reductions = lazy [|
-# 514 "Parser.fs"
+# 527 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Window in
             Microsoft.FSharp.Core.Operators.box
@@ -520,31 +533,31 @@ let _fsyacc_reductions = lazy [|
                       raise (FSharp.Text.Parsing.Accept(Microsoft.FSharp.Core.Operators.box _1))
                    )
                  : 'gentype__startProg));
-# 523 "Parser.fs"
+# 536 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Window in
             let _2 = parseState.GetInput(2) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 77 "Parser.fsy"
-                                      _1 
+# 80 "Parser.fsy"
+                                         _1 
                    )
-# 77 "Parser.fsy"
+# 80 "Parser.fsy"
                  : AbSyn.Window));
-# 535 "Parser.fs"
+# 548 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 82 "Parser.fsy"
-                                            Window (fst _2, None, None, None, [], _1) 
+# 84 "Parser.fsy"
+                                                 Window (fst _2, None, None, None, [], [], _1) 
                    )
-# 82 "Parser.fsy"
+# 84 "Parser.fsy"
                  : AbSyn.Window));
-# 547 "Parser.fs"
+# 560 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -553,12 +566,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 83 "Parser.fsy"
-                                                    Window (fst _2, Some (fst _3), Some (fst _4), None, [], _1) 
+# 85 "Parser.fsy"
+                                                    Window (fst _2, Some (fst _3), Some (fst _4), None, [], [], _1) 
                    )
-# 83 "Parser.fsy"
+# 85 "Parser.fsy"
                  : AbSyn.Window));
-# 561 "Parser.fs"
+# 574 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -568,12 +581,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 84 "Parser.fsy"
-                                                              Window (fst _2, Some (fst _3), Some (fst _4), Some (fst _5), [], _1) 
+# 86 "Parser.fsy"
+                                                              Window (fst _2, Some (fst _3), Some (fst _4), Some (fst _5), [], [], _1) 
                    )
-# 84 "Parser.fsy"
+# 86 "Parser.fsy"
                  : AbSyn.Window));
-# 576 "Parser.fs"
+# 589 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Window in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -582,47 +595,85 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 85 "Parser.fsy"
+# 87 "Parser.fsy"
                                                                                     add_ui_elements _1 _3 
                    )
-# 85 "Parser.fsy"
+# 87 "Parser.fsy"
                  : AbSyn.Window));
-# 590 "Parser.fs"
+# 603 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> AbSyn.Window in
+            let _2 = parseState.GetInput(2) :?> Position in
+            let _3 = parseState.GetInput(3) :?> AbSyn.UIElement list in
+            let _4 = parseState.GetInput(4) :?> 'gentype_Functions in
+            let _5 = parseState.GetInput(5) :?> Position in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 88 "Parser.fsy"
+                                                                                              construct_window _1 _3 _4 
+                   )
+# 88 "Parser.fsy"
+                 : AbSyn.Window));
+# 618 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.UIElement in
             let _2 = parseState.GetInput(2) :?> AbSyn.UIElement list in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 90 "Parser.fsy"
-                                                _1 :: _2 
+# 92 "Parser.fsy"
+                                                         _1 :: _2 
                    )
-# 90 "Parser.fsy"
+# 92 "Parser.fsy"
                  : AbSyn.UIElement list));
-# 602 "Parser.fs"
+# 630 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.UIElement in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 91 "Parser.fsy"
-                                                [_1] 
+# 93 "Parser.fsy"
+                                                         [_1] 
                    )
-# 91 "Parser.fsy"
+# 93 "Parser.fsy"
                  : AbSyn.UIElement list));
-# 613 "Parser.fs"
+# 641 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> AbSyn.FunctionT in
+            let _2 = parseState.GetInput(2) :?> 'gentype_Funcs in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 97 "Parser.fsy"
+                                              _1 :: _2 
+                   )
+# 97 "Parser.fsy"
+                 : 'gentype_Funcs));
+# 653 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> AbSyn.FunctionT in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 98 "Parser.fsy"
+                                              [_1] 
+                   )
+# 98 "Parser.fsy"
+                 : 'gentype_Funcs));
+# 664 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 95 "Parser.fsy"
-                                            Button (fst _2, default_button_props _1, _1) 
+# 101 "Parser.fsy"
+                                                    Button (fst _2, default_button_props _1, _1) 
                    )
-# 95 "Parser.fsy"
+# 101 "Parser.fsy"
                  : AbSyn.UIElement));
-# 625 "Parser.fs"
+# 676 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -632,24 +683,24 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 96 "Parser.fsy"
+# 102 "Parser.fsy"
                                                                                                Button (fst _2, _4, _1) 
                    )
-# 96 "Parser.fsy"
+# 102 "Parser.fsy"
                  : AbSyn.UIElement));
-# 640 "Parser.fs"
+# 691 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 97 "Parser.fsy"
+# 103 "Parser.fsy"
                                           TextBlock (fst _2, default_text_props _1 ,_1) 
                    )
-# 97 "Parser.fsy"
+# 103 "Parser.fsy"
                  : AbSyn.UIElement));
-# 652 "Parser.fs"
+# 703 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -659,131 +710,131 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 98 "Parser.fsy"
+# 104 "Parser.fsy"
                                                                                            TextBlock (fst _2, _4, _1) 
                    )
-# 98 "Parser.fsy"
+# 104 "Parser.fsy"
                  : AbSyn.UIElement));
-# 667 "Parser.fs"
+# 718 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 99 "Parser.fsy"
+# 105 "Parser.fsy"
                                              TextBox (fst _2, _1) 
                    )
-# 99 "Parser.fsy"
+# 105 "Parser.fsy"
                  : AbSyn.UIElement));
-# 679 "Parser.fs"
+# 730 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 100 "Parser.fsy"
+# 106 "Parser.fsy"
                                               CheckBox (fst _2, _1) 
                    )
-# 100 "Parser.fsy"
+# 106 "Parser.fsy"
                  : AbSyn.UIElement));
-# 691 "Parser.fs"
+# 742 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 101 "Parser.fsy"
+# 107 "Parser.fsy"
                                                  RadioButton (fst _2, _1) 
                    )
-# 101 "Parser.fsy"
+# 107 "Parser.fsy"
                  : AbSyn.UIElement));
-# 703 "Parser.fs"
+# 754 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 102 "Parser.fsy"
+# 108 "Parser.fsy"
                                                   ToggleSwitch (fst _2, _1) 
                    )
-# 102 "Parser.fsy"
+# 108 "Parser.fsy"
                  : AbSyn.UIElement));
-# 715 "Parser.fs"
+# 766 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 103 "Parser.fsy"
+# 109 "Parser.fsy"
                                     Calendar _1 
                    )
-# 103 "Parser.fsy"
+# 109 "Parser.fsy"
                  : AbSyn.UIElement));
-# 726 "Parser.fs"
+# 777 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 104 "Parser.fsy"
+# 110 "Parser.fsy"
                                         ToggleButton _1 
                    )
-# 104 "Parser.fsy"
+# 110 "Parser.fsy"
                  : AbSyn.UIElement));
-# 737 "Parser.fs"
+# 788 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.ButtonProp in
             let _2 = parseState.GetInput(2) :?> AbSyn.ButtonProp list in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 109 "Parser.fsy"
-                                                  _1 :: _2 
+# 114 "Parser.fsy"
+                                                            _1 :: _2 
                    )
-# 109 "Parser.fsy"
+# 114 "Parser.fsy"
                  : AbSyn.ButtonProp list));
-# 749 "Parser.fs"
+# 800 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.ButtonProp in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 110 "Parser.fsy"
+# 115 "Parser.fsy"
                                                  [_1] 
                    )
-# 110 "Parser.fsy"
-                 : AbSyn.ButtonProp list));
-# 760 "Parser.fs"
-        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = parseState.GetInput(1) :?> Position in
-            let _2 = parseState.GetInput(2) :?> Position in
-            let _3 = parseState.GetInput(3) :?> Position in
-            Microsoft.FSharp.Core.Operators.box
-                (
-                   (
-# 114 "Parser.fsy"
-                                                  IsVisible (true, _1) 
-                   )
-# 114 "Parser.fsy"
-                 : AbSyn.ButtonProp));
-# 773 "Parser.fs"
-        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = parseState.GetInput(1) :?> Position in
-            let _2 = parseState.GetInput(2) :?> Position in
-            let _3 = parseState.GetInput(3) :?> Position in
-            Microsoft.FSharp.Core.Operators.box
-                (
-                   (
 # 115 "Parser.fsy"
+                 : AbSyn.ButtonProp list));
+# 811 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> Position in
+            let _2 = parseState.GetInput(2) :?> Position in
+            let _3 = parseState.GetInput(3) :?> Position in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 118 "Parser.fsy"
+                                                           IsVisible (true, _1) 
+                   )
+# 118 "Parser.fsy"
+                 : AbSyn.ButtonProp));
+# 824 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> Position in
+            let _2 = parseState.GetInput(2) :?> Position in
+            let _3 = parseState.GetInput(3) :?> Position in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 119 "Parser.fsy"
                                                   IsVisible (false, _1) 
                    )
-# 115 "Parser.fsy"
+# 119 "Parser.fsy"
                  : AbSyn.ButtonProp));
-# 786 "Parser.fs"
+# 837 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -791,12 +842,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 116 "Parser.fsy"
+# 120 "Parser.fsy"
                                                   Width (fst _3, _1) 
                    )
-# 116 "Parser.fsy"
+# 120 "Parser.fsy"
                  : AbSyn.ButtonProp));
-# 799 "Parser.fs"
+# 850 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -804,35 +855,35 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 117 "Parser.fsy"
+# 121 "Parser.fsy"
                                                   Height (fst _3, _1) 
                    )
-# 117 "Parser.fsy"
+# 121 "Parser.fsy"
                  : AbSyn.ButtonProp));
-# 812 "Parser.fs"
+# 863 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.TextBlockProp in
             let _2 = parseState.GetInput(2) :?> AbSyn.TextBlockProp list in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 122 "Parser.fsy"
-                                              _1 :: _2 
+# 125 "Parser.fsy"
+                                                      _1 :: _2 
                    )
-# 122 "Parser.fsy"
+# 125 "Parser.fsy"
                  : AbSyn.TextBlockProp list));
-# 824 "Parser.fs"
+# 875 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.TextBlockProp in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 123 "Parser.fsy"
+# 126 "Parser.fsy"
                                               [_1] 
                    )
-# 123 "Parser.fsy"
+# 126 "Parser.fsy"
                  : AbSyn.TextBlockProp list));
-# 835 "Parser.fs"
+# 886 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -840,12 +891,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 127 "Parser.fsy"
-                                                  Foreground (_3, _1) 
+# 129 "Parser.fsy"
+                                                         Foreground (_3, _1) 
                    )
-# 127 "Parser.fsy"
+# 129 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 848 "Parser.fs"
+# 899 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -853,12 +904,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 128 "Parser.fsy"
+# 130 "Parser.fsy"
                                                   Background (_3, _1) 
                    )
-# 128 "Parser.fsy"
+# 130 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 861 "Parser.fs"
+# 912 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -866,12 +917,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 129 "Parser.fsy"
+# 131 "Parser.fsy"
                                                       FontFamily (fst _3, _1) 
                    )
-# 129 "Parser.fsy"
+# 131 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 874 "Parser.fs"
+# 925 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -879,12 +930,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 130 "Parser.fsy"
+# 132 "Parser.fsy"
                                                       FontSize (fst _3, _1) 
                    )
-# 130 "Parser.fsy"
+# 132 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 887 "Parser.fs"
+# 938 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -892,12 +943,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 131 "Parser.fsy"
+# 133 "Parser.fsy"
                                                       FontWeight (fst _3, _1) 
                    )
-# 131 "Parser.fsy"
+# 133 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 900 "Parser.fs"
+# 951 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -905,12 +956,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 132 "Parser.fsy"
+# 134 "Parser.fsy"
                                                       FontStyle (List.rev _3, _1) 
                    )
-# 132 "Parser.fsy"
+# 134 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 913 "Parser.fs"
+# 964 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -918,12 +969,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 133 "Parser.fsy"
+# 135 "Parser.fsy"
                                                       Padding (_3, _1) 
                    )
-# 133 "Parser.fsy"
+# 135 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 926 "Parser.fs"
+# 977 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -931,12 +982,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 134 "Parser.fsy"
+# 136 "Parser.fsy"
                                                       LineHeight (fst _3, _1) 
                    )
-# 134 "Parser.fsy"
+# 136 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 939 "Parser.fs"
+# 990 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -944,12 +995,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 135 "Parser.fsy"
+# 137 "Parser.fsy"
                                                       TextAlign (_3, _1) 
                    )
-# 135 "Parser.fsy"
+# 137 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 952 "Parser.fs"
+# 1003 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -957,12 +1008,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 136 "Parser.fsy"
+# 138 "Parser.fsy"
                                                       TextWrap (_3, _1) 
                    )
-# 136 "Parser.fsy"
+# 138 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 965 "Parser.fs"
+# 1016 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -970,115 +1021,115 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 137 "Parser.fsy"
+# 139 "Parser.fsy"
                                                       TextTrim (_3, _1) 
                    )
-# 137 "Parser.fsy"
+# 139 "Parser.fsy"
                  : AbSyn.TextBlockProp));
-# 978 "Parser.fs"
+# 1029 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 142 "Parser.fsy"
-                                   
-                           match parse_hex_code (fst _1) with
-                           | Some rgba -> Hex (rgba, snd _1)
-                           | None -> failwithf "Invalid hex color: %s" (fst _1)
-                         
+# 144 "Parser.fsy"
+                                 
+                         match parse_hex_code (fst _1) with
+                         | Some rgba -> Hex (rgba, snd _1)
+                         | None -> failwithf "Invalid hex color: %s" (fst _1)
+                       
                    )
-# 142 "Parser.fsy"
+# 144 "Parser.fsy"
                  : AbSyn.ColorT));
-# 993 "Parser.fs"
+# 1044 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 147 "Parser.fsy"
+# 149 "Parser.fsy"
                                   ColorName (Red, _1) 
                    )
-# 147 "Parser.fsy"
+# 149 "Parser.fsy"
                  : AbSyn.ColorT));
-# 1004 "Parser.fs"
+# 1055 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 148 "Parser.fsy"
+# 150 "Parser.fsy"
                                   ColorName (Blue, _1) 
                    )
-# 148 "Parser.fsy"
+# 150 "Parser.fsy"
                  : AbSyn.ColorT));
-# 1015 "Parser.fs"
+# 1066 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 149 "Parser.fsy"
+# 151 "Parser.fsy"
                                   ColorName (Green, _1) 
                    )
-# 149 "Parser.fsy"
+# 151 "Parser.fsy"
                  : AbSyn.ColorT));
-# 1026 "Parser.fs"
+# 1077 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 150 "Parser.fsy"
+# 152 "Parser.fsy"
                                   ColorName (Yellow, _1) 
                    )
-# 150 "Parser.fsy"
+# 152 "Parser.fsy"
                  : AbSyn.ColorT));
-# 1037 "Parser.fs"
+# 1088 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 151 "Parser.fsy"
+# 153 "Parser.fsy"
                                   ColorName (Pink, _1) 
                    )
-# 151 "Parser.fsy"
+# 153 "Parser.fsy"
                  : AbSyn.ColorT));
-# 1048 "Parser.fs"
-        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
-            let _1 = parseState.GetInput(1) :?> Position in
-            Microsoft.FSharp.Core.Operators.box
-                (
-                   (
-# 156 "Parser.fsy"
-                                         Italic 
-                   )
-# 156 "Parser.fsy"
-                 : 'gentype_FontStyle));
-# 1059 "Parser.fs"
+# 1099 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
 # 157 "Parser.fsy"
+                                                 Italic 
+                   )
+# 157 "Parser.fsy"
+                 : 'gentype_FontStyle));
+# 1110 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> Position in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 158 "Parser.fsy"
                                          Underline 
                    )
-# 157 "Parser.fsy"
+# 158 "Parser.fsy"
                  : 'gentype_FontStyle));
-# 1070 "Parser.fs"
+# 1121 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 158 "Parser.fsy"
+# 159 "Parser.fsy"
                                          StrikeThrough 
                    )
-# 158 "Parser.fsy"
+# 159 "Parser.fsy"
                  : 'gentype_FontStyle));
-# 1081 "Parser.fs"
+# 1132 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> 'gentype_FontStyle in
             let _2 = parseState.GetInput(2) :?> 'gentype_FontStyles in
@@ -1086,11 +1137,11 @@ let _fsyacc_reductions = lazy [|
                 (
                    (
 # 162 "Parser.fsy"
-                                                _1 :: _2 
+                                                         _1 :: _2 
                    )
 # 162 "Parser.fsy"
                  : 'gentype_FontStyles));
-# 1093 "Parser.fs"
+# 1144 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> 'gentype_FontStyle in
             Microsoft.FSharp.Core.Operators.box
@@ -1101,106 +1152,106 @@ let _fsyacc_reductions = lazy [|
                    )
 # 163 "Parser.fsy"
                  : 'gentype_FontStyles));
-# 1104 "Parser.fs"
+# 1155 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 168 "Parser.fsy"
-                                  Center 
+# 167 "Parser.fsy"
+                                          Center 
                    )
-# 168 "Parser.fsy"
+# 167 "Parser.fsy"
                  : 'gentype_TextAlign));
-# 1115 "Parser.fs"
+# 1166 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 169 "Parser.fsy"
+# 168 "Parser.fsy"
                                   Left 
                    )
-# 169 "Parser.fsy"
+# 168 "Parser.fsy"
                  : 'gentype_TextAlign));
-# 1126 "Parser.fs"
+# 1177 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 170 "Parser.fsy"
+# 169 "Parser.fsy"
                                   Right 
                    )
-# 170 "Parser.fsy"
+# 169 "Parser.fsy"
                  : 'gentype_TextAlign));
-# 1137 "Parser.fs"
+# 1188 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 174 "Parser.fsy"
-                                      Overflow 
+# 172 "Parser.fsy"
+                                             Overflow 
                    )
-# 174 "Parser.fsy"
+# 172 "Parser.fsy"
                  : 'gentype_TextWrap));
-# 1148 "Parser.fs"
+# 1199 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 175 "Parser.fsy"
+# 173 "Parser.fsy"
                                       Wrap 
                    )
-# 175 "Parser.fsy"
+# 173 "Parser.fsy"
                  : 'gentype_TextWrap));
-# 1159 "Parser.fs"
+# 1210 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 176 "Parser.fsy"
+# 174 "Parser.fsy"
                                       ForceWrap 
                    )
-# 176 "Parser.fsy"
+# 174 "Parser.fsy"
                  : 'gentype_TextWrap));
-# 1170 "Parser.fs"
+# 1221 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 180 "Parser.fsy"
-                                     Word 
+# 177 "Parser.fsy"
+                                            Word 
                    )
-# 180 "Parser.fsy"
+# 177 "Parser.fsy"
                  : 'gentype_TextTrim));
-# 1181 "Parser.fs"
+# 1232 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 181 "Parser.fsy"
+# 178 "Parser.fsy"
                                      Character 
                    )
-# 181 "Parser.fsy"
+# 178 "Parser.fsy"
                  : 'gentype_TextTrim));
-# 1192 "Parser.fs"
+# 1243 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 182 "Parser.fsy"
+# 179 "Parser.fsy"
                                      NoTrim 
                    )
-# 182 "Parser.fsy"
+# 179 "Parser.fsy"
                  : 'gentype_TextTrim));
-# 1203 "Parser.fs"
+# 1254 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> int * Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -1212,12 +1263,12 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 186 "Parser.fsy"
-                                                             Uniform (fst _1, fst _3, fst _5, fst _7) 
+# 182 "Parser.fsy"
+                                                                   Uniform (fst _1, fst _3, fst _5, fst _7) 
                    )
-# 186 "Parser.fsy"
+# 182 "Parser.fsy"
                  : 'gentype_Padding));
-# 1220 "Parser.fs"
+# 1271 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> int * Position in
             let _2 = parseState.GetInput(2) :?> Position in
@@ -1225,12 +1276,35 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
+# 183 "Parser.fsy"
+                                                                   Symmetric (fst _1, fst _3) 
+                   )
+# 183 "Parser.fsy"
+                 : 'gentype_Padding));
+# 1284 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> AbSyn.FunctionT in
+            let _2 = parseState.GetInput(2) :?> 'gentype_Functions in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 186 "Parser.fsy"
+                                                      _1 :: _2 
+                   )
+# 186 "Parser.fsy"
+                 : 'gentype_Functions));
+# 1296 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> AbSyn.FunctionT in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
 # 187 "Parser.fsy"
-                                                             Symmetric (fst _1, fst _3) 
+                                                      [_1] 
                    )
 # 187 "Parser.fsy"
-                 : 'gentype_Padding));
-# 1233 "Parser.fs"
+                 : 'gentype_Functions));
+# 1307 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -1242,35 +1316,35 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 192 "Parser.fsy"
-                                                                                                            Function (fst _2, _6, _1) 
+# 190 "Parser.fsy"
+                                                                                                                   AbSyn.Function (fst _2, _6, _1) 
                    )
-# 192 "Parser.fsy"
+# 190 "Parser.fsy"
                  : AbSyn.FunctionT));
-# 1250 "Parser.fs"
+# 1324 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Stmt in
             let _2 = parseState.GetInput(2) :?> AbSyn.Stmt list in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 196 "Parser.fsy"
-                                           _1 :: _2 
+# 193 "Parser.fsy"
+                                                    _1 :: _2 
                    )
-# 196 "Parser.fsy"
+# 193 "Parser.fsy"
                  : AbSyn.Stmt list));
-# 1262 "Parser.fs"
+# 1336 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> AbSyn.Stmt in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 197 "Parser.fsy"
-                                           [_1] 
+# 194 "Parser.fsy"
+                                                    [_1] 
                    )
-# 197 "Parser.fsy"
+# 194 "Parser.fsy"
                  : AbSyn.Stmt list));
-# 1273 "Parser.fs"
+# 1347 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             let _2 = parseState.GetInput(2) :?> string * Position in
@@ -1279,68 +1353,92 @@ let _fsyacc_reductions = lazy [|
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 201 "Parser.fsy"
-                                            Let (fst _2, _4, _1) 
+# 197 "Parser.fsy"
+                                               Let (fst _2, _4, _1) 
                    )
-# 201 "Parser.fsy"
+# 197 "Parser.fsy"
                  : AbSyn.Stmt));
-# 1287 "Parser.fs"
+# 1361 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> AbSyn.Exp in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 198 "Parser.fsy"
+                                               ExprStmt (_1, match _1 with Constant(_,pos) | Var(_,pos) | Call(_,pos) -> pos) 
+                   )
+# 198 "Parser.fsy"
+                 : AbSyn.Stmt));
+# 1372 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> int * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 206 "Parser.fsy"
-                                     Constant (Int (fst _1), snd _1) 
+# 202 "Parser.fsy"
+                                       Constant (Int (fst _1), snd _1) 
                    )
-# 206 "Parser.fsy"
+# 202 "Parser.fsy"
                  : AbSyn.Exp));
-# 1298 "Parser.fs"
+# 1383 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 207 "Parser.fsy"
-                                     Constant (String (fst _1), snd _1) 
+# 203 "Parser.fsy"
+                                       Constant (String (fst _1), snd _1) 
                    )
-# 207 "Parser.fsy"
+# 203 "Parser.fsy"
                  : AbSyn.Exp));
-# 1309 "Parser.fs"
+# 1394 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> string * Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 208 "Parser.fsy"
-                                     Var _1 
+# 204 "Parser.fsy"
+                                       Var _1 
                    )
-# 208 "Parser.fsy"
+# 204 "Parser.fsy"
                  : AbSyn.Exp));
-# 1320 "Parser.fs"
+# 1405 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 209 "Parser.fsy"
-                                     Constant (Bool true, _1) 
+# 205 "Parser.fsy"
+                                       Constant (Bool true, _1) 
                    )
-# 209 "Parser.fsy"
+# 205 "Parser.fsy"
                  : AbSyn.Exp));
-# 1331 "Parser.fs"
+# 1416 "Parser.fs"
         (fun (parseState : FSharp.Text.Parsing.IParseState) ->
             let _1 = parseState.GetInput(1) :?> Position in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (
-# 210 "Parser.fsy"
-                                     Constant (Bool false, _1) 
+# 206 "Parser.fsy"
+                                       Constant (Bool false, _1) 
                    )
-# 210 "Parser.fsy"
+# 206 "Parser.fsy"
+                 : AbSyn.Exp));
+# 1427 "Parser.fs"
+        (fun (parseState : FSharp.Text.Parsing.IParseState) ->
+            let _1 = parseState.GetInput(1) :?> string * Position in
+            let _2 = parseState.GetInput(2) :?> Position in
+            let _3 = parseState.GetInput(3) :?> Position in
+            Microsoft.FSharp.Core.Operators.box
+                (
+                   (
+# 207 "Parser.fsy"
+                                                   Call (fst _1, snd _1) 
+                   )
+# 207 "Parser.fsy"
                  : AbSyn.Exp));
 |]
-# 1343 "Parser.fs"
+# 1441 "Parser.fs"
 let tables : FSharp.Text.Parsing.Tables<_> = 
   { reductions = _fsyacc_reductions.Value;
     endOfInputTag = _fsyacc_endOfInputTag;
