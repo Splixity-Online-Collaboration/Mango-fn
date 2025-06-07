@@ -30,6 +30,7 @@ let applyFontSize props applied =
 let applyTextBlockProperties props =
     []
     |> applyForeGround props
+    |> applyBackGround props
     |> applyFontFamily props
     |> applyFontSize props
 

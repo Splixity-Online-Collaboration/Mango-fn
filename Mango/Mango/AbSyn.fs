@@ -48,6 +48,8 @@ type PredefinedColor =
     | Yellow
     | Pink
     | Green
+    | Black
+    | White
 
 type HexCode = byte * byte * byte * byte
 
@@ -70,9 +72,14 @@ type TextTrimT =
     | Character
     | NoTrim
 
-type PaddingT =
-    | Uniform of int * int * int * int
+type Thickness =
+    | Uniform of int
     | Symmetric of int * int
+    | Custom of int * int * int * int
+
+type LayoutT =
+    | Horizontal
+    | Vertical
 
 type TextBlockProp =
     | Foreground of ColorT * Position
@@ -82,23 +89,28 @@ type TextBlockProp =
     | FontSize of int * Position
     | FontWeight of int * Position
     | FontStyle of FontStyleT list * Position
-    // Padding
-    | Padding of PaddingT * Position
+    // Margin
+    | Margin of Thickness * Position
     // Formatting
     | LineHeight of int * Position
     | TextWrap of TextWrapT * Position
     | TextAlign of TextAlignT * Position
-    | TextTrim of TextTrimT * Position
+    | TextTrim of TextTrimT * Position  
+
+type ContainerProp =
+    | Layout of LayoutT * Position
+    | Margin of Thickness * Position
 
 type UIElement = 
     | Button of string * ButtonProp list * Position
-    | TextBlock of string * TextBlockProp list * Position
+    | TextBlock of string * TextBlockProp list option * Position
     | TextBox of string * Position 
     | CheckBox of string * Position
     | RadioButton of string * Position
     | ToggleSwitch of string * Position
     | Calendar of Position
     | ToggleButton of Position
+    | Container of ContainerProp list * UIElement list * Position
 
 type Window = 
     | Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

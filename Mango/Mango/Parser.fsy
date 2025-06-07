@@ -24,7 +24,7 @@ let add_ui_elements window elements =
   | Window (name, width, height, icon, _, functions, pos) -> Window (name, width, height, icon, elements, functions, pos)
 
 let default_button_props pos = [IsVisible (true, pos)]
-let default_text_props pos = [Foreground (Hex (HexCode(byte 255,byte 255,byte 255,byte 255), pos), pos)]
+let default_text_props pos = []
 
 let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
   let hex = if s.StartsWith("#") then s.Substring(1) else s
@@ -44,12 +44,13 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
 %token <string * Position> ID STRINGLIT HEXCOLOR
 
 // Keywords
-%token <Position> WINDOW BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
+%token <Position> WINDOW CONTAINER BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
 %token <Position> IS_VISIBLE TRUE FALSE WIDTH HEIGHT FUNCTION LET
-%token <Position> FOREGROUND BACKGROUND FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE PADDING LINEHEIGHT TEXTALIGN TEXTWRAP TEXTTRIM
+%token <Position> FOREGROUND BACKGROUND FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE MARGIN LAYOUT LINEHEIGHT TEXTALIGN TEXTWRAP TEXTTRIM
 %token <Position> ITALIC UNDERLINE STRIKETHROUGH
-%token <Position> RED BLUE GREEN YELLOW PINK
+%token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
 %token <Position> CENTER LEFT RIGHT
+%token <Position> HORIZONTAL VERTICAL
 %token <Position> OVERFLOW WRAP FORCEWRAP
 %token <Position> WORD CHARACTER NOTRIM
 
@@ -88,9 +89,31 @@ Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], $1) }
   | Window LEFT_CURLY_BRACKET UIElements Functions RIGHT_CURLY_BRACKET { construct_window $1 $3 $4 }
 ;
 
-// UI Elements
-UIElements : UIElement UIElements { $1 :: $2 }
-           | UIElement            { [$1] }
+ContainerProp : 
+    LAYOUT COLON Layout { Layout ($3, $1) }
+  | MARGIN COLON ContainerMargin { ContainerProp.Margin ($3, $1) }
+
+ContainerProps :
+    ContainerProp ContainerProps  { $1 :: $2 }
+  | ContainerProp             { [$1] }
+
+UIElement :
+    BUTTON STRINGLIT                                                              { Button (fst $2, default_button_props $1, $1) }
+  | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET           { Button (fst $2, $4, $1) }
+  | TEXT STRINGLIT                                                                { TextBlock (fst $2, None, $1) }
+  | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET               { TextBlock (fst $2, Some $4, $1) }
+  | TEXTBOX STRINGLIT                                                             { TextBox (fst $2, $1) }
+  | CHECKBOX STRINGLIT                                                            { CheckBox (fst $2, $1) }
+  | RADIOBUTTON STRINGLIT                                                         { RadioButton (fst $2, $1) }
+  | TOGGLESWITCH STRINGLIT                                                        { ToggleSwitch (fst $2, $1) }
+  | CALENDAR                                                                      { Calendar $1 }
+  | TOGGLEBUTTON                                                                  { ToggleButton $1 }
+  | CONTAINER LEFT_CURLY_BRACKET ContainerProps UIElements RIGHT_CURLY_BRACKET    { Container ($3, $4, $1)}
+;
+
+UIElements :
+    UIElement UIElements { $1 :: $2 }
+  | UIElement            { [$1] }
 ;
 
 // Functions
@@ -126,17 +149,18 @@ TextProps : TextProp TextProps { $1 :: $2 }
   | TextProp           { [$1] }
 ;
 
-TextProp : FOREGROUND COLON Color { Foreground ($3, $1) }
-  | BACKGROUND COLON Color { Background ($3, $1) }
-  | FONTFAMILY COLON STRINGLIT { FontFamily (fst $3, $1) }
-  | FONTSIZE COLON NUM         { FontSize (fst $3, $1) }
-  | FONTWEIGHT COLON NUM       { FontWeight (fst $3, $1) }
-  | FONTSTYLE COLON FontStyles { FontStyle (List.rev $3, $1) }
-  | PADDING COLON Padding      { Padding ($3, $1) }
-  | LINEHEIGHT COLON NUM       { LineHeight (fst $3, $1) }
-  | TEXTALIGN COLON TextAlign  { TextAlign ($3, $1) }
-  | TEXTWRAP COLON TextWrap    { TextWrap ($3, $1) }
-  | TEXTTRIM COLON TextTrim    { TextTrim ($3, $1) }
+TextProp :
+    FOREGROUND COLON Color      { Foreground ($3, $1) }
+  | BACKGROUND COLON Color      { Background ($3, $1) }
+  | FONTFAMILY COLON STRINGLIT  { FontFamily (fst $3, $1) }
+  | FONTSIZE COLON NUM          { FontSize (fst $3, $1) }
+  | FONTWEIGHT COLON NUM        { FontWeight (fst $3, $1) }
+  | FONTSTYLE COLON FontStyles  { FontStyle (List.rev $3, $1) }
+  | MARGIN COLON TextMargin    { TextBlockProp.Margin ($3, $1) }
+  | LINEHEIGHT COLON NUM        { LineHeight (fst $3, $1) }
+  | TEXTALIGN COLON TextAlign   { TextAlign ($3, $1) }
+  | TEXTWRAP COLON TextWrap     { TextWrap ($3, $1) }
+  | TEXTTRIM COLON TextTrim     { TextTrim ($3, $1) }
 ;
 
 // Color
@@ -151,6 +175,8 @@ Color :
   | GREEN  { ColorName (Green, $1) }
   | YELLOW { ColorName (Yellow, $1) }
   | PINK   { ColorName (Pink, $1) }
+  | BLACK   { ColorName (Black, $1) }
+  | WHITE   { ColorName (White, $1) }
 ;
 
 // FontStyle
@@ -179,8 +205,21 @@ TextTrim : WORD      { Word }
   | NOTRIM    { NoTrim }
 ;
 
-Padding : NUM COMMA NUM COMMA NUM COMMA NUM { Uniform (fst $1, fst $3, fst $5, fst $7) }
-        | NUM COMMA NUM                     { Symmetric (fst $1, fst $3) }
+ContainerMargin :
+     NUM                               { Uniform (fst $1) }
+  |  NUM COMMA NUM                     { Symmetric (fst $1, fst $3) }
+  |  NUM COMMA NUM COMMA NUM COMMA NUM { Custom (fst $1, fst $3, fst $5, fst $7) }
+;
+
+TextMargin :
+     NUM                               { Uniform (fst $1) }
+  |  NUM COMMA NUM                     { Symmetric (fst $1, fst $3) }
+  |  NUM COMMA NUM COMMA NUM COMMA NUM { Custom (fst $1, fst $3, fst $5, fst $7) }
+;
+
+Layout : 
+    HORIZONTAL  { Horizontal }
+  | VERTICAL    { Vertical }
 ;
 
 Functions : Function Functions { $1 :: $2 }

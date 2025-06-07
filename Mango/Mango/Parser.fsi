@@ -15,6 +15,8 @@ type token =
   | OVERFLOW of (Position)
   | WRAP of (Position)
   | FORCEWRAP of (Position)
+  | HORIZONTAL of (Position)
+  | VERTICAL of (Position)
   | CENTER of (Position)
   | LEFT of (Position)
   | RIGHT of (Position)
@@ -23,6 +25,8 @@ type token =
   | GREEN of (Position)
   | YELLOW of (Position)
   | PINK of (Position)
+  | BLACK of (Position)
+  | WHITE of (Position)
   | ITALIC of (Position)
   | UNDERLINE of (Position)
   | STRIKETHROUGH of (Position)
@@ -32,7 +36,8 @@ type token =
   | FONTSIZE of (Position)
   | FONTWEIGHT of (Position)
   | FONTSTYLE of (Position)
-  | PADDING of (Position)
+  | MARGIN of (Position)
+  | LAYOUT of (Position)
   | LINEHEIGHT of (Position)
   | TEXTALIGN of (Position)
   | TEXTWRAP of (Position)
@@ -45,6 +50,7 @@ type token =
   | FUNCTION of (Position)
   | LET of (Position)
   | WINDOW of (Position)
+  | CONTAINER of (Position)
   | BUTTON of (Position)
   | TEXT of (Position)
   | TEXTBOX of (Position)
@@ -72,6 +78,8 @@ type tokenId =
     | TOKEN_OVERFLOW
     | TOKEN_WRAP
     | TOKEN_FORCEWRAP
+    | TOKEN_HORIZONTAL
+    | TOKEN_VERTICAL
     | TOKEN_CENTER
     | TOKEN_LEFT
     | TOKEN_RIGHT
@@ -80,6 +88,8 @@ type tokenId =
     | TOKEN_GREEN
     | TOKEN_YELLOW
     | TOKEN_PINK
+    | TOKEN_BLACK
+    | TOKEN_WHITE
     | TOKEN_ITALIC
     | TOKEN_UNDERLINE
     | TOKEN_STRIKETHROUGH
@@ -89,7 +99,8 @@ type tokenId =
     | TOKEN_FONTSIZE
     | TOKEN_FONTWEIGHT
     | TOKEN_FONTSTYLE
-    | TOKEN_PADDING
+    | TOKEN_MARGIN
+    | TOKEN_LAYOUT
     | TOKEN_LINEHEIGHT
     | TOKEN_TEXTALIGN
     | TOKEN_TEXTWRAP
@@ -102,6 +113,7 @@ type tokenId =
     | TOKEN_FUNCTION
     | TOKEN_LET
     | TOKEN_WINDOW
+    | TOKEN_CONTAINER
     | TOKEN_BUTTON
     | TOKEN_TEXT
     | TOKEN_TEXTBOX
@@ -120,9 +132,11 @@ type nonTerminalId =
     | NONTERM__startProg
     | NONTERM_Prog
     | NONTERM_Window
+    | NONTERM_ContainerProp
+    | NONTERM_ContainerProps
+    | NONTERM_UIElement
     | NONTERM_UIElements
     | NONTERM_Funcs
-    | NONTERM_UIElement
     | NONTERM_ButtonProps
     | NONTERM_ButtonProp
     | NONTERM_TextProps
@@ -133,7 +147,9 @@ type nonTerminalId =
     | NONTERM_TextAlign
     | NONTERM_TextWrap
     | NONTERM_TextTrim
-    | NONTERM_Padding
+    | NONTERM_ContainerMargin
+    | NONTERM_TextMargin
+    | NONTERM_Layout
     | NONTERM_Functions
     | NONTERM_Function
     | NONTERM_Statements

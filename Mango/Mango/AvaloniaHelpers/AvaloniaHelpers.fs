@@ -8,6 +8,8 @@ open AbSyn
 open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
+open Avalonia.Layout
+open AvaloniaContainerHelpers
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
@@ -55,25 +57,30 @@ let createToggleSwitch (label: string) : IView =
     ]
 
 let createCalendar : IView = Calendar.create []
-
 let createToggleButton = ToggleButton.create []
 
-let convertUIElementToIView element =
+let rec convertUIElementToIView element =
     match element with
     | Button (label,props, _) -> createButton label props
-    | TextBlock (label, props, _) -> createTextBlock label props
+    | TextBlock (label, Some props, _) -> createTextBlock label props
+    | TextBlock (label, None, _) -> createTextBlock label []
     | TextBox (label, _) -> createTextBox label
     | CheckBox (label, _) -> createCheckbox label
     | RadioButton (label, _) -> createRadioButton label
     | ToggleSwitch (label, _) -> createToggleSwitch label
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
+    | Container (props,elements,_) -> createContainer (props, elements)
+
+and createContainer (props: ContainerProp list, elements: UIElement list): IView =
+    StackPanel.create (
+      [ StackPanel.children (List.map convertUIElementToIView elements) ] @ applyContainerProperties props
+    )
 
 let setWindowContent elements (window: HostWindow) =
     window.Content <- Component(fun _ ->
-        DockPanel.create [
-            DockPanel.children (List.map convertUIElementToIView elements)
-            ]
-        )
-
+        StackPanel.create [
+            StackPanel.orientation Orientation.Vertical
+            StackPanel.children (List.map convertUIElementToIView elements)
+        ])
     window
