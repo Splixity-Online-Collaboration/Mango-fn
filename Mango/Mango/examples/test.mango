@@ -1,0 +1,38 @@
+window "Mango UI Test" 600 400 "icon.png" {
+
+    text "Welcome to Mango UI!" {
+        fontsize: 40
+        foreground: #ff00ff
+    }
+
+    container {
+        layout: vertical
+        margin: 0
+
+        button "Click me"
+        button "Another button"
+        checkbox "Enable advanced mode"
+    }
+
+    container {
+        layout: horizontal
+        margin: 20
+
+        text "Horizontal layout preview" {
+            foreground: white
+            background: red
+        }
+        radiobutton "Option A"
+        text "Additional details" {
+            foreground: yellow
+            background: blue
+        }
+    }
+
+    container {
+        layout: vertical
+        margin: 100
+
+        button "Launch"
+    }
+}

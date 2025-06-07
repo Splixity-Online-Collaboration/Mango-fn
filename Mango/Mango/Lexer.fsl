@@ -28,6 +28,7 @@ let keyword (s, pos) =
     match s with
     // Elements
     | "window"        -> Parser.WINDOW pos
+    | "container"     -> Parser.CONTAINER pos
     | "button"        -> Parser.BUTTON pos
     | "text"          -> Parser.TEXT pos
     | "textbox"       -> Parser.TEXTBOX pos
@@ -51,11 +52,16 @@ let keyword (s, pos) =
     | "fontsize"      -> Parser.FONTSIZE pos
     | "fontweight"    -> Parser.FONTWEIGHT pos
     | "fontstyle"     -> Parser.FONTSTYLE pos
-    | "padding"       -> Parser.PADDING pos
     | "lineheight"    -> Parser.LINEHEIGHT pos
     | "textalign"     -> Parser.TEXTALIGN pos
     | "textwrap"      -> Parser.TEXTWRAP pos
     | "texttrim"      -> Parser.TEXTTRIM pos
+
+    // General UI
+    | "margin"        -> Parser.MARGIN pos
+    | "layout"        -> Parser.LAYOUT pos
+    | "horizontal"    -> Parser.HORIZONTAL pos
+    | "vertical"      -> Parser.VERTICAL pos
 
     // Fontstyle Values
     | "italic"        -> Parser.ITALIC pos
@@ -83,13 +89,15 @@ let keyword (s, pos) =
     | "green"         -> Parser.GREEN pos
     | "yellow"        -> Parser.YELLOW pos
     | "pink"          -> Parser.PINK pos
+    | "black"          -> Parser.BLACK pos
+    | "white"          -> Parser.WHITE pos
 
     // General Language Keywords
     | "let"           -> Parser.LET pos
     | "function"      -> Parser.FUNCTION pos
 
     // Fallback
-    | _               -> Parser.ID (s, pos)
+    | _               -> Parser.ID (s, pos  )
 }
 
 rule Token = parse

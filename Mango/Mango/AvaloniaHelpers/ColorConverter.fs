@@ -9,6 +9,8 @@ let fromPredefined = function
     | Yellow -> Colors.Yellow
     | Pink -> Colors.Pink
     | Green -> Colors.Green
+    | Black -> Colors.Black
+    | White -> Colors.White
 
 let fromColor (color: AbSyn.ColorT) : IBrush =
     match color with
