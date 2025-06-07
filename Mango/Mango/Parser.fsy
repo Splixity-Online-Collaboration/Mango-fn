@@ -121,18 +121,6 @@ Funcs : Function Funcs { $1 :: $2 }
       | Function       { [$1] }
 ;
 
-UIElement : BUTTON STRINGLIT { Button (fst $2, default_button_props $1, $1) }
-  | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET { Button (fst $2, $4, $1) }
-  | TEXT STRINGLIT { TextBlock (fst $2, default_text_props $1 ,$1) }
-  | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET { TextBlock (fst $2, $4, $1) }
-  | TEXTBOX STRINGLIT { TextBox (fst $2, $1) }
-  | CHECKBOX STRINGLIT { CheckBox (fst $2, $1) }
-  | RADIOBUTTON STRINGLIT { RadioButton (fst $2, $1) }
-  | TOGGLESWITCH STRINGLIT { ToggleSwitch (fst $2, $1) }
-  | CALENDAR { Calendar $1 }
-  | TOGGLEBUTTON { ToggleButton $1 }
-;
-
 // Button Props
 ButtonProps : ButtonProp ButtonProps { $1 :: $2 }
   | ButtonProp            { [$1] }
