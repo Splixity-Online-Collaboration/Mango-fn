@@ -1,5 +1,12 @@
 # Mango-fn
 
+# Passing file-arguments using `dotnet run` command
+To pass an argument for which file to use consider the following example where we want to interpret
+the window.mango file placed in the examples folder:
+```
+dotnet run -- examples/window.mango
+```
+if no argument is provided it automatically interprets the examples/window.mango file.
 # Code Structure
 The code is mostly build using module-based code structuring. The project is build as an fsharp project with the source code relying inside the innermost "Mango" folder.
 

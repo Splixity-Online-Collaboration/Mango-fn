@@ -9,6 +9,8 @@ open FSharp.Text.Lexing
 open System.Text
 open Interpreter
 
+let mutable filepath = ""
+
 exception SyntaxError of int * int
 
 let printPos (errString : string) : unit =
@@ -58,7 +60,7 @@ let parseString (s : string) =
 /// <returns>Result containing string of the read file or IO error</returns>
 let readContent path = 
     try // read text from file given as parameter with added extension
-        let inStream = File.OpenText (path + ".mango")
+        let inStream = File.OpenText path
         let txt = inStream.ReadToEnd()
         inStream.Close()
         Ok txt
@@ -81,7 +83,7 @@ type App() =
         this.Styles.Add (FluentTheme())
 
     override this.OnFrameworkInitializationCompleted() =
-        let absyn = parseMangoFile "examples/window"
+        let absyn = parseMangoFile filepath
 
         match absyn with
         | Ok syntax_tree ->
@@ -95,6 +97,10 @@ module Program =
 
     [<EntryPoint>]
     let main(args: string[]) =
+        if args.Length = 0 then
+            do filepath <- "examples/window.mango"
+        else
+            do filepath <- args[0]
         AppBuilder
             .Configure<App>()
             .UsePlatformDetect()
