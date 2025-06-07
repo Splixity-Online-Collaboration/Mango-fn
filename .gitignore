@@ -2,3 +2,7 @@ Mango/Mango/bin/
 Mango/Mango/obj/
 Mango/Mango/Parser.fsyacc.output
 Mango/.vs/
+Mango/Mango/Lexer.fs
+Mango/Mango/Lexer.fsi
+Mango/Mango/Parser.fs
+Mango/Mango/Parser.fsi
