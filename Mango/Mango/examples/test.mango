@@ -9,7 +9,9 @@ window "Mango UI Test" 600 400 "icon.png" {
         layout: vertical
         margin: 0
 
-        button "Click me"
+        button "Click me" {
+            width: 1000
+        }
         button "Another button"
         checkbox "Enable advanced mode"
     }
@@ -27,12 +29,5 @@ window "Mango UI Test" 600 400 "icon.png" {
             foreground: yellow
             background: blue
         }
-    }
-
-    container {
-        layout: vertical
-        margin: 100
-
-        button "Launch"
     }
 }
