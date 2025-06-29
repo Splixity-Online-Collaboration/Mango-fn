@@ -14,9 +14,9 @@ let applyOrientation props applied =
             | Vertical -> Some (StackPanel.orientation Orientation.Vertical)
         | _ -> None)
 
-let applyMargin props applied =
+let applyMargin  props applied =
     applyProp props applied (function
-        | Margin (m, _) ->
+        | ContainerProp.Margin (m, _) ->
             let thickness =
                 match m with
                 | Uniform x -> Thickness(float x)
@@ -29,3 +29,4 @@ let applyContainerProperties props =
     []
     |> applyOrientation props
     |> applyMargin props
+    

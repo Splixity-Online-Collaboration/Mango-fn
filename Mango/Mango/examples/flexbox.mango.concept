@@ -1,8 +1,8 @@
 window "Flexbox Test" 400 600 "icon.png" {
     // Flexbox with flex-direction row (wrap is optional, decides whether to wrap the items or not)
     row wrap {
-        width: fill // fill is default, accepts pixels / percentages (100% is equivalent to fill)
-        height: hug // hug is default, accepts pixels / percentages
+        width: hug // hug is default, accepts fill / hug / pixels / percentages (100% is equivalent to fill)
+        height: hug // hug is default, accepts fill / hug / pixels / percentages
 
         justify: between // default, accepts between, around, start, end
         align: center    // default, accepts top, bottom, center
@@ -26,10 +26,10 @@ window "Flexbox Test" 400 600 "icon.png" {
         ...
     }
 
-    // Flexbox with default fill-width, justify: between, align: center as flex-direction column
-    column {
-        width: hug   // hug is default, accepts pixels / percentages
-        height: fill // fill is default, accepts pixels / percentages (100% is equivalent to fill)
+    // Flexbox with flex-direction column (wrap is optional, decides whether to wrap the items or not)
+    wrap column {
+        width: hug   // hug is default, accepts fill / hug / pixels / percentages
+        height: hug // hug is default, accepts fill / hug / pixels / percentages (100% is equivalent to fill)
 
         justify: start // default, accepts between, around, start, end
         align: left    // default, accepts left, right, center

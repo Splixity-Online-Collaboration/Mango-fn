@@ -26,6 +26,7 @@
 		<Compile Include="AvaloniaHelpers/ViewHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaButtonHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaTextBlockHelpers.fs" />
+		<Compile Include="AvaloniaHelpers\AvaloniaRowHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaContainerHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaHelpers.fs" />
 		<Compile Include="Interpreter.fs" />

@@ -101,6 +101,9 @@ type ContainerProp =
     | Layout of LayoutT * Position
     | Margin of Thickness * Position
 
+type RowProp =
+    | Margin of Thickness * Position
+
 type UIElement = 
     | Button of string * ButtonProp list * Position
     | TextBlock of string * TextBlockProp list option * Position
@@ -111,6 +114,7 @@ type UIElement =
     | Calendar of Position
     | ToggleButton of Position
     | Container of ContainerProp list * UIElement list * Position
+    | Row of RowProp list * UIElement list * Position
 
 type Window = 
     | Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

@@ -29,6 +29,7 @@ let keyword (s, pos) =
     // Elements
     | "window"        -> Parser.WINDOW pos
     | "container"     -> Parser.CONTAINER pos
+    | "row"           -> Parser.ROW pos
     | "button"        -> Parser.BUTTON pos
     | "text"          -> Parser.TEXT pos
     | "textbox"       -> Parser.TEXTBOX pos

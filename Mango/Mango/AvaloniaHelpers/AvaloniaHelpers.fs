@@ -10,10 +10,11 @@ open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
 open Avalonia.Layout
 open AvaloniaContainerHelpers
+open AvaloniaRowHelpers
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
-    | Some filename -> 
+    | Some filename ->
         window.Icon <- new WindowIcon(filename)
         window
     | None -> window
@@ -26,7 +27,7 @@ let setWindowWidthAndHeight width height (window: HostWindow) =
         window
     | _ -> window
 
-let setWindowName name (window: HostWindow) = 
+let setWindowName name (window: HostWindow) =
     window.Name <- name
     window
 
@@ -36,51 +37,52 @@ let setWindowProperties name width height icon (window: HostWindow) =
     |> setWindowWidthAndHeight width height
     |> setWindowIcon icon
 
-let createTextBox text : IView = 
-    TextBox.create [
-        TextBox.text text
-    ]
+let createTextBox text : IView = TextBox.create [ TextBox.text text ]
 
-let createCheckbox (label: string) : IView = 
-    CheckBox.create [
-        CheckBox.content label
-    ]
+let createCheckbox (label: string) : IView =
+    CheckBox.create [ CheckBox.content label ]
 
 let createRadioButton (label: string) : IView =
-    RadioButton.create [
-        RadioButton.content label
-    ]
+    RadioButton.create [ RadioButton.content label ]
 
 let createToggleSwitch (label: string) : IView =
-    ToggleSwitch.create [
-        ToggleSwitch.content label
-    ]
+    ToggleSwitch.create [ ToggleSwitch.content label ]
 
-let createCalendar : IView = Calendar.create []
+let createCalendar: IView = Calendar.create []
 let createToggleButton = ToggleButton.create []
 
 let rec convertUIElementToIView element =
     match element with
-    | Button (label,props, _) -> createButton label props
-    | TextBlock (label, Some props, _) -> createTextBlock label props
-    | TextBlock (label, None, _) -> createTextBlock label []
-    | TextBox (label, _) -> createTextBox label
-    | CheckBox (label, _) -> createCheckbox label
-    | RadioButton (label, _) -> createRadioButton label
-    | ToggleSwitch (label, _) -> createToggleSwitch label
+    | Button(label, props, _) -> createButton label props
+    | TextBlock(label, Some props, _) -> createTextBlock label props
+    | TextBlock(label, None, _) -> createTextBlock label []
+    | TextBox(label, _) -> createTextBox label
+    | CheckBox(label, _) -> createCheckbox label
+    | RadioButton(label, _) -> createRadioButton label
+    | ToggleSwitch(label, _) -> createToggleSwitch label
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
-    | Container (props,elements,_) -> createContainer (props, elements)
+    | Container(props, elements, _) -> createContainer (props, elements)
+    | Row(props, elements, _) -> createRow (props, elements)
 
-and createContainer (props: ContainerProp list, elements: UIElement list): IView =
+and createContainer (props: ContainerProp list, elements: UIElement list) : IView =
     StackPanel.create (
-      [ StackPanel.children (List.map convertUIElementToIView elements) ] @ applyContainerProperties props
+        [ StackPanel.children (List.map convertUIElementToIView elements) ]
+        @ applyContainerProperties props
+    )
+
+and createRow (props: RowProp list, elements: UIElement list) : IView =
+    StackPanel.create (
+        [ StackPanel.orientation Orientation.Horizontal
+          StackPanel.children (List.map convertUIElementToIView elements) ]
+        @ applyRowProperties props
     )
 
 let setWindowContent elements (window: HostWindow) =
-    window.Content <- Component(fun _ ->
-        StackPanel.create [
-            StackPanel.orientation Orientation.Vertical
-            StackPanel.children (List.map convertUIElementToIView elements)
-        ])
+    window.Content <-
+        Component(fun _ ->
+            StackPanel.create
+                [ StackPanel.orientation Orientation.Vertical
+                  StackPanel.children (List.map convertUIElementToIView elements) ])
+
     window
