@@ -26,8 +26,8 @@ window "Flexbox Test" 400 600 "icon.png" {
         ...
     }
 
-    // Flexbox with flex-direction column (wrap is optional, decides whether to wrap the items or not)
-    wrap column {
+    // Flexbox with flex-direction column
+    column {
         width: hug   // hug is default, accepts fill / hug / pixels / percentages
         height: hug // hug is default, accepts fill / hug / pixels / percentages (100% is equivalent to fill)
 
@@ -37,11 +37,12 @@ window "Flexbox Test" 400 600 "icon.png" {
         gap: 5         // default is 0
 
         overflow: visible // explicitly declared, even though it’s default
-        wrap              // wrap items, false by default        
+        wrap: true             // wrap items, false by default        
 
         // Elements (example)
 
-        text xl "Your Todo-list" // instead of using header like h1, always use text with prefix xs, s, m, l, xl, or use the fontsize prop inside {}
+        text xl "Your Todo-list" // instead of using header like h1, always use text with prefix xs, sm, lg, xl, or use the fontsize prop inside {}
+        // The base size (medium) between sm and lg is default (no suffix)
         
         // 1, A, a, I, i (possible list types)
         list "1" {

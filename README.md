@@ -13,6 +13,23 @@ The code is mostly build using module-based code structuring. The project is bui
 ## Namespaces
 - AvaloniaHelpers - Helper functions for interpreting and constructing UI using Avalonia UI.
 
+## Bools
+
+- Should always be false by default. Only turn true when needed.
+
+**Example**
+
+✔️ Correct: `hidden: true`
+❌ Wrong: `visible: false`
+
+This is so that you can also prefix bools on Elements:
+
+```mango
+// Correct Syntax
+button hidden { ... }
+row wrap { ... }
+```
+
 # Design Principles
 ## 1. Joy of Creation First
 "It should feel fun, not technical."

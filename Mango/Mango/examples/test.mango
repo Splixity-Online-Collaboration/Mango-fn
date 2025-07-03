@@ -2,11 +2,10 @@ window "Mango UI Test" 600 400 "icon.png" {
 
     text "Welcome to Mango UI!" {
         fontsize: 40
-        foreground: #ff00ff
+        color: #ff00ff
     }
 
-    container {
-        layout: vertical
+    column {
         margin: 0
 
         button "Click me" {
@@ -16,25 +15,17 @@ window "Mango UI Test" 600 400 "icon.png" {
         checkbox "Enable advanced mode"
     }
 
-    container {
-        layout: horizontal
+    row {
         margin: 20
 
         text "Horizontal layout preview" {
-            foreground: white
-            background: red
+            color: white
+            bgcolor: red
         }
         radiobutton "Option A"
         text "Additional details" {
-            foreground: yellow
-            background: blue
+            color: yellow
+            bgcolor: blue
         }
-    }
-
-    row {
-        margin: 10
-
-        button "test2"
-        button "test"
     }
 }

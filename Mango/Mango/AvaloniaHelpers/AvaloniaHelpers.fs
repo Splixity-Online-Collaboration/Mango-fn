@@ -9,8 +9,8 @@ open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
 open Avalonia.Layout
-open AvaloniaContainerHelpers
 open AvaloniaRowHelpers
+open AvaloniaColumnHelpers
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
@@ -53,36 +53,39 @@ let createToggleButton = ToggleButton.create []
 
 let rec convertUIElementToIView element =
     match element with
-    | Button(label, props, _) -> createButton label props
-    | TextBlock(label, Some props, _) -> createTextBlock label props
-    | TextBlock(label, None, _) -> createTextBlock label []
+    | Button(label, props, _) -> createButton label (defaultArg props [])
+    | TextBlock(label, props, _) -> createTextBlock label (defaultArg props [])
     | TextBox(label, _) -> createTextBox label
     | CheckBox(label, _) -> createCheckbox label
     | RadioButton(label, _) -> createRadioButton label
     | ToggleSwitch(label, _) -> createToggleSwitch label
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
-    | Container(props, elements, _) -> createContainer (props, elements)
-    | Row(props, elements, _) -> createRow (props, elements)
-
-and createContainer (props: ContainerProp list, elements: UIElement list) : IView =
-    StackPanel.create (
-        [ StackPanel.children (List.map convertUIElementToIView elements) ]
-        @ applyContainerProperties props
-    )
+    | Row(props, elements, _) -> createRow (defaultArg props [], defaultArg elements [])
+    | Column(props, elements, _) -> createColumn (defaultArg props [], defaultArg elements [])
 
 and createRow (props: RowProp list, elements: UIElement list) : IView =
-    StackPanel.create (
-        [ StackPanel.orientation Orientation.Horizontal
-          StackPanel.children (List.map convertUIElementToIView elements) ]
+    printfn "Row props: %A" props
+    // decide here whether to Stackpanel or wrappanel
+
+    WrapPanel.create (
+        [ WrapPanel.orientation Orientation.Horizontal
+          WrapPanel.children (List.map convertUIElementToIView elements) ]
         @ applyRowProperties props
+    )
+
+and createColumn (props: ColumnProp list, elements: UIElement list) : IView =
+    WrapPanel.create (
+        [ WrapPanel.orientation Orientation.Vertical
+          WrapPanel.children (List.map convertUIElementToIView elements) ]
+        @ applyColumnProperties props
     )
 
 let setWindowContent elements (window: HostWindow) =
     window.Content <-
         Component(fun _ ->
-            StackPanel.create
-                [ StackPanel.orientation Orientation.Vertical
-                  StackPanel.children (List.map convertUIElementToIView elements) ])
+            WrapPanel.create
+                [ WrapPanel.orientation Orientation.Vertical
+                  WrapPanel.children (List.map convertUIElementToIView elements) ])
 
     window

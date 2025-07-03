@@ -1,4 +1,4 @@
-module AvaloniaHelpers.AvaloniaRowHelpers
+module AvaloniaHelpers.AvaloniaColumnHelpers
 
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL
@@ -9,7 +9,7 @@ open ColorConverter
 
 let applyMargin props applied =
     applyProp props applied (function
-        | RowProp.Margin(m, _) ->
+        | ColumnProp.Margin(m, _) ->
             let thickness =
                 match m with
                 | Uniform x -> Thickness(float x)
@@ -21,22 +21,18 @@ let applyMargin props applied =
 
 let applyWidth props applied =
     applyProp props applied (function
-        | RowProp.Width(num, _) -> Some(Panel.width num)
+        | ColumnProp.Width(num, _) -> Some(Panel.width num)
         | _ -> None)
 
 let applyHeight props applied =
     applyProp props applied (function
-        | RowProp.Height(num, _) -> Some(Panel.height num)
+        | ColumnProp.Height(num, _) -> Some(Panel.height num)
         | _ -> None)
 
 let applyBackgroundColor props applied =
     applyProp props applied (function
-        | RowProp.BackgroundColor(c, _) -> Some(Panel.background (fromColor c))
+        | ColumnProp.BackgroundColor(c, _) -> Some(Panel.background (fromColor c))
         | _ -> None)
 
-let applyRowProperties props =
-    []
-    |> applyMargin props
-    |> applyWidth props
-    |> applyHeight props
-    |> applyBackgroundColor props
+let applyColumnProperties props =
+    [] |> applyMargin props |> applyWidth props |> applyHeight props
