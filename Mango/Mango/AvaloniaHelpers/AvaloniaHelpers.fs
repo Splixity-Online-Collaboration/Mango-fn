@@ -84,8 +84,9 @@ and createColumn (props: ColumnProp list, elements: UIElement list) : IView =
 let setWindowContent elements (window: HostWindow) =
     window.Content <-
         Component(fun _ ->
-            WrapPanel.create
-                [ WrapPanel.orientation Orientation.Vertical
-                  WrapPanel.children (List.map convertUIElementToIView elements) ])
+            ScrollViewer.create
+                [ ScrollViewer.content (
+                      StackPanel.create [ StackPanel.children (List.map convertUIElementToIView elements) ]
+                  ) ])
 
     window

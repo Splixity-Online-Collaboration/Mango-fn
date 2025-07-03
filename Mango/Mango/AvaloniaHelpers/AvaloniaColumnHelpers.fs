@@ -26,7 +26,7 @@ let applyWidth props applied =
 
 let applyHeight props applied =
     applyProp props applied (function
-        | ColumnProp.Height(num, _) -> Some(Panel.height num)
+        | ColumnProp.Height(num, _) -> Some(Panel.maxHeight num)
         | _ -> None)
 
 let applyBackgroundColor props applied =
@@ -35,4 +35,8 @@ let applyBackgroundColor props applied =
         | _ -> None)
 
 let applyColumnProperties props =
-    [] |> applyMargin props |> applyWidth props |> applyHeight props
+    []
+    |> applyMargin props
+    |> applyWidth props
+    |> applyHeight props
+    |> applyBackgroundColor props

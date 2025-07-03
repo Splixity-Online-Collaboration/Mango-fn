@@ -9,6 +9,7 @@ window "Mango UI Flexboxes Test" 610 600 "icon.png" {
     row {
         margin: 10
         wrap: true
+        bgcolor: yellow
 
         // this could be refactored later with custom function components, note that inline this looks ass
         row { 
@@ -53,6 +54,7 @@ window "Mango UI Flexboxes Test" 610 600 "icon.png" {
     column {
         height: 200
         margin: 10
+        bgcolor: yellow
         wrap: true
 
         button "test"
