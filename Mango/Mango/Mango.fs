@@ -1,29 +1,6 @@
 ﻿module Globals =
     let filepath = ref None
 
-module FileIO =
-
-    open System.IO
-
-    let readContent path =
-        try
-            File.ReadAllText(path) |> Ok
-        with ex -> Error $"Could not read file: {ex.Message}"
-
-module ParserWrapper =
-
-    open System.Text
-    open FSharp.Text.Lexing
-
-    let parseString (source: string) =
-        try
-            let lexbuf = LexBuffer<_>.FromBytes(Encoding.UTF8.GetBytes(source))
-            Ok (Parser.Prog Lexer.Token lexbuf)
-        with
-        | Lexer.LexicalError (msg, (line, col)) ->
-            Error $"Lexical error: {msg} at line {line}, column {col}"
-        | ex -> Error $"Parser error: {ex.Message}"
-
 module AppMain =
 
     open Avalonia
@@ -34,15 +11,13 @@ module AppMain =
     open ParserWrapper
     open Interpreter
 
-    let mutable filepath = "examples/window.mango"
-
     type App() =
         inherit Application()
         override this.Initialize() =
             this.Styles.Add(FluentTheme())
 
         override this.OnFrameworkInitializationCompleted() =
-            match readContent filepath with
+            match readContent Globals.filepath.Value.Value with
             | Error err -> failwithf "File error: %s" err
             | Ok source ->
                 match parseString source with
@@ -60,7 +35,7 @@ module Program =
 
     [<EntryPoint>]
     let main (args: string[]) =
-        let path = if args.Length > 0 then args[0] else "examples/test.mango"
+        let path = if args.Length > 0 then args[0] else "examples/window.mango"
         Globals.filepath.Value <- Some path
         AppBuilder
             .Configure<App>()

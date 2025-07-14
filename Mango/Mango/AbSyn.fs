@@ -11,8 +11,7 @@ let fromCString (s : string) : string =
         | c           :: l' -> c    :: unescape l'
     Seq.toList s |> unescape |> System.String.Concat
 
-(* position: (line, column) *)
-type Position = int * int  // row, column
+type Position = int * int // (line, column)
 
 type Value =
     | Int of int

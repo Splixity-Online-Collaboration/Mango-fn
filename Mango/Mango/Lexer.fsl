@@ -18,7 +18,10 @@ let rec getLineCol pos line = function
 let getPos (lexbuf: LexBuffer<'char>) =
     getLineCol lexbuf.StartPos.pos_cnum currentLine lineStartPos
 
-exception LexicalError of string * (int * int) // (message, (line, column))
+type Position = int * int // (line, column)
+(* Custom exception for lexer errors *)
+
+exception LexicalError of string * Position
 
 let lexerError lexbuf s =
     raise (LexicalError (s, getPos lexbuf))
@@ -150,4 +153,4 @@ rule Token = parse
   | '='                     { Parser.EQUAL (getPos lexbuf) }
   | eof                     { Parser.EOF (getPos lexbuf) }
 
-  | _                       { lexerError lexbuf "Illegal symbol in input" }
+  | _ { raise (LexicalError($"Unexpected character", (lexbuf.StartPos.Line, lexbuf.StartPos.Column))) }

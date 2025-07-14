@@ -7,12 +7,12 @@ open AbSyn
 (* parse-error function *)
 let mutable ErrorContextDescriptor : string = ""
 
-let parse_error_rich =
-  Some (fun (ctxt: ParseErrorContext<_>) ->
+let parse_error_rich : (ParseErrorContext<'tok> -> unit) option =
+  Some (fun ctxt ->
     ErrorContextDescriptor <-
-      match ctxt.CurrentToken with
-      | None -> "At beginning of input\n"
-      | Some token -> sprintf "at token %A\n" token
+        match ctxt.CurrentToken with
+        | Some tok -> $"Syntax error at token {tok}. {ctxt.Message}"
+        | None -> "Syntax error at beginning of file"
   )
 
 let construct_window window elements functions = 
