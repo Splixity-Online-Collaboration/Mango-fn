@@ -13,6 +13,8 @@ let fromCString (s : string) : string =
 
 type Position = int * int // (line, column)
 
+type CommonProp = | IsVisible of bool * Position
+
 type Value =
     | Int of int
     | Real of float
@@ -32,9 +34,12 @@ type FunctionT =
     | Function of string * Stmt list * Position
 
 type ButtonProp =
-    | IsVisible of bool * Position
     | Width of int * Position
     | Height of int * Position
+
+type ButtonProperty = 
+    | CommonProp of CommonProp
+    | ButtonProp of ButtonProp
 
 type FontStyleT = 
     | Italic
@@ -101,7 +106,7 @@ type ContainerProp =
     | Margin of Thickness * Position
 
 type UIElement = 
-    | Button of string * ButtonProp list * Position
+    | Button of string * ButtonProperty list * Position
     | TextBlock of string * TextBlockProp list option * Position
     | TextBox of string * Position 
     | CheckBox of string * Position

@@ -23,7 +23,7 @@ let add_ui_elements window elements =
   match window with
   | Window (name, width, height, icon, _, functions, pos) -> Window (name, width, height, icon, elements, functions, pos)
 
-let default_button_props pos = [IsVisible (true, pos)]
+let default_button_props pos = [CommonProp (IsVisible (true, pos))]
 let default_text_props pos = []
 
 let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
@@ -65,8 +65,8 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
 // Types
 %type <AbSyn.UIElement list> UIElements
 %type <AbSyn.UIElement> UIElement
-%type <AbSyn.ButtonProp list> ButtonProps
-%type <AbSyn.ButtonProp> ButtonProp
+%type <AbSyn.ButtonProperty list> ButtonProps
+%type <AbSyn.ButtonProperty> ButtonProp
 %type <AbSyn.TextBlockProp list> TextProps
 %type <AbSyn.TextBlockProp> TextProp
 %type <AbSyn.ColorT> Color
@@ -99,7 +99,7 @@ ContainerProps :
 
 UIElement :
     BUTTON STRINGLIT                                                              { Button (fst $2, default_button_props $1, $1) }
-  | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET           { Button (fst $2, $4, $1) }
+  | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProperties RIGHT_CURLY_BRACKET           { Button (fst $2, $4, $1) }
   | TEXT STRINGLIT                                                                { TextBlock (fst $2, None, $1) }
   | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET               { TextBlock (fst $2, Some $4, $1) }
   | TEXTBOX STRINGLIT                                                             { TextBox (fst $2, $1) }
@@ -121,15 +121,28 @@ Funcs : Function Funcs { $1 :: $2 }
       | Function       { [$1] }
 ;
 
+ButtonProperties : ButtonProp ButtonProperties { $1 :: $2 }
+  | CommonProp ButtonProperties { $1 :: $2 }
+  | ButtonProp            { [$1] }
+  | CommonProp            { [$1] }
+;
+
 // Button Props
 ButtonProps : ButtonProp ButtonProps { $1 :: $2 }
   | ButtonProp            { [$1] }
 ;
 
-ButtonProp : IS_VISIBLE COLON TRUE  { IsVisible (true, $1) }
-  | IS_VISIBLE COLON FALSE { IsVisible (false, $1) }
-  | WIDTH COLON NUM        { Width (fst $3, $1) }
-  | HEIGHT COLON NUM       { Height (fst $3, $1) }
+ButtonProp :
+  | WIDTH COLON NUM        { ButtonProp (Width (fst $3, $1)) }
+  | HEIGHT COLON NUM       { ButtonProp (Height (fst $3, $1)) }
+;
+
+CommonProps : CommonProp CommonProps { $1 :: $2 }
+  | CommonProp            { [$1] }
+;
+
+CommonProp : IS_VISIBLE COLON TRUE { CommonProp (IsVisible (true, $1)) }
+  | IS_VISIBLE COLON FALSE { CommonProp (IsVisible (false, $1)) }
 ;
 
 // Text Props
