@@ -7,12 +7,12 @@ open AbSyn
 (* parse-error function *)
 let mutable ErrorContextDescriptor : string = ""
 
-let parse_error_rich =
-  Some (fun (ctxt: ParseErrorContext<_>) ->
+let parse_error_rich : (ParseErrorContext<'tok> -> unit) option =
+  Some (fun ctxt ->
     ErrorContextDescriptor <-
-      match ctxt.CurrentToken with
-      | None -> "At beginning of input\n"
-      | Some token -> sprintf "at token %A\n" token
+        match ctxt.CurrentToken with
+        | Some tok -> $"Syntax error at token {tok}. {ctxt.Message}"
+        | None -> "Syntax error at beginning of file"
   )
 
 let construct_window window elements functions = 
@@ -22,9 +22,6 @@ let construct_window window elements functions =
 let add_ui_elements window elements = 
   match window with
   | Window (name, width, height, icon, _, functions, pos) -> Window (name, width, height, icon, elements, functions, pos)
-
-let default_button_props pos = [IsVisible (true, pos)]
-let default_text_props pos = []
 
 let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
   let hex = if s.StartsWith("#") then s.Substring(1) else s
@@ -37,6 +34,13 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
       let (rOk, r), (gOk, g), (bOk, b), (aOk, a) = tryByte 0, tryByte 2, tryByte 4, tryByte 6
       if rOk && gOk && bOk && aOk then Some (r, g, b, a) else None
   | _ -> None
+
+let splitInterleaved props =
+    List.foldBack (fun prop (cs, ss) ->
+        match prop with
+        | Common c   -> (c :: cs, ss)
+        | Specific s -> (cs, s :: ss)
+    ) props ([], [])
 %}
 
 // Tokens with values
@@ -65,10 +69,10 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
 // Types
 %type <AbSyn.UIElement list> UIElements
 %type <AbSyn.UIElement> UIElement
-%type <AbSyn.ButtonProp list> ButtonProps
-%type <AbSyn.ButtonProp> ButtonProp
-%type <AbSyn.TextBlockProp list> TextProps
+%type <AbSyn.InterleavedProp<TextBlockProp> list> TextProps
 %type <AbSyn.TextBlockProp> TextProp
+%type <AbSyn.InterleavedProp<ContainerProp> list> ContainerProps
+%type <AbSyn.ContainerProp> ContainerProp
 %type <AbSyn.ColorT> Color
 %type <AbSyn.FunctionT> Function
 %type <AbSyn.Stmt list> Statements
@@ -91,24 +95,37 @@ Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], $1) }
 
 ContainerProp : 
     LAYOUT COLON Layout { Layout ($3, $1) }
-  | MARGIN COLON ContainerMargin { ContainerProp.Margin ($3, $1) }
+
+InterleavedContainerProp :
+    ContainerProp     { Specific $1 }
+  | CommonProp        { Common $1 }
+;
 
 ContainerProps :
-    ContainerProp ContainerProps  { $1 :: $2 }
-  | ContainerProp             { [$1] }
+    InterleavedContainerProp ContainerProps { $1 :: $2 }
+  | InterleavedContainerProp                { [$1] }
+;
 
 UIElement :
-    BUTTON STRINGLIT                                                              { Button (fst $2, default_button_props $1, $1) }
-  | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProps RIGHT_CURLY_BRACKET           { Button (fst $2, $4, $1) }
-  | TEXT STRINGLIT                                                                { TextBlock (fst $2, None, $1) }
-  | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET               { TextBlock (fst $2, Some $4, $1) }
-  | TEXTBOX STRINGLIT                                                             { TextBox (fst $2, $1) }
-  | CHECKBOX STRINGLIT                                                            { CheckBox (fst $2, $1) }
-  | RADIOBUTTON STRINGLIT                                                         { RadioButton (fst $2, $1) }
-  | TOGGLESWITCH STRINGLIT                                                        { ToggleSwitch (fst $2, $1) }
-  | CALENDAR                                                                      { Calendar $1 }
-  | TOGGLEBUTTON                                                                  { ToggleButton $1 }
-  | CONTAINER LEFT_CURLY_BRACKET ContainerProps UIElements RIGHT_CURLY_BRACKET    { Container ($3, $4, $1)}
+    BUTTON STRINGLIT                                                                { Button (fst $2, None, $1) }
+  | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProperties RIGHT_CURLY_BRACKET        { Button (fst $2, Some $4, $1) }
+  | TEXT STRINGLIT                                                                  { TextBlock (fst $2, None, None, $1) }
+  | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET
+    {
+        let commonProps, specificProps = splitInterleaved $4
+        TextBlock(fst $2, Some commonProps, Some specificProps, $1)
+    }
+  | TEXTBOX STRINGLIT                                                               { TextBox (fst $2, $1) }
+  | CHECKBOX STRINGLIT                                                              { CheckBox (fst $2, $1) }
+  | RADIOBUTTON STRINGLIT                                                           { RadioButton (fst $2, $1) }
+  | TOGGLESWITCH STRINGLIT                                                          { ToggleSwitch (fst $2, $1) }
+  | CALENDAR                                                                        { Calendar $1 }
+  | TOGGLEBUTTON                                                                    { ToggleButton $1 }
+  | CONTAINER LEFT_CURLY_BRACKET ContainerProps UIElements RIGHT_CURLY_BRACKET 
+    { 
+        let commonProps, specificProps = splitInterleaved $3
+        Container (Some commonProps, Some specificProps, $4, $1)
+    }
 ;
 
 UIElements :
@@ -121,20 +138,25 @@ Funcs : Function Funcs { $1 :: $2 }
       | Function       { [$1] }
 ;
 
-// Button Props
-ButtonProps : ButtonProp ButtonProps { $1 :: $2 }
-  | ButtonProp            { [$1] }
+ButtonProperties : CommonProp ButtonProperties { $1 :: $2 }
+  | CommonProp            { [$1] }
 ;
 
-ButtonProp : IS_VISIBLE COLON TRUE  { IsVisible (true, $1) }
+Margin :
+     NUM                               { Uniform (fst $1) }
+  |  NUM COMMA NUM                     { Symmetric (fst $1, fst $3) }
+  |  NUM COMMA NUM COMMA NUM COMMA NUM { Custom (fst $1, fst $3, fst $5, fst $7) }
+;
+
+CommonProps : CommonProp CommonProps { $1 :: $2 }
+  | CommonProp            { [$1] }
+;
+
+CommonProp : IS_VISIBLE COLON TRUE { IsVisible (true, $1) }
   | IS_VISIBLE COLON FALSE { IsVisible (false, $1) }
   | WIDTH COLON NUM        { Width (fst $3, $1) }
   | HEIGHT COLON NUM       { Height (fst $3, $1) }
-;
-
-// Text Props
-TextProps : TextProp TextProps { $1 :: $2 }
-  | TextProp           { [$1] }
+  | MARGIN COLON Margin    { Margin ($3, $1) }
 ;
 
 TextProp :
@@ -144,11 +166,20 @@ TextProp :
   | FONTSIZE COLON NUM          { FontSize (fst $3, $1) }
   | FONTWEIGHT COLON NUM        { FontWeight (fst $3, $1) }
   | FONTSTYLE COLON FontStyles  { FontStyle (List.rev $3, $1) }
-  | MARGIN COLON TextMargin    { TextBlockProp.Margin ($3, $1) }
   | LINEHEIGHT COLON NUM        { LineHeight (fst $3, $1) }
   | TEXTALIGN COLON TextAlign   { TextAlign ($3, $1) }
   | TEXTWRAP COLON TextWrap     { TextWrap ($3, $1) }
   | TEXTTRIM COLON TextTrim     { TextTrim ($3, $1) }
+;
+
+InterleavedTextProp :
+    TextProp      { Specific $1 }
+  | CommonProp        { Common $1 }
+;
+
+TextProps :
+    InterleavedTextProp TextProps { $1 :: $2 }
+  | InterleavedTextProp           { [$1] }
 ;
 
 // Color
@@ -191,12 +222,6 @@ TextWrap : OVERFLOW   { Overflow }
 TextTrim : WORD      { Word }
   | CHARACTER { Character }
   | NOTRIM    { NoTrim }
-;
-
-ContainerMargin :
-     NUM                               { Uniform (fst $1) }
-  |  NUM COMMA NUM                     { Symmetric (fst $1, fst $3) }
-  |  NUM COMMA NUM COMMA NUM COMMA NUM { Custom (fst $1, fst $3, fst $5, fst $7) }
 ;
 
 TextMargin :
