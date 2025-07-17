@@ -61,20 +61,26 @@ let createToggleButton = ToggleButton.create []
 
 let rec convertUIElementToIView element =
     match element with
-    | Button (label,props, _) -> createButton label props
-    | TextBlock (label, Some props, _) -> createTextBlock label props
-    | TextBlock (label, None, _) -> createTextBlock label []
+    | Button (label, Some props, _) -> createButton label props
+    | Button (label, None, _) -> createButton label []
+    | TextBlock (label, Some commonProps, Some props, _) -> createTextBlock label commonProps props
+    | TextBlock (label, Some commonProps, None, _) -> createTextBlock label commonProps []
+    | TextBlock (label, None, Some props, _) -> createTextBlock label [] props
+    | TextBlock (label, None, None, _) -> createTextBlock label [] []
     | TextBox (label, _) -> createTextBox label
     | CheckBox (label, _) -> createCheckbox label
     | RadioButton (label, _) -> createRadioButton label
     | ToggleSwitch (label, _) -> createToggleSwitch label
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
-    | Container (props,elements,_) -> createContainer (props, elements)
+    | Container (Some commonProps, Some containerProps, elements, _) -> createContainer commonProps containerProps elements
+    | Container (Some commonProps, None, elements, _) -> createContainer commonProps [] elements
+    | Container (None, Some containerProps, elements, _) -> createContainer [] containerProps elements
+    | Container (None, None, elements, _) -> createContainer [] [] elements
 
-and createContainer (props: ContainerProp list, elements: UIElement list): IView =
+and createContainer (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list): IView =
     StackPanel.create (
-      [ StackPanel.children (List.map convertUIElementToIView elements) ] @ applyContainerProperties props
+      [ StackPanel.children (List.map convertUIElementToIView elements) ] @ applyContainerCommonProperties commonProps @ applyContainerProperties props
     )
 
 let setWindowContent elements (window: HostWindow) =
