@@ -7,6 +7,7 @@ open Avalonia.Controls
 open Avalonia
 open AbSyn
 open AvaloniaHelpers.ColorConverter
+open AvaloniaCommonHelpers
 
 let applyColor props applied =
     applyProp props applied (function
@@ -28,25 +29,12 @@ let applyFontSize props applied =
         | TextBlockProp.FontSize(i, _) -> Some(TextBlock.fontSize (float i))
         | _ -> None)
 
-let applyMargin props applied =
-    applyProp props applied (function
-        | TextBlockProp.Margin(m, _) ->
-            let thickness =
-                match m with
-                | Uniform x -> Thickness(float x)
-                | Symmetric(x, y) -> Thickness(float x, float y, float x, float y)
-                | Custom(l, t, r, b) -> Thickness(float l, float t, float r, float b)
-
-            Some(TextBlock.margin thickness)
-        | _ -> None)
-
 let applyTextBlockProperties props =
     []
     |> applyColor props
     |> applyBackgroundColor props
     |> applyFontFamily props
     |> applyFontSize props
-    |> applyMargin props
 
 let createTextBlock (text: string) (commonProps: CommonProp list) (props: TextBlockProp list) : IView =
-    TextBlock.create ([ TextBlock.text text ] @ applyTextBlockProperties props)
+    TextBlock.create ([ TextBlock.text text ] @ applyCommonProps commonProps @ applyTextBlockProperties props)

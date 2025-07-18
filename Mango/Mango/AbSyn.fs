@@ -88,10 +88,12 @@ type TextBlockProp =
     | LineHeight of int * Position
     | TextAlign of TextAlignT * Position
     | TextTrim of TextTrimT * Position
+    | TextWrap of TextWrapT * Position
 
 type ContainerProp =
     | Wrap of bool * Position
     | BackgroundColor of ColorT * Position
+    | Border of ColorT * Thickness * Position
 
 type InterleavedProp<'specific> =
   | Common of CommonProp

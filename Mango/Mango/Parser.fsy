@@ -49,8 +49,8 @@ let splitInterleaved props =
 
 // Keywords
 %token <Position> WINDOW COLUMN ROW BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
-%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT FUNCTION LET
-%token <Position> COLOR BACKGROUNDCOLOR FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE MARGIN LINEHEIGHT TEXTALIGN TEXTTRIM
+%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT BORDER FUNCTION LET
+%token <Position> COLOR BACKGROUNDCOLOR FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE MARGIN LINEHEIGHT TEXTALIGN TEXTTRIM TEXTWRAP
 %token <Position> ITALIC UNDERLINE STRIKETHROUGH
 %token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
 %token <Position> CENTER LEFT RIGHT
@@ -93,7 +93,10 @@ Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], $1) }
 ;
 
 ContainerProp : 
-  | BACKGROUNDCOLOR COLON Color { ContainerProp.BackgroundColor ($3, $1) }
+  | BACKGROUNDCOLOR COLON Color   { ContainerProp.BackgroundColor ($3, $1) }
+  | WRAP COLON TRUE               { ContainerProp.Wrap (true, $1) }
+  | WRAP COLON FALSE              { ContainerProp.Wrap (false, $1) }
+  | BORDER COLON Color Thickness  { ContainerProp.Border ($3, $4, $1) }
 ;
 
 InterleavedContainerProp :
@@ -121,12 +124,12 @@ UIElement :
   | TOGGLESWITCH STRINGLIT                                                          { ToggleSwitch (fst $2, $1) }
   | CALENDAR                                                                        { Calendar $1 }
   | TOGGLEBUTTON                                                                    { ToggleButton $1 }
-  | COLUMN LEFT_CURLY_BRACKET ContainerProps UIElements RIGHT_CURLY_BRACKET 
+  | COLUMN LEFT_CURLY_BRACKET ContainerProps OptionalUIElements RIGHT_CURLY_BRACKET 
     { 
         let commonProps, specificProps = splitInterleaved $3
         Column (Some commonProps, Some specificProps, $4, $1)
     }
-  | ROW LEFT_CURLY_BRACKET ContainerProps UIElements RIGHT_CURLY_BRACKET 
+  | ROW LEFT_CURLY_BRACKET ContainerProps OptionalUIElements RIGHT_CURLY_BRACKET 
     { 
         let commonProps, specificProps = splitInterleaved $3
         Row (Some commonProps, Some specificProps, $4, $1)
@@ -138,6 +141,11 @@ UIElements :
   | UIElement            { [$1] }
 ;
 
+OptionalUIElements :
+    UIElements { $1 }
+  |            { [] }
+;
+
 // Functions
 Funcs : Function Funcs { $1 :: $2 }
       | Function       { [$1] }
@@ -147,7 +155,7 @@ ButtonProperties : CommonProp ButtonProperties { $1 :: $2 }
   | CommonProp            { [$1] }
 ;
 
-Margin :
+Thickness :
      NUM                               { Uniform (fst $1) }
   |  NUM COMMA NUM                     { Symmetric (fst $1, fst $3) }
   |  NUM COMMA NUM COMMA NUM COMMA NUM { Custom (fst $1, fst $3, fst $5, fst $7) }
@@ -161,20 +169,20 @@ CommonProp : HIDDEN COLON TRUE { Hidden (true, $1) }
   | HIDDEN COLON FALSE { Hidden (false, $1) }
   | WIDTH COLON NUM        { Width (fst $3, $1) }
   | HEIGHT COLON NUM       { Height (fst $3, $1) }
-  | MARGIN COLON Margin    { Margin ($3, $1) }
+  | MARGIN COLON Thickness { Margin ($3, $1) }
 ;
 
 TextProp :
     COLOR COLON Color           { TextBlockProp.Color ($3, $1) }
   | BACKGROUNDCOLOR COLON Color { TextBlockProp.BackgroundColor ($3, $1) }
-  | FONTFAMILY COLON STRINGLIT  { FontFamily (fst $3, $1) }
-  | FONTSIZE COLON NUM          { FontSize (fst $3, $1) }
-  | FONTWEIGHT COLON NUM        { FontWeight (fst $3, $1) }
-  | FONTSTYLE COLON FontStyles  { FontStyle (List.rev $3, $1) }
-  | LINEHEIGHT COLON NUM        { LineHeight (fst $3, $1) }
-  | TEXTALIGN COLON TextAlign   { TextAlign ($3, $1) }
-  | TEXTWRAP COLON TextWrap     { TextWrap ($3, $1) }
-  | TEXTTRIM COLON TextTrim     { TextTrim ($3, $1) }
+  | FONTFAMILY COLON STRINGLIT  { TextBlockProp.FontFamily (fst $3, $1) }
+  | FONTSIZE COLON NUM          { TextBlockProp.FontSize (fst $3, $1) }
+  | FONTWEIGHT COLON NUM        { TextBlockProp.FontWeight (fst $3, $1) }
+  | FONTSTYLE COLON FontStyles  { TextBlockProp.FontStyle (List.rev $3, $1) }
+  | LINEHEIGHT COLON NUM        { TextBlockProp.LineHeight (fst $3, $1) }
+  | TEXTALIGN COLON TextAlign   { TextBlockProp.TextAlign ($3, $1) }
+  | TEXTWRAP COLON TextWrap     { TextBlockProp.TextWrap ($3, $1) }
+  | TEXTTRIM COLON TextTrim     { TextBlockProp.TextTrim ($3, $1) }
 ;
 
 InterleavedTextProp :
@@ -227,12 +235,6 @@ TextWrap : OVERFLOW   { Overflow }
 TextTrim : WORD      { Word }
   | CHARACTER { Character }
   | NOTRIM    { NoTrim }
-;
-
-TextMargin :
-     NUM                               { Uniform (fst $1) }
-  |  NUM COMMA NUM                     { Symmetric (fst $1, fst $3) }
-  |  NUM COMMA NUM COMMA NUM COMMA NUM { Custom (fst $1, fst $3, fst $5, fst $7) }
 ;
 
 Functions : Function Functions { $1 :: $2 }

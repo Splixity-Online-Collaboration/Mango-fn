@@ -6,6 +6,15 @@ open Avalonia.FuncUI.Builder
 open Avalonia
 open AbSyn
 
+// Thickness helper function
+let createThickness(t: Thickness)  = 
+    let thickness =
+        match t with 
+        | Uniform x -> Thickness(float x)
+        | Symmetric (x,y) -> Thickness(float x, float y, float x, float y)
+        | Custom (l,t,r,b) -> Thickness(float l,float t, float r,float b)
+    thickness
+
 let applyProp props applied tryExtract =
     props
     |> List.tryPick tryExtract
@@ -15,12 +24,7 @@ let applyProp props applied tryExtract =
 let applyMargin<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
         | Margin (m, _) ->
-            let thickness =
-                match m with
-                | Uniform x -> Thickness(float x)
-                | Symmetric (x, y) -> Thickness(float x, float y, float x, float y)
-                | Custom (l, t, r, b) -> Thickness(float l, float t, float r, float b)
-            Some (AttrBuilder<'a>.CreateProperty(Control.MarginProperty, thickness, ValueNone))
+            Some (AttrBuilder<'a>.CreateProperty(Control.MarginProperty, createThickness m, ValueNone))
         | _ -> None)
 
 let applyWidth<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =

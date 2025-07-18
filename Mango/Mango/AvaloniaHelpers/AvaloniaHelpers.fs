@@ -9,12 +9,11 @@ open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
 open Avalonia.Layout
-open AvaloniaRowHelpers
-open AvaloniaColumnHelpers
-
+open AvaloniaCommonHelpers
+open AvaloniaContainerHelpers
+open ColorConverter
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
-    | Some filename ->
     | Some filename ->
         window.Icon <- new WindowIcon(filename)
         window
@@ -29,7 +28,6 @@ let setWindowWidthAndHeight width height (window: HostWindow) =
     | _ -> window
 
 let setWindowName name (window: HostWindow) =
-let setWindowName name (window: HostWindow) =
     window.Name <- name
     window
 
@@ -40,19 +38,14 @@ let setWindowProperties name width height icon (window: HostWindow) =
     |> setWindowIcon icon
 
 let createTextBox text : IView = TextBox.create [ TextBox.text text ]
-let createTextBox text : IView = TextBox.create [ TextBox.text text ]
 
-let createCheckbox (label: string) : IView =
-    CheckBox.create [ CheckBox.content label ]
 let createCheckbox (label: string) : IView =
     CheckBox.create [ CheckBox.content label ]
 
 let createRadioButton (label: string) : IView =
     RadioButton.create [ RadioButton.content label ]
-    RadioButton.create [ RadioButton.content label ]
 
 let createToggleSwitch (label: string) : IView =
-    ToggleSwitch.create [ ToggleSwitch.content label ]
     ToggleSwitch.create [ ToggleSwitch.content label ]
 
 let createCalendar: IView = Calendar.create []
@@ -76,12 +69,58 @@ let rec convertUIElementToIView element =
         createContainer Orientation.Vertical (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] containerPropsOpt) elements
 
 and createContainer (orientation: Orientation) (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list) : IView =
-    StackPanel.create (
-        [ StackPanel.orientation orientation
-          StackPanel.children (List.map convertUIElementToIView elements) ]
-        @ applyContainerCommonProperties commonProps
-        @ applyContainerProperties props
-    )
+    let hasWrap =
+        props |> List.exists(fun prop-> 
+        match prop with 
+            | Wrap (true,_)-> true 
+            |  _ -> false
+        )
+    let isBorder =
+            props |> List.exists(fun prop -> match prop with | ContainerProp.Border(_,_,_) -> true | _ -> false)
+    if hasWrap then
+        let wrapPanel = 
+            WrapPanel.create (
+            [   WrapPanel.orientation orientation
+                WrapPanel.children (List.map convertUIElementToIView elements) ]
+            @ applyCommonProps commonProps
+            @ applyContainerProperties props
+        )
+        if isBorder then
+            let color, thickness =
+                props
+                |> List.pick (function
+                    | Border (c, t, _) -> Some (c, t)
+                    | _ -> None)
+
+            Border.create([
+                Border.borderBrush(fromColor color)
+                Border.borderThickness (createThickness thickness)
+                Border.child wrapPanel
+            ])
+        else
+            wrapPanel  
+    else
+        let stackPanel = 
+            StackPanel.create (
+            [   StackPanel.orientation orientation
+                StackPanel.children (List.map convertUIElementToIView elements) ]
+            @ applyCommonProps commonProps
+            @ applyContainerProperties props
+        )
+        if isBorder then
+            let color, thickness =
+                props
+                |> List.pick (function
+                    | Border(c, t, _) -> Some(c, t)
+                    | _ -> None)
+
+            Border.create ([
+                    Border.borderBrush (fromColor color)
+                    Border.borderThickness (createThickness thickness)
+                    Border.child stackPanel 
+                ])
+        else
+            stackPanel 
 
 let setWindowContent elements (window: HostWindow) =
     window.Content <-

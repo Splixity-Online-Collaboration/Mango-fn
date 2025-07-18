@@ -1,27 +1,69 @@
-window "Mango Component Showcase" 600 400 "icon.png" {
-
-    button "Submit" {
-        hidden: true
+window "Mango UI Flexboxes Test" 400 600 "icon.png" {
+    text "Flexbox Testing" {
+        fontsize: 30
+        margin: 10, 0
     }
-
-    button "Cancel"
-    checkbox "Enable notifications"
-    checkbox "Enable sound"
-    radiobutton "High performance mode"
-    text "System Status: OK"
-    textbox "Want some preview? switch to the testing file!"
-    textbox "just go to the Mango.fs file, switch examples/window to examples/test"
-    calendar
-    togglebutton
-    toggleswitch "Auto-sync enabled"
-
-    text "Highlighted Text" {
-        fontsize: 40
-        color: #ff00ff
+    text "row (scale window horizontally to see wrapping)" {
+        margin: 10, 0
     }
+    row {
+        margin: 10
+        wrap: true
+        bgcolor: white
 
-    // function test() {
-    //     let result = 3
-    //     let message = "hello world"
-    // }
+        // TODO: allow components to be stored using functions, which would make this alot smaller
+        row { 
+            bgcolor: red
+            width: 60
+            height: 60
+        }
+        row { 
+            bgcolor: red
+            width: 60
+            height: 60
+        }
+        row { 
+            bgcolor: red
+            width: 60
+            height: 60
+        }
+        row { 
+            bgcolor: red
+            width: 60
+            height: 60
+        }
+        row { 
+            bgcolor: red
+            width: 60
+            height: 60
+        }
+        row { 
+            bgcolor: red
+            width: 60
+            height: 60
+        }
+        row { 
+            bgcolor: red
+            width: 60
+            height: 60
+        }
+    }
+    text "column (no wrapping)" {
+        margin: 10, 0
+    }
+    column {
+        height: 200
+        margin: 10
+        wrap: false
+        border: red 2 // NEW
+
+        button "test"
+        button "test"
+        button "test"
+        button "test"
+        button "test"
+        button "test"
+        button "test"
+        button "test"
+    }
 }
