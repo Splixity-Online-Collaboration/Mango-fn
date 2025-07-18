@@ -8,12 +8,14 @@ window "Mango UI Test" 600 400 "icon.png" {
     column {
         margin: 0
 
-        button "Click me"
+        button "Click me" {
+            width: 1000
+        }
         button "Another button"
         checkbox "Enable advanced mode"
     }
 
-    column {
+    row {
         margin: 20
 
         text "Horizontal layout preview" {
@@ -25,11 +27,5 @@ window "Mango UI Test" 600 400 "icon.png" {
             color: yellow
             bgcolor: blue
         }
-    }
-
-    column {
-        margin: 100
-
-        button "Launch"
     }
 }

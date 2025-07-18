@@ -31,8 +31,7 @@ let keyword (s, pos) =
     match s with
     // Elements
     | "window"        -> Parser.WINDOW pos
-    | "column"        -> Parser.COLUMN pos
-    | "row"           -> Parser.ROW pos
+    | "container"     -> Parser.CONTAINER pos
     | "button"        -> Parser.BUTTON pos
     | "text"          -> Parser.TEXT pos
     | "textbox"       -> Parser.TEXTBOX pos
@@ -42,12 +41,16 @@ let keyword (s, pos) =
     | "calendar"      -> Parser.CALENDAR pos
     | "togglebutton"  -> Parser.TOGGLEBUTTON pos
 
-    // Boolean
+    // Boolean & Dimensions
     | "true"          -> Parser.TRUE pos
     | "false"         -> Parser.FALSE pos
-    | "hidden"        -> Parser.HIDDEN pos
+    | "isvisible"     -> Parser.IS_VISIBLE pos
+    | "width"         -> Parser.WIDTH pos
+    | "height"        -> Parser.HEIGHT pos
 
     // Text Props
+    | "foreground"    -> Parser.FOREGROUND pos
+    | "background"    -> Parser.BACKGROUND pos
     | "fontfamily"    -> Parser.FONTFAMILY pos
     | "fontsize"      -> Parser.FONTSIZE pos
     | "fontweight"    -> Parser.FONTWEIGHT pos
@@ -61,8 +64,9 @@ let keyword (s, pos) =
     | "color"         -> Parser.COLOR pos
     | "bgcolor"       -> Parser.BACKGROUNDCOLOR pos
     | "margin"        -> Parser.MARGIN pos
-    | "width"         -> Parser.WIDTH pos
-    | "height"        -> Parser.HEIGHT pos
+    | "layout"        -> Parser.LAYOUT pos
+    | "horizontal"    -> Parser.HORIZONTAL pos
+    | "vertical"      -> Parser.VERTICAL pos
 
     // Fontstyle Values
     | "italic"        -> Parser.ITALIC pos
@@ -73,11 +77,6 @@ let keyword (s, pos) =
     | "center"        -> Parser.CENTER pos
     | "left"          -> Parser.LEFT pos
     | "right"         -> Parser.RIGHT pos
-
-    // Textwrap Values
-    | "overflow"      -> Parser.OVERFLOW pos
-    | "wrap"          -> Parser.WRAP pos
-    | "forcewrap"     -> Parser.FORCEWRAP pos
 
     // Texttrim Values
     | "word"          -> Parser.WORD pos
@@ -90,65 +89,68 @@ let keyword (s, pos) =
     | "green"         -> Parser.GREEN pos
     | "yellow"        -> Parser.YELLOW pos
     | "pink"          -> Parser.PINK pos
-    | "black"          -> Parser.BLACK pos
-    | "white"          -> Parser.WHITE pos
+    | "black"         -> Parser.BLACK pos
+    | "white"         -> Parser.WHITE pos
 
     // General Language Keywords
     | "let"           -> Parser.LET pos
     | "function"      -> Parser.FUNCTION pos
 
     // Fallback
-    | _               -> Parser.ID (s, pos  )
+    | _               -> Parser.ID (s, pos)
 }
 
 rule Token = parse
-    [' ' '\t' '\r']+        { Token lexbuf } // Whitespace
+    | [' ' '\t' '\r']+                     { Token lexbuf } // Whitespace
 
-  | ['\n' '\012']           {
-                              currentLine <- currentLine + 1
-                              lineStartPos <- lexbuf.StartPos.pos_cnum :: lineStartPos
-                              Token lexbuf
-                            }
+    | ['\n' '\012']                        {
+                                             currentLine <- currentLine + 1
+                                             lineStartPos <- lexbuf.StartPos.pos_cnum :: lineStartPos
+                                             Token lexbuf
+                                           }
 
-  | "//" [^ '\n' '\012']*   { Token lexbuf } // Comment
+    | "//" [^ '\n' '\012']*                { Token lexbuf } // Comment
 
-  | '0' | ['1'-'9']['0'-'9']* {
-                              Parser.NUM (
-                                  int (Encoding.UTF8.GetString lexbuf.Lexeme),
-                                  getPos lexbuf
-                              )
-                            }
+    | '0' | ['1'-'9']['0'-'9']*            {
+                                             Parser.NUM (
+                                                 int (Encoding.UTF8.GetString lexbuf.Lexeme),
+                                                 getPos lexbuf
+                                             )
+                                           }
 
-  | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* {
-                              keyword (
-                                  Encoding.UTF8.GetString lexbuf.Lexeme,
-                                  getPos lexbuf
-                              )
-                            }
+    | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* {
+                                             keyword (
+                                                 Encoding.UTF8.GetString lexbuf.Lexeme,
+                                                 getPos lexbuf
+                                             )
+                                           }
 
-  | '"' (
-        [' ' '!' '#'-'&' '('-'[' ']'-'~'] |
-        '\\' ['n' 't' '\'' '"' '\\']
-      )* '"' {
-                              let str0 = Encoding.UTF8.GetString lexbuf.Lexeme
-                              let str1 = str0.Substring(1, str0.Length - 2)
-                              Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
-                            }
-  | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
-                              let str = Encoding.UTF8.GetString lexbuf.Lexeme
-                              Parser.HEXCOLOR (str, getPos lexbuf)
-                            }
-  | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
-                              let str = Encoding.UTF8.GetString lexbuf.Lexeme
-                              Parser.HEXCOLOR (str, getPos lexbuf)
-                            }
-  | ','                     { Parser.COMMA (getPos lexbuf) }
-  | '{'                     { Parser.LEFT_CURLY_BRACKET (getPos lexbuf) }
-  | '}'                     { Parser.RIGHT_CURLY_BRACKET (getPos lexbuf) }
-  | '('                     { Parser.LEFT_PAR (getPos lexbuf) }
-  | ')'                     { Parser.RIGHT_PAR (getPos lexbuf) }
-  | ':'                     { Parser.COLON (getPos lexbuf) }
-  | '='                     { Parser.EQUAL (getPos lexbuf) }
-  | eof                     { Parser.EOF (getPos lexbuf) }
+    | '"' (
+          [' ' '!' '#'-'&' '('-'[' ']'-'~'] |
+          '\\' ['n' 't' '\'' '"' '\\']
+        )* '"'                             {
+                                             let str0 = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             let str1 = str0.Substring(1, str0.Length - 2)
+                                             Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
+                                           }
 
-  | _ { raise (LexicalError($"Unexpected character", (lexbuf.StartPos.Line, lexbuf.StartPos.Column))) }
+    | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
+                                             let str = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             Parser.HEXCOLOR (str, getPos lexbuf)
+                                           }
+
+    | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
+                                             let str = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             Parser.HEXCOLOR (str, getPos lexbuf)
+                                           }
+
+    | ','                                  { Parser.COMMA (getPos lexbuf) }
+    | '{'                                  { Parser.LEFT_CURLY_BRACKET (getPos lexbuf) }
+    | '}'                                  { Parser.RIGHT_CURLY_BRACKET (getPos lexbuf) }
+    | '('                                  { Parser.LEFT_PAR (getPos lexbuf) }
+    | ')'                                  { Parser.RIGHT_PAR (getPos lexbuf) }
+    | ':'                                  { Parser.COLON (getPos lexbuf) }
+    | '='                                  { Parser.EQUAL (getPos lexbuf) }
+    | eof                                  { Parser.EOF (getPos lexbuf) }
+
+  | _                       { lexerError lexbuf "Illegal symbol in input" }

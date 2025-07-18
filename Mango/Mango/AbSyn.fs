@@ -1,14 +1,15 @@
 module AbSyn
 
 // Doesn't actually support all escapes. Too bad.
-let fromCString (s : string) : string =
-    let rec unescape l: char list =
+let fromCString (s: string) : string =
+    let rec unescape l : char list =
         match l with
-        | []                -> []
+        | [] -> []
         | '\\' :: 'n' :: l' -> '\n' :: unescape l'
         | '\\' :: 't' :: l' -> '\t' :: unescape l'
-        | '\\' :: c   :: l' -> c    :: unescape l'
-        | c           :: l' -> c    :: unescape l'
+        | '\\' :: c :: l' -> c :: unescape l'
+        | c :: l' -> c :: unescape l'
+
     Seq.toList s |> unescape |> System.String.Concat
 
 type Position = int * int // (line, column)
@@ -50,7 +51,7 @@ type Exp =
     | Var of string * Position
     | Call of string * Position
 
-type Stmt = 
+type Stmt =
     | Let of string * Exp * Position
     | ExprStmt of Exp * Position
 
@@ -69,7 +70,7 @@ type TextWrapT =
 
 type TextAlignT =
     | Center
-    | Left 
+    | Left
     | Right
 
 type TextTrimT =
@@ -85,9 +86,8 @@ type TextBlockProp =
     | FontWeight of int * Position
     | FontStyle of FontStyleT list * Position
     | LineHeight of int * Position
-    | TextWrap of TextWrapT * Position
     | TextAlign of TextAlignT * Position
-    | TextTrim of TextTrimT * Position  
+    | TextTrim of TextTrimT * Position
 
 type ContainerProp =
     | Wrap of bool * Position
@@ -109,5 +109,4 @@ type UIElement =
     | Row of CommonProp list option * ContainerProp list option * UIElement list * Position
     | Column of CommonProp list option * ContainerProp list option * UIElement list * Position
 
-type Window = 
-    | Window of string * int option * int option * string option * UIElement list * FunctionT list * Position
+type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position
