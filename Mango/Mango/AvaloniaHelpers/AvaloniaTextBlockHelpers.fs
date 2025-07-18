@@ -7,14 +7,14 @@ open Avalonia.Controls
 open AbSyn
 open AvaloniaHelpers.ColorConverter
 
-let applyForeGround props applied =
+let applyColor props applied =
     applyProp props applied (function
-        | Foreground (c, _) -> Some (TextBlock.foreground (fromColor c))
+        | Color (c, _) -> Some (TextBlock.foreground (fromColor c))
         | _ -> None)
 
-let applyBackGround props applied =
+let applyBackgroundColor props applied =
     applyProp props applied (function
-        | Background (c, _) -> Some (TextBlock.background (fromColor c))
+        | TextBlockProp.BackgroundColor (c, _) -> Some (TextBlock.background (fromColor c))
         | _ -> None)
 
 let applyFontFamily props applied =
@@ -29,8 +29,8 @@ let applyFontSize props applied =
 
 let applyTextBlockProperties props =
     []
-    |> applyForeGround props
-    |> applyBackGround props
+    |> applyColor props
+    |> applyBackgroundColor props
     |> applyFontFamily props
     |> applyFontSize props
 

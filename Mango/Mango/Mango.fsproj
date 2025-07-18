@@ -6,8 +6,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-    	<PackageReference Include="FsLexYacc" Version="11.2.0" />
-  	</ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.3.2" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+		<PackageReference Include="Avalonia.FuncUI" Version="1.0.0" />
+		<PackageReference Include="FsLexYacc" Version="11.2.0" />
+	</ItemGroup>
 
 	<ItemGroup>
 		
@@ -24,7 +28,7 @@
 		<Compile Include="AbSyn.fs" />
 		<Compile Include="Parser.fs" />
     	<Compile Include="Lexer.fs" />
-    	<Compile Include="AvaloniaHelpers\AvaloniaCommonHelpers.fs" />
+    	<Compile Include="AvaloniaHelpers/AvaloniaCommonHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/ColorConverter.fs" />
 		<Compile Include="AvaloniaHelpers/ViewHelpers.fs" />
 		<Compile Include="AvaloniaHelpers/AvaloniaButtonHelpers.fs" />
@@ -34,11 +38,5 @@
 		<Compile Include="Interpreter.fs" />
 		<Compile Include="ParserWrapper.fs" />
 		<Compile Include="Mango.fs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Avalonia.Desktop" Version="11.0.0" />
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0" />
-		<PackageReference Include="Avalonia.FuncUI" Version="1.0.0" />
 	</ItemGroup>
 </Project>

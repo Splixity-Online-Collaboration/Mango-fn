@@ -31,7 +31,8 @@ let keyword (s, pos) =
     match s with
     // Elements
     | "window"        -> Parser.WINDOW pos
-    | "container"     -> Parser.CONTAINER pos
+    | "column"        -> Parser.COLUMN pos
+    | "row"           -> Parser.ROW pos
     | "button"        -> Parser.BUTTON pos
     | "text"          -> Parser.TEXT pos
     | "textbox"       -> Parser.TEXTBOX pos
@@ -41,16 +42,12 @@ let keyword (s, pos) =
     | "calendar"      -> Parser.CALENDAR pos
     | "togglebutton"  -> Parser.TOGGLEBUTTON pos
 
-    // Boolean & Dimensions
+    // Boolean
     | "true"          -> Parser.TRUE pos
     | "false"         -> Parser.FALSE pos
-    | "isvisible"     -> Parser.IS_VISIBLE pos
-    | "width"         -> Parser.WIDTH pos
-    | "height"        -> Parser.HEIGHT pos
+    | "hidden"        -> Parser.HIDDEN pos
 
     // Text Props
-    | "foreground"    -> Parser.FOREGROUND pos
-    | "background"    -> Parser.BACKGROUND pos
     | "fontfamily"    -> Parser.FONTFAMILY pos
     | "fontsize"      -> Parser.FONTSIZE pos
     | "fontweight"    -> Parser.FONTWEIGHT pos
@@ -61,10 +58,11 @@ let keyword (s, pos) =
     | "texttrim"      -> Parser.TEXTTRIM pos
 
     // General UI
+    | "color"         -> Parser.COLOR pos
+    | "bgcolor"       -> Parser.BACKGROUNDCOLOR pos
     | "margin"        -> Parser.MARGIN pos
-    | "layout"        -> Parser.LAYOUT pos
-    | "horizontal"    -> Parser.HORIZONTAL pos
-    | "vertical"      -> Parser.VERTICAL pos
+    | "width"         -> Parser.WIDTH pos
+    | "height"        -> Parser.HEIGHT pos
 
     // Fontstyle Values
     | "italic"        -> Parser.ITALIC pos

@@ -18,8 +18,23 @@ type Thickness =
     | Symmetric of int * int
     | Custom of int * int * int * int
 
+type PredefinedColor = 
+    | Blue 
+    | Red
+    | Yellow
+    | Pink
+    | Green
+    | Black
+    | White
+
+type HexCode = byte * byte * byte * byte
+
+type ColorT =
+    | ColorName of PredefinedColor * Position
+    | Hex of HexCode * Position
+
 type CommonProp = 
-    | IsVisible of bool * Position
+    | Hidden of bool * Position
     | Margin of Thickness * Position
     | Width of int * Position
     | Height of int * Position
@@ -47,21 +62,6 @@ type FontStyleT =
     | StrikeThrough
     | Underline
 
-type PredefinedColor = 
-    | Blue 
-    | Red
-    | Yellow
-    | Pink
-    | Green
-    | Black
-    | White
-
-type HexCode = byte * byte * byte * byte
-
-type ColorT =
-    | ColorName of PredefinedColor * Position
-    | Hex of HexCode * Position
-
 type TextWrapT =
     | Overflow
     | Wrap
@@ -77,26 +77,21 @@ type TextTrimT =
     | Character
     | NoTrim
 
-type LayoutT =
-    | Horizontal
-    | Vertical
-
 type TextBlockProp =
-    | Foreground of ColorT * Position
-    | Background of ColorT * Position
-    // Font Settings
+    | Color of ColorT * Position
+    | BackgroundColor of ColorT * Position
     | FontFamily of string * Position
     | FontSize of int * Position
     | FontWeight of int * Position
     | FontStyle of FontStyleT list * Position
-    // Formatting
     | LineHeight of int * Position
     | TextWrap of TextWrapT * Position
     | TextAlign of TextAlignT * Position
     | TextTrim of TextTrimT * Position  
 
 type ContainerProp =
-    | Layout of LayoutT * Position
+    | Wrap of bool * Position
+    | BackgroundColor of ColorT * Position
 
 type InterleavedProp<'specific> =
   | Common of CommonProp
@@ -111,7 +106,8 @@ type UIElement =
     | ToggleSwitch of string * Position
     | Calendar of Position
     | ToggleButton of Position
-    | Container of CommonProp list option * ContainerProp list option * UIElement list * Position
+    | Row of CommonProp list option * ContainerProp list option * UIElement list * Position
+    | Column of CommonProp list option * ContainerProp list option * UIElement list * Position
 
 type Window = 
     | Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

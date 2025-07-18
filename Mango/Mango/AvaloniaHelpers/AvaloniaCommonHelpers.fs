@@ -20,27 +20,27 @@ let applyMargin<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<
                 | Uniform x -> Thickness(float x)
                 | Symmetric (x, y) -> Thickness(float x, float y, float x, float y)
                 | Custom (l, t, r, b) -> Thickness(float l, float t, float r, float b)
-            Some (AttrBuilder<'a>.CreateProperty(Avalonia.Controls.Control.MarginProperty, thickness, ValueNone))
+            Some (AttrBuilder<'a>.CreateProperty(Control.MarginProperty, thickness, ValueNone))
         | _ -> None)
 
 let applyWidth<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Width (num, _) -> Some (AttrBuilder<'a>.CreateProperty(Avalonia.Controls.Control.WidthProperty, float num, ValueNone))
+        | Width (num, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
         | _ -> None)
 
 let applyHeight<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Height (num, _) -> Some (AttrBuilder<'a>.CreateProperty(Avalonia.Controls.Control.HeightProperty, float num, ValueNone))
+        | Height (num, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
         | _ -> None)
 
-let applyIsVisible<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
+let applyHidden<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | IsVisible (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Avalonia.Controls.Control.IsVisibleProperty, b, ValueNone))
+        | Hidden (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
         | _ -> None)
 
 let applyCommonProps props = 
     []
-    |> applyIsVisible props
+    |> applyHidden props
     |> applyWidth props
     |> applyHeight props
     |> applyMargin props
