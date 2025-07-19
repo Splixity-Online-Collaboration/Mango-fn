@@ -7,7 +7,7 @@ open Avalonia
 open AbSyn
 
 // Thickness helper function
-let createThickness(t: Thickness)  = 
+let createThickness (t: Thickness) = 
     let thickness =
         match t with 
         | Uniform x -> Thickness(float x)

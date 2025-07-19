@@ -4,11 +4,11 @@ module AbSyn
 let fromCString (s: string) : string =
     let rec unescape l : char list =
         match l with
-        | [] -> []
+        | []                -> []
         | '\\' :: 'n' :: l' -> '\n' :: unescape l'
         | '\\' :: 't' :: l' -> '\t' :: unescape l'
-        | '\\' :: c :: l' -> c :: unescape l'
-        | c :: l' -> c :: unescape l'
+        | '\\' :: c   :: l' -> c    :: unescape l'
+        | c    :: l'        -> c    :: unescape l'
 
     Seq.toList s |> unescape |> System.String.Concat
 

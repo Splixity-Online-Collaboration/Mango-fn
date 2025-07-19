@@ -48,7 +48,7 @@ let createRadioButton (label: string) : IView =
 let createToggleSwitch (label: string) : IView =
     ToggleSwitch.create [ ToggleSwitch.content label ]
 
-let createCalendar: IView = Calendar.create []
+let createCalendar : IView = Calendar.create []
 let createToggleButton = ToggleButton.create []
 
 let rec convertUIElementToIView element =
