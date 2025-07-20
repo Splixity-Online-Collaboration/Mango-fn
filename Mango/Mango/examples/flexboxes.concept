@@ -1,0 +1,54 @@
+window "Flexbox Test" 400 600 "icon.png" {
+    // Flexbox with flex-direction row (wrap is optional, decides whether to wrap the items or not)
+    row wrap {
+        width: hug // hug is default, accepts fill / hug / pixels / percentages (100% is equivalent to fill)
+        height: hug // hug is default, accepts fill / hug / pixels / percentages
+
+        justify: between // default, accepts between, around, start, end
+        align: center    // default, accepts top, bottom, center
+        margin: 10       // default is 0, not following HTML's stupid default margin
+        gap: 5           // default is 0, gap between items
+        overflow: clip   // accepts clip, visible (default), and scroll
+
+        // Elements (example)
+        
+        textbox "Type something..."
+        button "submit" {
+            onclick -> {
+                ...
+            }
+            // OR
+            onclick: onButtonClick
+        }
+    }
+
+    onButtonClick: -> {
+        ...
+    }
+
+    // Flexbox with flex-direction column
+    column {
+        width: hug   // hug is default, accepts fill / hug / pixels / percentages
+        height: hug // hug is default, accepts fill / hug / pixels / percentages (100% is equivalent to fill)
+
+        justify: start // default, accepts between, around, start, end
+        align: left    // default, accepts left, right, center
+        margin: 10     // default is 0
+        gap: 5         // default is 0
+
+        overflow: visible // explicitly declared, even though it’s default
+        wrap: true             // wrap items, false by default        
+
+        // Elements (example)
+
+        text xl "Your Todo-list" // instead of using header like h1, always use text with prefix xs, sm, lg, xl, or use the fontsize prop inside {}
+        // The base size (medium) between sm and lg is default (no suffix)
+        
+        // 1, A, a, I, i (possible list types)
+        list "1" {
+            text "Buy groceries"
+            text "Do paperwork"
+            text "Relax"
+        }
+    }
+}

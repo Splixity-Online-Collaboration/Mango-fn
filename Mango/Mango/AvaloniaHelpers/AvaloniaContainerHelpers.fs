@@ -1,25 +1,16 @@
 module AvaloniaHelpers.AvaloniaContainerHelpers
 
 open Avalonia.Controls
-open Avalonia.FuncUI.DSL
 open AbSyn
-open Avalonia.Layout
-open Avalonia
-open ViewHelpers
+open Avalonia.FuncUI.Builder
 open AvaloniaCommonHelpers
+open ColorConverter
 
-let applyOrientation props applied =
+let applyBackgroundColor props applied =
     applyProp props applied (function
-        | Layout (layout, _) ->
-            match layout with
-            | Horizontal -> Some (StackPanel.orientation Orientation.Horizontal)
-            | Vertical -> Some (StackPanel.orientation Orientation.Vertical)
+        | ContainerProp.BackgroundColor (c, _) -> Some (AttrBuilder<'a>.CreateProperty(Panel.BackgroundProperty, fromColor c, ValueNone))
         | _ -> None)
-
-let applyContainerProperties (props : ContainerProp list) =
+        
+let applyContainerProperties (props: ContainerProp list) =
     []
-    |> applyOrientation props
-
-let applyContainerCommonProperties (props : CommonProp list) =
-    []
-    |> applyMargin<StackPanel> props
+    |> applyBackgroundColor props

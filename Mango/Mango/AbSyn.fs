@@ -1,14 +1,15 @@
 module AbSyn
 
 // Doesn't actually support all escapes. Too bad.
-let fromCString (s : string) : string =
-    let rec unescape l: char list =
+let fromCString (s: string) : string =
+    let rec unescape l : char list =
         match l with
         | []                -> []
         | '\\' :: 'n' :: l' -> '\n' :: unescape l'
         | '\\' :: 't' :: l' -> '\t' :: unescape l'
         | '\\' :: c   :: l' -> c    :: unescape l'
-        | c           :: l' -> c    :: unescape l'
+        | c    :: l'        -> c    :: unescape l'
+
     Seq.toList s |> unescape |> System.String.Concat
 
 type Position = int * int // (line, column)
@@ -17,35 +18,6 @@ type Thickness =
     | Uniform of int
     | Symmetric of int * int
     | Custom of int * int * int * int
-
-type CommonProp = 
-    | IsVisible of bool * Position
-    | Margin of Thickness * Position
-    | Width of int * Position
-    | Height of int * Position
-
-type Value =
-    | Int of int
-    | Real of float
-    | String of string
-    | Bool of bool
-
-type Exp =
-    | Constant of Value * Position
-    | Var of string * Position
-    | Call of string * Position
-
-type Stmt = 
-    | Let of string * Exp * Position
-    | ExprStmt of Exp * Position
-
-type FunctionT = 
-    | Function of string * Stmt list * Position
-
-type FontStyleT = 
-    | Italic
-    | StrikeThrough
-    | Underline
 
 type PredefinedColor = 
     | Blue 
@@ -62,6 +34,35 @@ type ColorT =
     | ColorName of PredefinedColor * Position
     | Hex of HexCode * Position
 
+type CommonProp = 
+    | Hidden of bool * Position
+    | Margin of Thickness * Position
+    | Width of int * Position
+    | Height of int * Position
+
+type Value =
+    | Int of int
+    | Real of float
+    | String of string
+    | Bool of bool
+
+type Exp =
+    | Constant of Value * Position
+    | Var of string * Position
+    | Call of string * Position
+
+type Stmt =
+    | Let of string * Exp * Position
+    | ExprStmt of Exp * Position
+
+type FunctionT = 
+    | Function of string * Stmt list * Position
+
+type FontStyleT = 
+    | Italic
+    | StrikeThrough
+    | Underline
+
 type TextWrapT =
     | Overflow
     | Wrap
@@ -69,7 +70,7 @@ type TextWrapT =
 
 type TextAlignT =
     | Center
-    | Left 
+    | Left
     | Right
 
 type TextTrimT =
@@ -77,26 +78,22 @@ type TextTrimT =
     | Character
     | NoTrim
 
-type LayoutT =
-    | Horizontal
-    | Vertical
-
 type TextBlockProp =
-    | Foreground of ColorT * Position
-    | Background of ColorT * Position
-    // Font Settings
+    | Color of ColorT * Position
+    | BackgroundColor of ColorT * Position
     | FontFamily of string * Position
     | FontSize of int * Position
     | FontWeight of int * Position
     | FontStyle of FontStyleT list * Position
-    // Formatting
     | LineHeight of int * Position
-    | TextWrap of TextWrapT * Position
     | TextAlign of TextAlignT * Position
-    | TextTrim of TextTrimT * Position  
+    | TextTrim of TextTrimT * Position
+    | TextWrap of TextWrapT * Position
 
 type ContainerProp =
-    | Layout of LayoutT * Position
+    | Wrap of bool * Position
+    | BackgroundColor of ColorT * Position
+    | Border of ColorT * Thickness * Position
 
 type InterleavedProp<'specific> =
   | Common of CommonProp
@@ -111,7 +108,7 @@ type UIElement =
     | ToggleSwitch of string * Position
     | Calendar of Position
     | ToggleButton of Position
-    | Container of CommonProp list option * ContainerProp list option * UIElement list * Position
+    | Row of CommonProp list option * ContainerProp list option * UIElement list * Position
+    | Column of CommonProp list option * ContainerProp list option * UIElement list * Position
 
-type Window = 
-    | Window of string * int option * int option * string option * UIElement list * FunctionT list * Position
+type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position
