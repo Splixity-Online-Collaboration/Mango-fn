@@ -25,7 +25,7 @@ module AppMain =
                 | Ok syntax_tree ->
                     match this.ApplicationLifetime with
                     | :? IClassicDesktopStyleApplicationLifetime as desktop ->
-                        desktop.MainWindow <- interpret (HostWindow()) syntax_tree
+                        desktop.MainWindow <- interpret (HostWindow()) syntax_tree (SymTab.empty ())
                     | _ -> ()
 
 module Program =

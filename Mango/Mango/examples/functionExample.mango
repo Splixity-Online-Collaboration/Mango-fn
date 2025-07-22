@@ -1,0 +1,14 @@
+window "Example" 300 300 "icon.png" {
+  text "Welcome" {
+    id: textLabel
+    fontsize: 30
+  }
+
+  button "Click me" {
+    onclick: onButtonClick
+  }
+
+  func onButtonClick -> {
+    set(textLabel, "text", "You clicked!")
+  }
+}

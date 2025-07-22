@@ -39,6 +39,7 @@ type CommonProp =
     | Margin of Thickness * Position
     | Width of int * Position
     | Height of int * Position
+    | Id of string * Position
 
 type Value =
     | Int of int

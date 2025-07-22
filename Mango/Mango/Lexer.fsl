@@ -65,6 +65,7 @@ let keyword (s, pos) =
     | "width"         -> Parser.WIDTH pos
     | "height"        -> Parser.HEIGHT pos
     | "border"        -> Parser.BORDER pos // NEW
+    | "id"            -> Parser.IDENTIFIER pos
 
     // Fontstyle Values
     | "italic"        -> Parser.ITALIC pos

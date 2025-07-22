@@ -12,6 +12,8 @@ open Avalonia.Layout
 open AvaloniaCommonHelpers
 open AvaloniaContainerHelpers
 open ColorConverter
+open Types
+
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
     | Some filename ->
@@ -122,7 +124,7 @@ and createContainer (orientation: Orientation) (commonProps: CommonProp list) (p
         else
             stackPanel 
 
-let setWindowContent elements (window: HostWindow) =
+let setWindowContent elements (tab : TreeEnv) (window: HostWindow) =
     window.Content <-
         Component(fun _ ->
             ScrollViewer.create

@@ -55,7 +55,7 @@ let splitInterleaved props =
 %token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
 %token <Position> CENTER LEFT RIGHT
 %token <Position> OVERFLOW WRAP FORCEWRAP
-%token <Position> WORD CHARACTER NOTRIM
+%token <Position> WORD CHARACTER NOTRIM IDENTIFIER
 
 // Symbols
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON LEFT_PAR RIGHT_PAR EQUAL
@@ -170,6 +170,7 @@ CommonProp : HIDDEN COLON TRUE { Hidden (true, $1) }
   | WIDTH COLON NUM        { Width (fst $3, $1) }
   | HEIGHT COLON NUM       { Height (fst $3, $1) }
   | MARGIN COLON Thickness { Margin ($3, $1) }
+  | IDENTIFIER COLON STRINGLIT { Id (fst $3, $1) }
 ;
 
 TextProp :

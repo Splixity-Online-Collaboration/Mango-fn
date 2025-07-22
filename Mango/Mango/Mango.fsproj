@@ -14,7 +14,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		
 		<Compile Include="FileIO.fs" />
 		<Compile Include="SymTab.fsi" />
     	<Compile Include="SymTab.fs" />
@@ -26,6 +25,7 @@
       		<OtherFlags></OtherFlags>
     	</FsLex>
 		<Compile Include="AbSyn.fs" />
+		<Compile Include="Core\Types.fs" />
 		<Compile Include="Parser.fs" />
     	<Compile Include="Lexer.fs" />
     	<Compile Include="AvaloniaHelpers/AvaloniaCommonHelpers.fs" />
