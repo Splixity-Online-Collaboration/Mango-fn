@@ -1,14 +1,34 @@
-window "Example" 300 300 "icon.png" {
-  text "Welcome" {
-    id: textLabel
-    fontsize: 30
-  }
+window "Counter Example" 400 300 "icon.png" {
+  column {
+    id: mainColumn
+    margin: 20
+    gap: 10
+    align: center
+    justify: center
 
-  button "Click me" {
-    onclick: onButtonClick
-  }
+    text "Count: 0" {
+      id: counterText
+      fontsize: 24
+    }
 
-  func onButtonClick -> {
-    set(textLabel, "text", "You clicked!")
+    row {
+      gap: 10
+
+      button "Increment" {
+        onclick -> {
+          set(label, counterText, "Count: 1")
+        }
+      }
+
+      button "Reset" {
+        onclick -> {
+          update("counterText") {
+            label: "Count: 0"
+            fontsize: 24
+            color: red
+          }
+        }
+      }
+    }
   }
 }
