@@ -7,26 +7,21 @@ open AbSyn
 open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 open MangoUI
 
-let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIElement list * TreeEnv =
+let rec tryRegisterElement element commonProps pos childElements elements tab =
+    let buttonId = getId commonProps
+    match buttonId with
+        | Some id ->
+            let tab' = SymTab.bind id element tab
+            (elements @ [Identifier (id, pos)], tab')
+        | None -> 
+            (elements @ [element], tab)
+
+and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIElement list * TreeEnv =
     List.fold (fun (accElements, accTab) element ->
         match element with
-        | Button(_, propsOpt, pos) ->
-            let buttonId = getId (Option.defaultValue [] propsOpt)
-            match buttonId with
-            | Some id ->
-                let tab' = SymTab.bind id element accTab
-                (accElements @ [Identifier (id, pos)], tab')
-            | None -> 
-                (accElements @ [element], accTab)
-        | TextBlock(_, commonPropsOpt, _, pos) ->
-            let textId = getId (Option.defaultValue [] commonPropsOpt)
-            match textId with
-            | Some id ->
-                let tab' = SymTab.bind id element accTab
-                (accElements @ [Identifier (id, pos)], tab')
-            | None -> 
-                (accElements @ [element], accTab)
-        | Row (commonPropsOpt, _, elements, pos) ->
+        | Button(_, propsOpt, pos) -> tryRegisterElement element (Option.defaultValue [] propsOpt) pos None accElements accTab
+        | TextBlock(_, commonPropsOpt, _, pos) -> tryRegisterElement element (Option.defaultValue [] commonPropsOpt) pos None accElements accTab
+        | Row (commonPropsOpt, props, elements, pos) ->
             let rowId = getId (Option.defaultValue [] commonPropsOpt)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match rowId with
@@ -34,8 +29,8 @@ let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : 
                 let tab'' = SymTab.bind id element tab'
                 (accElements @ [Identifier (id, pos)], tab'')
             | None -> 
-                (accElements @ subElements, tab')
-        | Column (commonPropsOpt, _, elements, pos) ->
+                (accElements @ [Row (commonPropsOpt, props, subElements, pos)], tab')
+        | Column (commonPropsOpt, props, elements, pos) ->
             let columnId = getId (Option.defaultValue [] commonPropsOpt)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match columnId with
@@ -43,7 +38,7 @@ let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : 
                 let tab'' = SymTab.bind id element tab'
                 (accElements @ [Identifier (id, pos)], tab'')
             | None -> 
-                (accElements @ subElements, tab')
+                (accElements @ [Column (commonPropsOpt, props, subElements, pos)], tab')
         | _ -> 
             (accElements @ [element], accTab)
     ) ([], tab) elements
