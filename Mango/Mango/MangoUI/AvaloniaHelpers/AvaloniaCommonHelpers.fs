@@ -1,10 +1,10 @@
-﻿module AvaloniaHelpers.AvaloniaCommonHelpers
+﻿module MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 
 open Avalonia.FuncUI.Types
 open Avalonia.Controls
 open Avalonia.FuncUI.Builder
 open Avalonia
-open AbSyn
+open MangoUI.Core.AbSyn
 
 let hasProp props tryExtract =
     props

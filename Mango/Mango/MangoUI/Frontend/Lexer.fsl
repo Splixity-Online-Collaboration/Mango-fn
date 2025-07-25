@@ -4,6 +4,7 @@ module Lexer
 open System
 open FSharp.Text.Lexing
 open System.Text
+open MangoUI.Core
 
 (* Boilerplate tracking for position handling *)
 let mutable currentLine = 1

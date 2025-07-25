@@ -1,4 +1,4 @@
-module AbSyn
+module MangoUI.Core.AbSyn
 
 // Doesn't actually support all escapes. Too bad.
 let fromCString (s: string) : string =

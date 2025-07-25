@@ -1,10 +1,9 @@
-﻿module AvaloniaHelpers.AvaloniaHelpers
+﻿module MangoUI.AvaloniaHelpers.AvaloniaHelpers
 
 open Avalonia.FuncUI.Hosts
 open Avalonia.Controls
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
-open AbSyn
 open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
@@ -12,7 +11,9 @@ open Avalonia.Layout
 open AvaloniaCommonHelpers
 open AvaloniaContainerHelpers
 open ColorConverter
-open Core.Types
+open MangoUI.Core.AbSyn
+open MangoUI
+open MangoUI.Core.Types
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
@@ -53,7 +54,7 @@ let createToggleSwitch (label: string) : IView =
 let createCalendar : IView = Calendar.create []
 let createToggleButton = ToggleButton.create []
 
-let rec convertUIElementToIView element tab =
+let rec convertUIElementToIView element (tab : TreeEnv) =
     match element with
     | Button(label, propsOpt, _) ->
         createButton label (Option.defaultValue [] propsOpt)

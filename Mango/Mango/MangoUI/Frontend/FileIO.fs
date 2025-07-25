@@ -1,4 +1,4 @@
-﻿module FileIO
+﻿module MangoUI.Frontend.FileIO
 
 open System.IO
 

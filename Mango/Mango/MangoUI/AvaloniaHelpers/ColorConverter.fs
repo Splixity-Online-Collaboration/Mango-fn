@@ -1,7 +1,7 @@
-module AvaloniaHelpers.ColorConverter
+module MangoUI.AvaloniaHelpers.ColorConverter
 
-open AbSyn
 open Avalonia.Media
+open MangoUI.Core.AbSyn
 
 let fromPredefined = function
     | Blue -> Colors.Blue
@@ -12,7 +12,7 @@ let fromPredefined = function
     | Black -> Colors.Black
     | White -> Colors.White
 
-let fromColor (color: AbSyn.ColorT) : IBrush =
+let fromColor (color: ColorT) : IBrush =
     match color with
     | ColorName (name, _) ->
         SolidColorBrush(fromPredefined name) :> IBrush

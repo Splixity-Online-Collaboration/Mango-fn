@@ -1,4 +1,8 @@
-﻿module Globals =
+﻿namespace MangoUI.Core
+
+open MangoUI
+
+module Globals =
     let filepath = ref None
 
 module AppMain =
@@ -7,8 +11,8 @@ module AppMain =
     open Avalonia.Controls.ApplicationLifetimes
     open Avalonia.FuncUI.Hosts
     open Avalonia.Themes.Fluent
-    open FileIO
-    open ParserWrapper
+    open MangoUI.Frontend.FileIO
+    open MangoUI.Frontend.ParserWrapper
     open Interpreter
 
     type App() =

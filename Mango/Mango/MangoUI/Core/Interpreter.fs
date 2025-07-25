@@ -1,9 +1,11 @@
-module Interpreter
+module MangoUI.Core.Interpreter
 open Avalonia.FuncUI.Hosts
-open AvaloniaHelpers.AvaloniaHelpers
-open Core.Types
+open MangoUI.AvaloniaHelpers.AvaloniaHelpers
+open MangoUI.Core.Types
 open AbSyn
-open AvaloniaHelpers.AvaloniaCommonHelpers
+open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
+open MangoUI.SymTab
+open MangoUI
 
 let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIElement list * TreeEnv =
     List.fold (fun (accElements, accTab) element ->

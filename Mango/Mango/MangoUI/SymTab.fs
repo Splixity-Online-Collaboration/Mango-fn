@@ -1,6 +1,6 @@
 ﻿(* A polymorphic symbol table. *)
 
-module SymTab
+module MangoUI.SymTab
 
 open System
 

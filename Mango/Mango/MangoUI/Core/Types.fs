@@ -1,6 +1,6 @@
-﻿module Core.Types
+﻿module MangoUI.Core.Types
 
-open SymTab
+open MangoUI.SymTab
 open AbSyn
 open Avalonia.FuncUI.Types
 
