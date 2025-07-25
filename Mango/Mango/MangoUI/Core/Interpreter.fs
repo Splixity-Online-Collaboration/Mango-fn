@@ -14,18 +14,18 @@ let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : 
             let buttonId = getId (Option.defaultValue [] propsOpt)
             match buttonId with
             | Some id ->
-                let tab' = SymTab.bind id element tab
+                let tab' = SymTab.bind id element accTab
                 (accElements @ [Identifier (id, pos)], tab')
             | None -> 
-                (accElements @ [element], tab)
+                (accElements @ [element], accTab)
         | TextBlock(label, commonPropsOpt, propsOpt, pos) ->
             let textId = getId (Option.defaultValue [] commonPropsOpt)
             match textId with
             | Some id ->
-                let tab' = SymTab.bind id element tab
+                let tab' = SymTab.bind id element accTab
                 (accElements @ [Identifier (id, pos)], tab')
             | None -> 
-                (accElements @ [element], tab)
+                (accElements @ [element], accTab)
         | Row (commonPropsOpt, containerPropsOpt, elements, pos) ->
             let rowId = getId (Option.defaultValue [] commonPropsOpt)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
