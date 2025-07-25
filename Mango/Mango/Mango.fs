@@ -35,7 +35,7 @@ module Program =
 
     [<EntryPoint>]
     let main (args: string[]) =
-        let path = if args.Length > 0 then args[0] else "examples/window.mango"
+        let path = if args.Length > 0 then args[0] else "examples/idTest.mango"
         Globals.filepath.Value <- Some path
         AppBuilder
             .Configure<App>()

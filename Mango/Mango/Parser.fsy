@@ -170,7 +170,7 @@ CommonProp : HIDDEN COLON TRUE { Hidden (true, $1) }
   | WIDTH COLON NUM        { Width (fst $3, $1) }
   | HEIGHT COLON NUM       { Height (fst $3, $1) }
   | MARGIN COLON Thickness { Margin ($3, $1) }
-  | IDENTIFIER COLON STRINGLIT { Id (fst $3, $1) }
+  | IDENTIFIER COLON ID { Id (fst $3, $1) }
 ;
 
 TextProp :

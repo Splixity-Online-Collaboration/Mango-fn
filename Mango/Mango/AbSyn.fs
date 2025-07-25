@@ -111,5 +111,6 @@ type UIElement =
     | ToggleButton of Position
     | Row of CommonProp list option * ContainerProp list option * UIElement list * Position
     | Column of CommonProp list option * ContainerProp list option * UIElement list * Position
+    | Identifier of string * Position
 
 type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position
