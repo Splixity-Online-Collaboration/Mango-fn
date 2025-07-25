@@ -19,7 +19,7 @@ let rec temp (elements : UIElement list) (tab : TreeEnv) : UIElement list * Tree
                     (accElements @ [Identifier (id, pos)], tab')
                 | None -> failwith "Expected button to have an ID"
             else
-                (accElements, accTab)
+                (accElements @ [element], accTab)
         | TextBlock(label, commonPropsOpt, propsOpt, pos) ->
             if hasProp (Option.defaultValue [] commonPropsOpt) (function
                 | Id _ -> Some true
@@ -31,10 +31,29 @@ let rec temp (elements : UIElement list) (tab : TreeEnv) : UIElement list * Tree
                     (accElements @ [Identifier (id, pos)], tab')
                 | None -> failwith "Expected TextBlock to have an ID"
             else
-                (accElements, accTab)
+                (accElements @ [element], accTab)
+        | Row (commonPropsOpt, containerPropsOpt, elements, pos) ->
+            let rowId = getId (Option.defaultValue [] commonPropsOpt)
+            let subElements, tab' = temp elements accTab
+            match rowId with
+            | Some id ->
+                let tab'' = SymTab.bind id (Row (commonPropsOpt, containerPropsOpt, subElements, pos)) tab'
+                (accElements @ [Identifier (id, pos)], tab'')
+            | None -> 
+                
+                (accElements @ subElements, tab')
+        | Column (commonPropsOpt, containerPropsOpt, elements, pos) ->
+            let columnId = getId (Option.defaultValue [] commonPropsOpt)
+            let subElements, tab' = temp elements accTab
+            match columnId with
+            | Some id ->
+                let tab'' = SymTab.bind id (Column (commonPropsOpt, containerPropsOpt, subElements, pos)) tab'
+                (accElements @ [Identifier (id, pos)], tab'')
+            | None -> 
+                (accElements @ subElements, tab')
         | _ -> 
             // Handle other UIElement types similarly
-            (accElements, accTab)
+            (accElements @ [element], accTab)
     ) ([], tab) elements
 
 let rec interpret (window: HostWindow) program (tab : TreeEnv) : HostWindow =
