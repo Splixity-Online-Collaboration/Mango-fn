@@ -1,16 +1,16 @@
 module MangoUI.Core.Interpreter
+
 open Avalonia.FuncUI.Hosts
 open MangoUI.AvaloniaHelpers.AvaloniaHelpers
 open MangoUI.Core.Types
 open AbSyn
 open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
-open MangoUI.SymTab
 open MangoUI
 
 let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIElement list * TreeEnv =
     List.fold (fun (accElements, accTab) element ->
         match element with
-        | Button(label, propsOpt, pos) ->
+        | Button(_, propsOpt, pos) ->
             let buttonId = getId (Option.defaultValue [] propsOpt)
             match buttonId with
             | Some id ->
@@ -18,7 +18,7 @@ let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : 
                 (accElements @ [Identifier (id, pos)], tab')
             | None -> 
                 (accElements @ [element], accTab)
-        | TextBlock(label, commonPropsOpt, propsOpt, pos) ->
+        | TextBlock(_, commonPropsOpt, _, pos) ->
             let textId = getId (Option.defaultValue [] commonPropsOpt)
             match textId with
             | Some id ->
@@ -26,21 +26,21 @@ let rec storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : 
                 (accElements @ [Identifier (id, pos)], tab')
             | None -> 
                 (accElements @ [element], accTab)
-        | Row (commonPropsOpt, containerPropsOpt, elements, pos) ->
+        | Row (commonPropsOpt, _, elements, pos) ->
             let rowId = getId (Option.defaultValue [] commonPropsOpt)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match rowId with
             | Some id ->
-                let tab'' = SymTab.bind id (Row (commonPropsOpt, containerPropsOpt, subElements, pos)) tab'
+                let tab'' = SymTab.bind id element tab'
                 (accElements @ [Identifier (id, pos)], tab'')
             | None -> 
                 (accElements @ subElements, tab')
-        | Column (commonPropsOpt, containerPropsOpt, elements, pos) ->
+        | Column (commonPropsOpt, _, elements, pos) ->
             let columnId = getId (Option.defaultValue [] commonPropsOpt)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match columnId with
             | Some id ->
-                let tab'' = SymTab.bind id (Column (commonPropsOpt, containerPropsOpt, subElements, pos)) tab'
+                let tab'' = SymTab.bind id element tab'
                 (accElements @ [Identifier (id, pos)], tab'')
             | None -> 
                 (accElements @ subElements, tab')
