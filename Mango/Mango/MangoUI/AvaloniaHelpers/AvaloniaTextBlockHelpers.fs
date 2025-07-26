@@ -19,12 +19,12 @@ let applyBackgroundColor props applied =
 
 let applyFontFamily props applied =
     applyProp props applied (function
-        | TextBlockProp.FontFamily(s, _) -> Some(TextBlock.fontFamily s)
+        | FontFamily(s, _) -> Some(TextBlock.fontFamily s)
         | _ -> None)
 
 let applyFontSize props applied =
     applyProp props applied (function
-        | TextBlockProp.FontSize(i, _) -> Some(TextBlock.fontSize (float i))
+        | FontSize(i, _) -> Some(TextBlock.fontSize (float i))
         | _ -> None)
 
 let applyTextBlockProperties props =

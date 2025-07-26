@@ -14,20 +14,25 @@ window "Counter Example" 400 300 "icon.png" {
     row {
       gap: 10
 
-      button "Increment" {
-        onclick -> {
-          set(label, counterText, "Count: 1")
-        }
+      button "Increment counter" {
+        onclick -> increment
+        onclick: increment
       }
 
-      button "Reset" {
+      button "Reset counter" {
         onclick -> {
-          update("counterText") {
+          update(counterText) label "Count 0"
+
+          update(counterText) {
             label: "Count: 0"
             fontsize: 24
             color: red
           }
         }
+      }
+
+      function increment() {
+        set(label, counterText, "Count: 1")
       }
     }
   }

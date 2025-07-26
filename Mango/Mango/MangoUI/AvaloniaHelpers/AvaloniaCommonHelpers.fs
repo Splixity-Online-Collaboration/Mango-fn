@@ -5,6 +5,7 @@ open Avalonia.Controls
 open Avalonia.FuncUI.Builder
 open Avalonia
 open MangoUI.Core.AbSyn
+open Avalonia.Layout
 
 let hasProp props tryExtract =
     props
@@ -40,12 +41,20 @@ let applyMargin<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<
 
 let applyWidth<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Width (num, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
+        | Width (size, _) -> 
+            match size with
+            | Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
+            | Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone))
+            | Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Left, ValueNone))
         | _ -> None)
 
 let applyHeight<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Height (num, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
+        | Height (size, _) -> 
+            match size with
+            | Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
+            | Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone))
+            | Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Top, ValueNone))
         | _ -> None)
 
 let applyHidden<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =

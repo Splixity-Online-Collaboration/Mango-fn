@@ -2,7 +2,6 @@
 
 open System.Text
 open FSharp.Text.Lexing
-open Frontend
 
 let parseString (source: string) =
     try
