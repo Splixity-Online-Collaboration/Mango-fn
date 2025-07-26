@@ -1,10 +1,21 @@
-﻿module AvaloniaCommonHelpers
+﻿module MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 
 open Avalonia.FuncUI.Types
 open Avalonia.Controls
 open Avalonia.FuncUI.Builder
 open Avalonia
-open AbSyn
+open MangoUI.Core.AbSyn
+
+let hasProp props tryExtract =
+    props
+    |> List.tryPick tryExtract
+    |> Option.isSome
+
+let getId props =
+    props
+    |> List.tryPick (function
+        | Id (id, _) -> Some id
+        | _ -> None)
 
 // Thickness helper function
 let createThickness (t: Thickness) = 

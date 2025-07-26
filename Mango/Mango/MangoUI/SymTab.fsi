@@ -5,7 +5,7 @@ is useful for keeping track of binidngs. Bindings can be shadowed --- the
 active binding is the one made most recently.
 *)
 
-module SymTab
+module MangoUI.SymTab
   (* A symbol table with values of type 'a. *)
   type SymTab<'a> = SymTab of (string * 'a) list 
   // when 'a : equality

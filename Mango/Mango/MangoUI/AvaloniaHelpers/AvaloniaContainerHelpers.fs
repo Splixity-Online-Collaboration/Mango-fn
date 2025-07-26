@@ -1,10 +1,10 @@
-module AvaloniaHelpers.AvaloniaContainerHelpers
+module MangoUI.AvaloniaHelpers.AvaloniaContainerHelpers
 
 open Avalonia.Controls
-open AbSyn
 open Avalonia.FuncUI.Builder
 open AvaloniaCommonHelpers
 open ColorConverter
+open MangoUI.Core.AbSyn
 
 let applyBackgroundColor props applied =
     applyProp props applied (function

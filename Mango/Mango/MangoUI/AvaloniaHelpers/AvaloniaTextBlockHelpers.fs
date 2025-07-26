@@ -1,13 +1,11 @@
-module AvaloniaHelpers.AvaloniaTextBlockHelpers
+module MangoUI.AvaloniaHelpers.AvaloniaTextBlockHelpers
 
-open AvaloniaHelpers.ViewHelpers
 open Avalonia.FuncUI.DSL
 open Avalonia.FuncUI.Types
 open Avalonia.Controls
-open Avalonia
-open AbSyn
-open AvaloniaHelpers.ColorConverter
+open MangoUI.AvaloniaHelpers.ColorConverter
 open AvaloniaCommonHelpers
+open MangoUI.Core.AbSyn
 
 let applyColor props applied =
     applyProp props applied (function

@@ -1,0 +1,34 @@
+window "Counter Example" 400 300 "icon.png" {
+  column {
+    id: mainColumn
+    margin: 20
+    gap: 10
+    align: center
+    justify: center
+
+    text "Count: 0" {
+      id: counterText
+      fontsize: 24
+    }
+
+    row {
+      gap: 10
+
+      button "Increment" {
+        onclick -> {
+          set(label, counterText, "Count: 1")
+        }
+      }
+
+      button "Reset" {
+        onclick -> {
+          update("counterText") {
+            label: "Count: 0"
+            fontsize: 24
+            color: red
+          }
+        }
+      }
+    }
+  }
+}

@@ -14,29 +14,29 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="MangoUI\Core\AbSyn.fs" />
 		
-		<Compile Include="FileIO.fs" />
-		<Compile Include="SymTab.fsi" />
-    	<Compile Include="SymTab.fs" />
-    	
-    	<FsYacc Include="Parser.fsy">
+		<Compile Include="MangoUI\SymTab.fsi" />
+		<Compile Include="MangoUI\SymTab.fs" />
+		<Compile Include="MangoUI\Core\Types.fs" />
+		<FsYacc Include="MangoUI\Frontend\Parser.fsy">
       		<OtherFlags>-v --module Parser</OtherFlags>
     	</FsYacc>
-    	<FsLex Include="Lexer.fsl">
+		<FsLex Include="MangoUI\Frontend\Lexer.fsl">
       		<OtherFlags></OtherFlags>
     	</FsLex>
-		<Compile Include="AbSyn.fs" />
-		<Compile Include="Parser.fs" />
-    	<Compile Include="Lexer.fs" />
-    	<Compile Include="AvaloniaHelpers/AvaloniaCommonHelpers.fs" />
-		<Compile Include="AvaloniaHelpers/ColorConverter.fs" />
-		<Compile Include="AvaloniaHelpers/ViewHelpers.fs" />
-    	<Compile Include="AvaloniaHelpers/AvaloniaContainerHelpers.fs" />
-		<Compile Include="AvaloniaHelpers/AvaloniaButtonHelpers.fs" />
-		<Compile Include="AvaloniaHelpers/AvaloniaTextBlockHelpers.fs" />
-		<Compile Include="AvaloniaHelpers/AvaloniaHelpers.fs" />
-		<Compile Include="Interpreter.fs" />
-		<Compile Include="ParserWrapper.fs" />
-		<Compile Include="Mango.fs" />
+		<Compile Include="MangoUI\Frontend\Parser.fs" />
+		<Compile Include="MangoUI\Frontend\Lexer.fs" />
+		<Compile Include="MangoUI\Frontend\ParserWrapper.fs" />
+		<Compile Include="MangoUI\Frontend\FileIO.fs" />
+    	<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaCommonHelpers.fs" />
+		<Compile Include="MangoUI\AvaloniaHelpers\ColorConverter.fs" />
+		<Compile Include="MangoUI\AvaloniaHelpers\ViewHelpers.fs" />
+    	<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaContainerHelpers.fs" />
+		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaButtonHelpers.fs" />
+		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaTextBlockHelpers.fs" />
+		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaHelpers.fs" />
+		<Compile Include="MangoUI\Core\Interpreter.fs" />
+		<Compile Include="MangoUI\Core\Mango.fs" />
 	</ItemGroup>
 </Project>

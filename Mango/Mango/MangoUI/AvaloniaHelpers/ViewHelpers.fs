@@ -1,8 +1,4 @@
-module AvaloniaHelpers.ViewHelpers
-
-open AbSyn
-open Avalonia.Controls
-open Avalonia.FuncUI.DSL
+module MangoUI.AvaloniaHelpers.ViewHelpers
 
 let applyProp props applied tryExtract =
     props

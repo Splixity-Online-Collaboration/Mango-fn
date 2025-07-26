@@ -1,10 +1,9 @@
-﻿module AvaloniaHelpers.AvaloniaHelpers
+﻿module MangoUI.AvaloniaHelpers.AvaloniaHelpers
 
 open Avalonia.FuncUI.Hosts
 open Avalonia.Controls
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
-open AbSyn
 open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
@@ -12,6 +11,10 @@ open Avalonia.Layout
 open AvaloniaCommonHelpers
 open AvaloniaContainerHelpers
 open ColorConverter
+open MangoUI.Core.AbSyn
+open MangoUI
+open MangoUI.Core.Types
+
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
     | Some filename ->
@@ -51,7 +54,7 @@ let createToggleSwitch (label: string) : IView =
 let createCalendar : IView = Calendar.create []
 let createToggleButton = ToggleButton.create []
 
-let rec convertUIElementToIView element =
+let rec convertUIElementToIView element (tab : TreeEnv) =
     match element with
     | Button(label, propsOpt, _) ->
         createButton label (Option.defaultValue [] propsOpt)
@@ -64,11 +67,15 @@ let rec convertUIElementToIView element =
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
     | Row(commonPropsOpt, containerPropsOpt, elements, _) ->
-        createContainer Orientation.Horizontal (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] containerPropsOpt) elements
+        createContainer Orientation.Horizontal (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] containerPropsOpt) elements tab
     | Column(commonPropsOpt, containerPropsOpt, elements, _) ->
-        createContainer Orientation.Vertical (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] containerPropsOpt) elements
+        createContainer Orientation.Vertical (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] containerPropsOpt) elements tab
+    | Identifier (id, _) ->
+        match SymTab.lookup id tab with
+        | Some storedElement -> convertUIElementToIView storedElement tab
+        | None -> failwithf "Identifier '%s' not found in symbol table." id
 
-and createContainer (orientation: Orientation) (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list) : IView =
+and createContainer (orientation: Orientation) (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list) (tab : TreeEnv) : IView =
     let hasWrap =
         props |> List.exists(fun prop-> 
         match prop with 
@@ -81,7 +88,7 @@ and createContainer (orientation: Orientation) (commonProps: CommonProp list) (p
         let wrapPanel = 
             WrapPanel.create (
             [   WrapPanel.orientation orientation
-                WrapPanel.children (List.map convertUIElementToIView elements) ]
+                WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
             @ applyCommonProps commonProps
             @ applyContainerProperties props
         )
@@ -103,7 +110,7 @@ and createContainer (orientation: Orientation) (commonProps: CommonProp list) (p
         let stackPanel = 
             StackPanel.create (
             [   StackPanel.orientation orientation
-                StackPanel.children (List.map convertUIElementToIView elements) ]
+                StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
             @ applyCommonProps commonProps
             @ applyContainerProperties props
         )
@@ -122,12 +129,12 @@ and createContainer (orientation: Orientation) (commonProps: CommonProp list) (p
         else
             stackPanel 
 
-let setWindowContent elements (window: HostWindow) =
+let setWindowContent elements (tab : TreeEnv) (window: HostWindow) =
     window.Content <-
         Component(fun _ ->
             ScrollViewer.create
                 [ ScrollViewer.content (
-                      StackPanel.create [ StackPanel.children (List.map convertUIElementToIView elements) ]
+                      StackPanel.create [ StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
                   ) ])
 
     window

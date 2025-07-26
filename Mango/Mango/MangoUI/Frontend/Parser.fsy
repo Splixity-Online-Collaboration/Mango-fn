@@ -2,7 +2,8 @@
 let p0 = (0,0)
 
 open FSharp.Text.Parsing
-open AbSyn
+open MangoUI.Core
+open MangoUI.AbSyn
 
 (* parse-error function *)
 let mutable ErrorContextDescriptor : string = ""
@@ -55,28 +56,28 @@ let splitInterleaved props =
 %token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
 %token <Position> CENTER LEFT RIGHT
 %token <Position> OVERFLOW WRAP FORCEWRAP
-%token <Position> WORD CHARACTER NOTRIM
+%token <Position> WORD CHARACTER NOTRIM IDENTIFIER
 
 // Symbols
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON LEFT_PAR RIGHT_PAR EQUAL
 
 // Entry points
 %start Prog
-%type <AbSyn.Window> Prog
-%type <AbSyn.Window> Window
+%type <Core.AbSyn.Window> Prog
+%type <Core.AbSyn.Window> Window
 
 // Types
-%type <AbSyn.UIElement list> UIElements
-%type <AbSyn.UIElement> UIElement
-%type <AbSyn.InterleavedProp<TextBlockProp> list> TextProps
-%type <AbSyn.TextBlockProp> TextProp
-%type <AbSyn.InterleavedProp<ContainerProp> list> ContainerProps
-%type <AbSyn.ContainerProp> ContainerProp
-%type <AbSyn.ColorT> Color
-%type <AbSyn.FunctionT> Function
-%type <AbSyn.Stmt list> Statements
-%type <AbSyn.Stmt> Stmt
-%type <AbSyn.Exp> Exp
+%type <Core.AbSyn.UIElement list> UIElements
+%type <Core.AbSyn.UIElement> UIElement
+%type <Core.AbSyn.InterleavedProp<TextBlockProp> list> TextProps
+%type <Core.AbSyn.TextBlockProp> TextProp
+%type <Core.AbSyn.InterleavedProp<ContainerProp> list> ContainerProps
+%type <Core.AbSyn.ContainerProp> ContainerProp
+%type <Core.AbSyn.ColorT> Color
+%type <Core.AbSyn.FunctionT> Function
+%type <Core.AbSyn.Stmt list> Statements
+%type <Core.AbSyn.Stmt> Stmt
+%type <Core.AbSyn.Exp> Exp
 
 %%
 
@@ -170,6 +171,7 @@ CommonProp : HIDDEN COLON TRUE { Hidden (true, $1) }
   | WIDTH COLON NUM        { Width (fst $3, $1) }
   | HEIGHT COLON NUM       { Height (fst $3, $1) }
   | MARGIN COLON Thickness { Margin ($3, $1) }
+  | IDENTIFIER COLON ID { Id (fst $3, $1) }
 ;
 
 TextProp :
@@ -241,7 +243,7 @@ Functions : Function Functions { $1 :: $2 }
           | Function           { [$1] }
 
 // Functions and Statements
-Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { AbSyn.Function (fst $2, $6, $1) }
+Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { Function (fst $2, $6, $1) }
 ;
 
 Statements : Stmt Statements { $1 :: $2 }

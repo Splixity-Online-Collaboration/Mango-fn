@@ -1,4 +1,4 @@
-module AbSyn
+module MangoUI.Core.AbSyn
 
 // Doesn't actually support all escapes. Too bad.
 let fromCString (s: string) : string =
@@ -39,6 +39,7 @@ type CommonProp =
     | Margin of Thickness * Position
     | Width of int * Position
     | Height of int * Position
+    | Id of string * Position
 
 type Value =
     | Int of int
@@ -110,5 +111,6 @@ type UIElement =
     | ToggleButton of Position
     | Row of CommonProp list option * ContainerProp list option * UIElement list * Position
     | Column of CommonProp list option * ContainerProp list option * UIElement list * Position
+    | Identifier of string * Position
 
 type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

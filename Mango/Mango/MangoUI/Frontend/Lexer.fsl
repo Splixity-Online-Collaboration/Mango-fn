@@ -4,6 +4,7 @@ module Lexer
 open System
 open FSharp.Text.Lexing
 open System.Text
+open MangoUI.Core
 
 (* Boilerplate tracking for position handling *)
 let mutable currentLine = 1
@@ -65,6 +66,7 @@ let keyword (s, pos) =
     | "width"         -> Parser.WIDTH pos
     | "height"        -> Parser.HEIGHT pos
     | "border"        -> Parser.BORDER pos // NEW
+    | "id"            -> Parser.IDENTIFIER pos
 
     // Fontstyle Values
     | "italic"        -> Parser.ITALIC pos
