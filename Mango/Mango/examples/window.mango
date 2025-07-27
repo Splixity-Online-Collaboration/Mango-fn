@@ -1,15 +1,18 @@
 window "Mango UI Flexboxes Test" 400 600 "icon.png" {
-    text "Flexbox Testing" {
-        fontsize: 30
+    column {
         margin: 10, 0
-    }
-    text "row (scale window horizontally to see wrapping)" {
-        margin: 10, 0
+
+        text "Flexbox Testing" {
+            fontsize: 30
+        }
+        text "row (scale window horizontally to see wrapping)" 
+        text "width: hug" 
     }
     row {
         margin: 10
-        wrap: true
         bgcolor: white
+        wrap: true
+        width: hug
 
         // TODO: allow components to be stored using functions, which would make this alot smaller
         row { 
@@ -55,7 +58,7 @@ window "Mango UI Flexboxes Test" 400 600 "icon.png" {
         height: 200
         margin: 10
         wrap: false
-        border: red 2 // NEW
+        border: red 1
 
         button "test"
         button "test"
@@ -66,4 +69,13 @@ window "Mango UI Flexboxes Test" 400 600 "icon.png" {
         button "test"
         button "test"
     }
+    border {
+        corner: 10
+        margin: 10
+
+        text "This text has a border" {
+            margin: 10
+        }
+    }
+
 }

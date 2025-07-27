@@ -10,10 +10,28 @@ open Avalonia.FuncUI.Types
 open Avalonia.Layout
 open AvaloniaCommonHelpers
 open AvaloniaContainerHelpers
+open AvaloniaBorderHelpers
 open ColorConverter
 open MangoUI.Core.AbSyn
 open MangoUI
 open MangoUI.Core.Types
+
+let doesBorderExist props = props |> List.exists(fun prop -> match prop with | ContainerProp.Border(_,_,_) -> true | _ -> false)
+
+let doesWrapExist props = props |> List.exists(fun prop -> match prop with | Wrap (true,_)-> true |  _ -> false)
+
+let getColorAndThickness props =
+    props
+    |> List.pick (function
+        | ContainerProp.Border (c, t, _) -> Some (c, t)
+        | _ -> None)
+
+let createBorderProp (panel : IView) (color, thickness) : IView =
+    Border.create([
+        Border.borderBrush(fromColor color)
+        Border.borderThickness (createThickness thickness)
+        Border.child panel
+    ])
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
@@ -74,60 +92,49 @@ let rec convertUIElementToIView element (tab : TreeEnv) =
         match SymTab.lookup id tab with
         | Some storedElement -> convertUIElementToIView storedElement tab
         | None -> failwithf "Identifier '%s' not found in symbol table." id
+    | Border(commonPropsOpt, borderPropsOpt, element, _) ->
+        createBorderElement (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] borderPropsOpt) element tab
 
-and createContainer (orientation: Orientation) (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list) (tab : TreeEnv) : IView =
-    let hasWrap =
-        props |> List.exists(fun prop-> 
-        match prop with 
-            | Wrap (true,_)-> true 
-            |  _ -> false
-        )
-    let isBorder =
-            props |> List.exists(fun prop -> match prop with | ContainerProp.Border(_,_,_) -> true | _ -> false)
-    if hasWrap then
-        let wrapPanel = 
-            WrapPanel.create (
+and createWrapPanel orientation elements commonProps props tab =
+    WrapPanel.create (
             [   WrapPanel.orientation orientation
                 WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
             @ applyCommonProps commonProps
             @ applyContainerProperties props
         )
-        if isBorder then
-            let color, thickness =
-                props
-                |> List.pick (function
-                    | Border (c, t, _) -> Some (c, t)
-                    | _ -> None)
 
-            Border.create([
-                Border.borderBrush(fromColor color)
-                Border.borderThickness (createThickness thickness)
-                Border.child wrapPanel
-            ])
-        else
-            wrapPanel  
+and createStackPanel orientation elements commonProps props tab =
+    StackPanel.create (
+        [StackPanel.orientation orientation
+         StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) 
+        ] @ applyCommonProps commonProps @ applyContainerProperties props
+    )
+
+and createWrapElement orientation elements commonProps props tab =
+    let isBorder = doesBorderExist props
+    let wrapPanel = createWrapPanel orientation elements commonProps props tab
+    if isBorder then
+        getColorAndThickness props |> createBorderProp wrapPanel
     else
-        let stackPanel = 
-            StackPanel.create (
-            [   StackPanel.orientation orientation
-                StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
-            @ applyCommonProps commonProps
-            @ applyContainerProperties props
-        )
-        if isBorder then
-            let color, thickness =
-                props
-                |> List.pick (function
-                    | Border(c, t, _) -> Some(c, t)
-                    | _ -> None)
+        wrapPanel
 
-            Border.create ([
-                    Border.borderBrush (fromColor color)
-                    Border.borderThickness (createThickness thickness)
-                    Border.child stackPanel 
-                ])
-        else
-            stackPanel 
+and createStackElement orientation elements commonProps props tab =
+    let isBorder = doesBorderExist props
+    let stackPanel = createStackPanel orientation elements commonProps props tab
+    if isBorder then
+        getColorAndThickness props |> createBorderProp stackPanel
+    else
+        stackPanel 
+
+and createContainer (orientation: Orientation) (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list)  (tab : TreeEnv) : IView =
+    let hasWrap = doesWrapExist props
+    if hasWrap then createWrapElement orientation elements commonProps props tab
+    else createStackElement orientation elements commonProps props tab
+
+and createBorderElement (commonProps: CommonProp list) (props: BorderProp list) (element: UIElement) (tab : TreeEnv): IView = 
+  Border.create([
+    Border.child (convertUIElementToIView element tab)
+  ] @ applyCommonProps commonProps @ applyBorderProperties props)
 
 let setWindowContent elements (tab : TreeEnv) (window: HostWindow) =
     window.Content <-

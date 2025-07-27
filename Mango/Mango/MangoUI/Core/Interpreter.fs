@@ -12,9 +12,9 @@ let rec tryRegisterElement element commonProps pos childElements elements tab =
     match buttonId with
         | Some id ->
             let tab' = SymTab.bind id element tab
-            (elements @ [Identifier (id, pos)], tab')
+            elements @ [Identifier (id, pos)], tab'
         | None -> 
-            (elements @ [element], tab)
+            elements @ [element], tab
 
 and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIElement list * TreeEnv =
     List.fold (fun (accElements, accTab) element ->
@@ -27,25 +27,25 @@ and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIEl
             match rowId with
             | Some id ->
                 let tab'' = SymTab.bind id element tab'
-                (accElements @ [Identifier (id, pos)], tab'')
+                accElements @ [Identifier (id, pos)], tab''
             | None -> 
-                (accElements @ [Row (commonPropsOpt, props, subElements, pos)], tab')
+                accElements @ [Row (commonPropsOpt, props, subElements, pos)], tab'
         | Column (commonPropsOpt, props, elements, pos) ->
             let columnId = getId (Option.defaultValue [] commonPropsOpt)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match columnId with
             | Some id ->
                 let tab'' = SymTab.bind id element tab'
-                (accElements @ [Identifier (id, pos)], tab'')
+                accElements @ [Identifier (id, pos)], tab''
             | None -> 
-                (accElements @ [Column (commonPropsOpt, props, subElements, pos)], tab')
+                accElements @ [Column (commonPropsOpt, props, subElements, pos)], tab'
         | _ -> 
-            (accElements @ [element], accTab)
+            accElements @ [element], accTab
     ) ([], tab) elements
 
 let rec interpret (window: HostWindow) program (tab : TreeEnv) : HostWindow =
     match program with
-    | AbSyn.Window (name,width, height, icon, elements, _, _) ->
+    | Window (name,width, height, icon, elements, _, _) ->
         do printfn "elements: %A" elements
         do printfn "tab: %A" tab
         let elements', tab' = storeElementsMarkedWithId elements tab

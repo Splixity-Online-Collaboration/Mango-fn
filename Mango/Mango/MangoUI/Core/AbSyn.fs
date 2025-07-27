@@ -34,11 +34,16 @@ type ColorT =
     | ColorName of PredefinedColor * Position
     | Hex of HexCode * Position
 
+type Size =
+    | Pixels of int
+    | Fill
+    | Hug
+
 type CommonProp = 
     | Hidden of bool * Position
     | Margin of Thickness * Position
-    | Width of int * Position
-    | Height of int * Position
+    | Width of Size * Position
+    | Height of Size * Position
     | Id of string * Position
 
 type Value =
@@ -91,10 +96,14 @@ type TextBlockProp =
     | TextTrim of TextTrimT * Position
     | TextWrap of TextWrapT * Position
 
+type BorderProp =
+    | Corner of Thickness * Position
+
 type ContainerProp =
     | Wrap of bool * Position
     | BackgroundColor of ColorT * Position
     | Border of ColorT * Thickness * Position
+    | BorderRadius of Thickness * Position
 
 type InterleavedProp<'specific> =
   | Common of CommonProp
@@ -111,6 +120,7 @@ type UIElement =
     | ToggleButton of Position
     | Row of CommonProp list option * ContainerProp list option * UIElement list * Position
     | Column of CommonProp list option * ContainerProp list option * UIElement list * Position
+    | Border of CommonProp list option * BorderProp list option * UIElement * Position
     | Identifier of string * Position
 
 type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

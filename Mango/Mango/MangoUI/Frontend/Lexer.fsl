@@ -1,10 +1,9 @@
 {
 module Lexer
 
-open System
-open FSharp.Text.Lexing
 open System.Text
 open MangoUI.Core
+open FSharp.Text.Lexing
 
 (* Boilerplate tracking for position handling *)
 let mutable currentLine = 1
@@ -16,7 +15,7 @@ let rec getLineCol pos line = function
         else getLineCol pos (line - 1) ps
     | [] -> (0, 0) // Should not happen
 
-let getPos (lexbuf: LexBuffer<'char>) =
+let getPos (lexbuf: LexBuffer<char>) =
     getLineCol lexbuf.StartPos.pos_cnum currentLine lineStartPos
 
 type Position = int * int // (line, column)
@@ -67,6 +66,10 @@ let keyword (s, pos) =
     | "height"        -> Parser.HEIGHT pos
     | "border"        -> Parser.BORDER pos // NEW
     | "id"            -> Parser.IDENTIFIER pos
+  
+    // Size Values
+    | "fill"          -> Parser.FILL pos
+    | "hug"           -> Parser.HUG pos
 
     // Fontstyle Values
     | "italic"        -> Parser.ITALIC pos
@@ -113,14 +116,14 @@ rule Token = parse
 
     | '0' | ['1'-'9']['0'-'9']*            {
                                              Parser.NUM (
-                                                 int (Encoding.UTF8.GetString lexbuf.Lexeme),
+                                                 int (LexBuffer.LexemeString lexbuf),
                                                  getPos lexbuf
                                              )
                                            }
 
     | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* {
                                              keyword (
-                                                 Encoding.UTF8.GetString lexbuf.Lexeme,
+                                                 LexBuffer.LexemeString lexbuf,
                                                  getPos lexbuf
                                              )
                                            }
@@ -129,18 +132,18 @@ rule Token = parse
           [' ' '!' '#'-'&' '('-'[' ']'-'~'] |
           '\\' ['n' 't' '\'' '"' '\\']
         )* '"'                             {
-                                             let str0 = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             let str0 = LexBuffer.LexemeString lexbuf
                                              let str1 = str0.Substring(1, str0.Length - 2)
                                              Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
                                            }
 
     | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
-                                             let str = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             let str = LexBuffer.LexemeString lexbuf
                                              Parser.HEXCOLOR (str, getPos lexbuf)
                                            }
 
     | '#' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] {
-                                             let str = Encoding.UTF8.GetString lexbuf.Lexeme
+                                             let str = LexBuffer.LexemeString lexbuf
                                              Parser.HEXCOLOR (str, getPos lexbuf)
                                            }
 

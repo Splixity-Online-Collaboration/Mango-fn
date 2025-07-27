@@ -2,8 +2,6 @@
 
 module MangoUI.SymTab
 
-open System
-
 type SymTab<'a> = SymTab of (string * 'a) list
 
 (*
