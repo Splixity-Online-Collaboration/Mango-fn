@@ -22,10 +22,11 @@
 		<Compile Include="MangoUI\Core\Types.fs" />
 
 		<FsYacc Include="MangoUI\Frontend\Parser.fsy">
-			<OtherFlags>--module Parser</OtherFlags>
+			<OtherFlags>--module MangoUI.Frontend.Parser</OtherFlags>
 		</FsYacc>
 
 		<FsLex Include="MangoUI\Frontend\Lexer.fsl">
+			<OtherFlags>--module MangoUI.Frontend.Lexer</OtherFlags>
 		</FsLex>
 
 		<Compile Include="MangoUI\Frontend\Parser.fs" />
