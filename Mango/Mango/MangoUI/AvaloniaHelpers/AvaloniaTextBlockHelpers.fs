@@ -9,22 +9,22 @@ open MangoUI.Core.AbSyn
 
 let applyColor props applied =
     applyProp props applied (function
-        | TextBlockProp.Color (c, _) -> Some (TextBlock.foreground (fromColor c))
+        | Color (c, _) -> Some (TextBlock.foreground (fromColor c))
         | _ -> None)
 
 let applyBackgroundColor props applied =
     applyProp props applied (function
-        | TextBlockProp.BackgroundColor (c, _) -> Some (TextBlock.background (fromColor c))
+        | BackgroundColor (c, _) -> Some (TextBlock.background (fromColor c))
         | _ -> None)
 
 let applyFontFamily props applied =
     applyProp props applied (function
-        | TextBlockProp.FontFamily(s, _) -> Some(TextBlock.fontFamily s)
+        | FontFamily(s, _) -> Some(TextBlock.fontFamily s)
         | _ -> None)
 
 let applyFontSize props applied =
     applyProp props applied (function
-        | TextBlockProp.FontSize(i, _) -> Some(TextBlock.fontSize (float i))
+        | FontSize(i, _) -> Some(TextBlock.fontSize (float i))
         | _ -> None)
 
 let applyTextBlockProperties props =
@@ -35,4 +35,4 @@ let applyTextBlockProperties props =
     |> applyFontSize props
 
 let createTextBlock (text: string) (props: Property list) : IView =
-    TextBlock.create ([ TextBlock.text text ] @ applyCommonProps commonProps @ applyTextBlockProperties props)
+    TextBlock.create ([ TextBlock.text text ] @ applyCommonProps props @ applyTextBlockProperties props)
