@@ -8,10 +8,8 @@ open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
 open Avalonia.Layout
-open AvaloniaCommonHelpers
 open AvaloniaContainerHelpers
 open AvaloniaBorderHelpers
-open ColorConverter
 open MangoUI.Core.AbSyn
 open MangoUI
 open MangoUI.Core.Types
