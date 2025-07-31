@@ -39,6 +39,7 @@ let keyword (s, pos) =
     | "toggleswitch"  -> Parser.TOGGLESWITCH pos
     | "calendar"      -> Parser.CALENDAR pos
     | "togglebutton"  -> Parser.TOGGLEBUTTON pos
+    | "border"        -> Parser.BORDER pos
 
     // Boolean
     | "true"          -> Parser.TRUE pos
@@ -62,8 +63,11 @@ let keyword (s, pos) =
     | "margin"        -> Parser.MARGIN pos
     | "width"         -> Parser.WIDTH pos
     | "height"        -> Parser.HEIGHT pos
-    | "border"        -> Parser.BORDER pos // NEW
     | "id"            -> Parser.IDENTIFIER pos
+
+    // Border Props
+    | "corner"        -> Parser.CORNER pos
+    | "density"       -> Parser.DENSITY pos
   
     // Size Values
     | "fill"          -> Parser.FILL pos

@@ -48,8 +48,8 @@ let splitInterleaved props =
 %token <string * Position> ID STRINGLIT HEXCOLOR
 
 // Keywords
-%token <Position> WINDOW COLUMN ROW BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH
-%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT BORDER FUNCTION LET
+%token <Position> WINDOW COLUMN ROW BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH BORDER
+%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT CORNER DENSITY FUNCTION LET
 %token <Position> COLOR BACKGROUNDCOLOR FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE MARGIN LINEHEIGHT TEXTALIGN TEXTTRIM TEXTWRAP
 %token <Position> ITALIC UNDERLINE STRIKETHROUGH
 %token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
@@ -71,6 +71,8 @@ let splitInterleaved props =
 %type <MangoUI.Core.AbSyn.InterleavedProp<MangoUI.Core.AbSyn.TextBlockProp> list> TextProps
 %type <MangoUI.Core.AbSyn.TextBlockProp> TextProp
 %type <MangoUI.Core.AbSyn.InterleavedProp<MangoUI.Core.AbSyn.ContainerProp> list> ContainerProps
+%type <MangoUI.Core.AbSyn.BorderProp> BorderProp
+%type <MangoUI.Core.AbSyn.InterleavedProp<MangoUI.Core.AbSyn.BorderProp> list> BorderProps
 %type <MangoUI.Core.AbSyn.ContainerProp> ContainerProp
 %type <MangoUI.Core.AbSyn.ColorT> Color
 %type <MangoUI.Core.AbSyn.Size> Size
@@ -94,10 +96,9 @@ Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], $1) }
 ;
 
 ContainerProp : 
-  | BACKGROUNDCOLOR COLON Color   { ContainerProp.BackgroundColor ($3, $1) }
+    BACKGROUNDCOLOR COLON Color   { ContainerProp.BackgroundColor ($3, $1) }
   | WRAP COLON TRUE               { ContainerProp.Wrap (true, $1) }
   | WRAP COLON FALSE              { ContainerProp.Wrap (false, $1) }
-  | BORDER COLON Color Thickness  { ContainerProp.Border ($3, $4, $1) }
 ;
 
 InterleavedContainerProp :
@@ -110,21 +111,41 @@ ContainerProps :
   | InterleavedContainerProp                { [$1] }
 ;
 
+BorderProp :
+    CORNER COLON Thickness  { Corner ($3, $1) }
+  | COLOR COLON Color       { BorderProp.Color ($3, $1) }
+  | DENSITY COLON Thickness { BorderProp.Density ($3, $1)}
+;
+
+InterleavedBorderProp: 
+    BorderProp    { Specific $1 }
+  | CommonProp    { Common $1 }
+;
+
+BorderProps :
+    InterleavedBorderProp BorderProps { $1 :: $2 }
+  | InterleavedBorderProp          { [$1] }
+
 UIElement :
     BUTTON STRINGLIT                                                                { Button (fst $2, None, $1) }
   | BUTTON STRINGLIT LEFT_CURLY_BRACKET ButtonProperties RIGHT_CURLY_BRACKET        { Button (fst $2, Some $4, $1) }
   | TEXT STRINGLIT                                                                  { TextBlock (fst $2, None, None, $1) }
-  | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET
-    {
-        let commonProps, specificProps = splitInterleaved $4
-        TextBlock(fst $2, Some commonProps, Some specificProps, $1)
-    }
   | TEXTBOX STRINGLIT                                                               { TextBox (fst $2, $1) }
   | CHECKBOX STRINGLIT                                                              { CheckBox (fst $2, $1) }
   | RADIOBUTTON STRINGLIT                                                           { RadioButton (fst $2, $1) }
   | TOGGLESWITCH STRINGLIT                                                          { ToggleSwitch (fst $2, $1) }
   | CALENDAR                                                                        { Calendar $1 }
   | TOGGLEBUTTON                                                                    { ToggleButton $1 }
+  | TEXT STRINGLIT LEFT_CURLY_BRACKET TextProps RIGHT_CURLY_BRACKET
+    {
+        let commonProps, specificProps = splitInterleaved $4
+        TextBlock(fst $2, Some commonProps, Some specificProps, $1)
+    }
+  | BORDER LEFT_CURLY_BRACKET BorderProps UIElement RIGHT_CURLY_BRACKET
+    {
+      let commonProps, specificProps = splitInterleaved $3
+      Border (Some commonProps, Some specificProps, $4, $1)
+    }
   | COLUMN LEFT_CURLY_BRACKET ContainerProps OptionalUIElements RIGHT_CURLY_BRACKET 
     { 
         let commonProps, specificProps = splitInterleaved $3

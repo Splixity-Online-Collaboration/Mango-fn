@@ -97,13 +97,13 @@ type TextBlockProp =
     | TextWrap of TextWrapT * Position
 
 type BorderProp =
+    | Color of ColorT * Position
     | Corner of Thickness * Position
+    | Density of Thickness * Position
 
 type ContainerProp =
     | Wrap of bool * Position
     | BackgroundColor of ColorT * Position
-    | Border of ColorT * Thickness * Position
-    | BorderRadius of Thickness * Position
 
 type InterleavedProp<'specific> =
   | Common of CommonProp

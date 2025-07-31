@@ -16,22 +16,7 @@ open MangoUI.Core.AbSyn
 open MangoUI
 open MangoUI.Core.Types
 
-let doesBorderExist props = props |> List.exists(fun prop -> match prop with | ContainerProp.Border(_,_,_) -> true | _ -> false)
-
 let doesWrapExist props = props |> List.exists(fun prop -> match prop with | Wrap (true,_)-> true |  _ -> false)
-
-let getColorAndThickness props =
-    props
-    |> List.pick (function
-        | ContainerProp.Border (c, t, _) -> Some (c, t)
-        | _ -> None)
-
-let createBorderProp (panel : IView) (color, thickness) : IView =
-    Border.create([
-        Border.borderBrush(fromColor color)
-        Border.borderThickness (createThickness thickness)
-        Border.child panel
-    ])
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
@@ -110,26 +95,10 @@ and createStackPanel orientation elements commonProps props tab =
         ] @ applyCommonProps commonProps @ applyContainerProperties props
     )
 
-and createWrapElement orientation elements commonProps props tab =
-    let isBorder = doesBorderExist props
-    let wrapPanel = createWrapPanel orientation elements commonProps props tab
-    if isBorder then
-        getColorAndThickness props |> createBorderProp wrapPanel
-    else
-        wrapPanel
-
-and createStackElement orientation elements commonProps props tab =
-    let isBorder = doesBorderExist props
-    let stackPanel = createStackPanel orientation elements commonProps props tab
-    if isBorder then
-        getColorAndThickness props |> createBorderProp stackPanel
-    else
-        stackPanel 
-
 and createContainer (orientation: Orientation) (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list)  (tab : TreeEnv) : IView =
     let hasWrap = doesWrapExist props
-    if hasWrap then createWrapElement orientation elements commonProps props tab
-    else createStackElement orientation elements commonProps props tab
+    if hasWrap then createWrapPanel orientation elements commonProps props tab
+    else createStackPanel orientation elements commonProps props tab
 
 and createBorderElement (commonProps: CommonProp list) (props: BorderProp list) (element: UIElement) (tab : TreeEnv): IView = 
   Border.create([

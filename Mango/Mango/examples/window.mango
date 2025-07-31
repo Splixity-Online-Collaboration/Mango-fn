@@ -1,4 +1,4 @@
-window "Mango UI Flexboxes Test" 400 600 "icon.png" {
+window "Mango UI Flexboxes Test" 400 700 "icon.png" {
     column {
         margin: 10, 0
 
@@ -51,14 +51,11 @@ window "Mango UI Flexboxes Test" 400 600 "icon.png" {
             height: 60
         }
     }
-    text "column (no wrapping)" {
+    text "column" {
         margin: 10, 0
     }
     column {
-        height: 200
         margin: 10
-        wrap: false
-        border: red 1
 
         button "test"
         button "test"
@@ -72,10 +69,53 @@ window "Mango UI Flexboxes Test" 400 600 "icon.png" {
     border {
         corner: 10
         margin: 10
-
-        text "This text has a border" {
+        density: 2
+        color: red
+        width: fill
+        
+        text "This text has a border, with width: fill" {
             margin: 10
         }
     }
 
+    border {
+        density: 5
+        color: red
+        width: hug
+        margin: 10
+
+        border {
+            density: 5
+            color: yellow
+            width: hug
+
+            border {
+                density: 5
+                color: pink
+                width: hug
+
+                border {
+                    density: 5
+                    color: green
+                    width: hug
+
+                    border {
+                        density: 5
+                        color: black
+                        width: hug
+
+                        border {
+                            density: 5
+                            color: white
+                            width: hug
+                            
+                            text "Woo" {
+                                margin: 10
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

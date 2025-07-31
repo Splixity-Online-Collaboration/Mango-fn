@@ -22,9 +22,9 @@ let getId props =
 let createThickness (t: Thickness) = 
     let thickness =
         match t with 
-        | Uniform x -> Thickness(float x)
-        | Symmetric (x,y) -> Thickness(float x, float y, float x, float y)
-        | Custom (l,t,r,b) -> Thickness(float l,float t, float r,float b)
+        | Thickness.Uniform x -> Thickness(float x)
+        | Thickness.Symmetric (x,y) -> Thickness(float x, float y, float x, float y)
+        | Thickness.Custom (l,t,r,b) -> Thickness(float l,float t, float r,float b)
     thickness
 
 let applyProp props applied tryExtract =
@@ -35,31 +35,31 @@ let applyProp props applied tryExtract =
 
 let applyMargin<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Margin (m, _) ->
+        | CommonProp.Margin (m, _) ->
             Some (AttrBuilder<'a>.CreateProperty(Control.MarginProperty, createThickness m, ValueNone))
         | _ -> None)
 
 let applyWidth<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Width (size, _) -> 
+        | CommonProp.Width (size, _) -> 
             match size with
-            | Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
-            | Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone))
-            | Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Left, ValueNone))
+            | Size.Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
+            | Size.Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone))
+            | Size.Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Left, ValueNone))
         | _ -> None)
 
 let applyHeight<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Height (size, _) -> 
+        | CommonProp.Height (size, _) -> 
             match size with
-            | Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
-            | Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone))
-            | Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Top, ValueNone))
+            | Size.Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
+            | Size.Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone))
+            | Size.Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Top, ValueNone))
         | _ -> None)
 
 let applyHidden<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Hidden (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
+        | CommonProp.Hidden (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
         | _ -> None)
 
 let applyCommonProps props = 
