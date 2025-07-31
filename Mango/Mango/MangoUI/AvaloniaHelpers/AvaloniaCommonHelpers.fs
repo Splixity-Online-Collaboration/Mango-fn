@@ -33,33 +33,33 @@ let applyProp props applied tryExtract =
     |> Option.map (fun attr -> applied @ [attr])
     |> Option.defaultValue applied
 
-let applyMargin<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
+let applyMargin<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | CommonProp.Margin (m, _) ->
+        | Margin (m, _) ->
             Some (AttrBuilder<'a>.CreateProperty(Control.MarginProperty, createThickness m, ValueNone))
         | _ -> None)
 
-let applyWidth<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
+let applyWidth<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | CommonProp.Width (size, _) -> 
+        | Width (size, _) -> 
             match size with
             | Size.Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
             | Size.Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone))
             | Size.Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Left, ValueNone))
         | _ -> None)
 
-let applyHeight<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
+let applyHeight<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | CommonProp.Height (size, _) -> 
+        | Height (size, _) -> 
             match size with
             | Size.Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
             | Size.Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone))
             | Size.Hug -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Top, ValueNone))
         | _ -> None)
 
-let applyHidden<'a when 'a :> Control> (props: CommonProp list) (applied: IAttr<'a> list) : IAttr<'a> list =
+let applyHidden<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | CommonProp.Hidden (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
+        | Hidden (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
         | _ -> None)
 
 let applyCommonProps props = 
