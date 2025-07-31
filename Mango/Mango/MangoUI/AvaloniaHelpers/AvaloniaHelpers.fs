@@ -61,49 +61,48 @@ let rec convertUIElementToIView element (tab : TreeEnv) =
     match element with
     | Button(label, propsOpt, _) ->
         createButton label (Option.defaultValue [] propsOpt)
-    | TextBlock(label, commonPropsOpt, propsOpt, _) ->
-        createTextBlock label (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] propsOpt)
+    | TextBlock(label, propsOpt, _) ->
+        createTextBlock label (Option.defaultValue [] propsOpt)
     | TextBox(label, _) -> createTextBox label
     | CheckBox(label, _) -> createCheckbox label
     | RadioButton(label, _) -> createRadioButton label
     | ToggleSwitch(label, _) -> createToggleSwitch label
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
-    | Row(commonPropsOpt, containerPropsOpt, elements, _) ->
-        createContainer Orientation.Horizontal (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] containerPropsOpt) elements tab
-    | Column(commonPropsOpt, containerPropsOpt, elements, _) ->
-        createContainer Orientation.Vertical (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] containerPropsOpt) elements tab
+    | Row(propsOpt, elements, _) ->
+        createContainer Orientation.Horizontal (Option.defaultValue [] propsOpt) elements tab
+    | Column(propsOpt, elements, _) ->
+        createContainer Orientation.Vertical (Option.defaultValue [] propsOpt) elements tab
     | Identifier (id, _) ->
         match SymTab.lookup id tab with
         | Some storedElement -> convertUIElementToIView storedElement tab
         | None -> failwithf "Identifier '%s' not found in symbol table." id
-    | Border(commonPropsOpt, borderPropsOpt, element, _) ->
-        createBorderElement (Option.defaultValue [] commonPropsOpt) (Option.defaultValue [] borderPropsOpt) element tab
+    | Border(propsOpt, element, _) ->
+        createBorderElement (Option.defaultValue [] propsOpt)element tab
 
-and createWrapPanel orientation elements commonProps props tab =
+and createWrapPanel orientation elements props tab =
     WrapPanel.create (
             [   WrapPanel.orientation orientation
                 WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
-            @ applyCommonProps commonProps
             @ applyContainerProperties props
         )
 
-and createStackPanel orientation elements commonProps props tab =
+and createStackPanel orientation elements props tab =
     StackPanel.create (
         [StackPanel.orientation orientation
          StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) 
-        ] @ applyCommonProps commonProps @ applyContainerProperties props
+        ] @ applyContainerProperties props
     )
 
-and createContainer (orientation: Orientation) (commonProps: CommonProp list) (props: ContainerProp list) (elements: UIElement list)  (tab : TreeEnv) : IView =
+and createContainer (orientation: Orientation) (props: Property list) (elements: UIElement list)  (tab : TreeEnv) : IView =
     let hasWrap = doesWrapExist props
-    if hasWrap then createWrapPanel orientation elements commonProps props tab
-    else createStackPanel orientation elements commonProps props tab
+    if hasWrap then createWrapPanel orientation elements props tab
+    else createStackPanel orientation elements props tab
 
-and createBorderElement (commonProps: CommonProp list) (props: BorderProp list) (element: UIElement) (tab : TreeEnv): IView = 
+and createBorderElement (props: Property list) (element: UIElement) (tab : TreeEnv): IView = 
   Border.create([
     Border.child (convertUIElementToIView element tab)
-  ] @ applyCommonProps commonProps @ applyBorderProperties props)
+  ] @ applyBorderProperties props)
 
 let setWindowContent elements (tab : TreeEnv) (window: HostWindow) =
     window.Content <-

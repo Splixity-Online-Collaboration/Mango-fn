@@ -20,25 +20,25 @@ and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIEl
     List.fold (fun (accElements, accTab) element ->
         match element with
         | Button(_, propsOpt, pos) -> tryRegisterElement element (Option.defaultValue [] propsOpt) pos None accElements accTab
-        | TextBlock(_, commonPropsOpt, _, pos) -> tryRegisterElement element (Option.defaultValue [] commonPropsOpt) pos None accElements accTab
-        | Row (commonPropsOpt, props, elements, pos) ->
-            let rowId = getId (Option.defaultValue [] commonPropsOpt)
+        | TextBlock(_, props, pos) -> tryRegisterElement element (Option.defaultValue [] props) pos None accElements accTab
+        | Row (props, elements, pos) ->
+            let rowId = getId (Option.defaultValue [] props)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match rowId with
             | Some id ->
                 let tab'' = SymTab.bind id element tab'
                 accElements @ [Identifier (id, pos)], tab''
             | None -> 
-                accElements @ [Row (commonPropsOpt, props, subElements, pos)], tab'
-        | Column (commonPropsOpt, props, elements, pos) ->
-            let columnId = getId (Option.defaultValue [] commonPropsOpt)
+                accElements @ [Row (props, subElements, pos)], tab'
+        | Column (props, elements, pos) ->
+            let columnId = getId (Option.defaultValue [] props)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match columnId with
             | Some id ->
                 let tab'' = SymTab.bind id element tab'
                 accElements @ [Identifier (id, pos)], tab''
             | None -> 
-                accElements @ [Column (commonPropsOpt, props, subElements, pos)], tab'
+                accElements @ [Column (props, subElements, pos)], tab'
         | _ -> 
             accElements @ [element], accTab
     ) ([], tab) elements

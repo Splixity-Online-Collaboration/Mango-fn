@@ -34,5 +34,5 @@ let applyTextBlockProperties props =
     |> applyFontFamily props
     |> applyFontSize props
 
-let createTextBlock (text: string) (commonProps: CommonProp list) (props: TextBlockProp list) : IView =
+let createTextBlock (text: string) (props: Property list) : IView =
     TextBlock.create ([ TextBlock.text text ] @ applyCommonProps commonProps @ applyTextBlockProperties props)

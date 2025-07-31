@@ -6,5 +6,5 @@ open Avalonia.Controls
 open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 open MangoUI.Core.AbSyn
 
-let createButton (label: string) (props: CommonProp list) : IView =
+let createButton (label: string) (props: Property list) : IView =
     Button.create ([ Button.content label ] @ applyCommonProps props)
