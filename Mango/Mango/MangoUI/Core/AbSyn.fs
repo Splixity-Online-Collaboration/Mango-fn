@@ -39,13 +39,6 @@ type Size =
     | Fill
     | Hug
 
-type CommonProp = 
-    | Hidden of bool * Position
-    | Margin of Thickness * Position
-    | Width of Size * Position
-    | Height of Size * Position
-    | Id of string * Position
-
 type Value =
     | Int of int
     | Real of float
@@ -84,7 +77,12 @@ type TextTrimT =
     | Character
     | NoTrim
 
-type TextBlockProp =
+type Property =
+    | Hidden of bool * Position
+    | Margin of Thickness * Position
+    | Width of Size * Position
+    | Height of Size * Position
+    | Id of string * Position
     | Color of ColorT * Position
     | BackgroundColor of ColorT * Position
     | FontFamily of string * Position
@@ -95,32 +93,22 @@ type TextBlockProp =
     | TextAlign of TextAlignT * Position
     | TextTrim of TextTrimT * Position
     | TextWrap of TextWrapT * Position
-
-type BorderProp =
-    | Color of ColorT * Position
     | Corner of Thickness * Position
     | Density of Thickness * Position
-
-type ContainerProp =
     | Wrap of bool * Position
-    | BackgroundColor of ColorT * Position
-
-type InterleavedProp<'specific> =
-  | Common of CommonProp
-  | Specific of 'specific
 
 type UIElement = 
-    | Button of string * CommonProp list option * Position
-    | TextBlock of string * CommonProp list option * TextBlockProp list option * Position
+    | Button of string * Property list option * Position
+    | TextBlock of string * Property list option * Position
     | TextBox of string * Position 
     | CheckBox of string * Position
     | RadioButton of string * Position
     | ToggleSwitch of string * Position
     | Calendar of Position
     | ToggleButton of Position
-    | Row of CommonProp list option * ContainerProp list option * UIElement list * Position
-    | Column of CommonProp list option * ContainerProp list option * UIElement list * Position
-    | Border of CommonProp list option * BorderProp list option * UIElement * Position
+    | Row of Property list option * UIElement list * Position
+    | Column of Property list option * UIElement list * Position
+    | Border of Property list option * UIElement * Position
     | Identifier of string * Position
 
 type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

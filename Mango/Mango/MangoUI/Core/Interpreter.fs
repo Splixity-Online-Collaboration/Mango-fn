@@ -54,4 +54,3 @@ let rec interpret (window: HostWindow) program (tab : TreeEnv) : HostWindow =
         window |>
         setWindowProperties name width height icon |>
         setWindowContent elements' tab'
-    
