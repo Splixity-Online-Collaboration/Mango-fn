@@ -35,12 +35,6 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
       if rOk && gOk && bOk && aOk then Some (r, g, b, a) else None
   | _ -> None
 
-let splitInterleaved props =
-    List.foldBack (fun prop (cs, ss) ->
-        match prop with
-        | Common c   -> (c :: cs, ss)
-        | Specific s -> (cs, s :: ss)
-    ) props ([], [])
 %}
 
 // Tokens with values
@@ -68,12 +62,6 @@ let splitInterleaved props =
 // Types
 %type <MangoUI.Core.AbSyn.UIElement list> UIElements
 %type <MangoUI.Core.AbSyn.UIElement> UIElement
-%type <MangoUI.Core.AbSyn.InterleavedProp<MangoUI.Core.AbSyn.TextBlockProp> list> TextProps
-%type <MangoUI.Core.AbSyn.TextBlockProp> TextProp
-%type <MangoUI.Core.AbSyn.InterleavedProp<MangoUI.Core.AbSyn.ContainerProp> list> ContainerProps
-%type <MangoUI.Core.AbSyn.BorderProp> BorderProp
-%type <MangoUI.Core.AbSyn.InterleavedProp<MangoUI.Core.AbSyn.BorderProp> list> BorderProps
-%type <MangoUI.Core.AbSyn.ContainerProp> ContainerProp
 %type <MangoUI.Core.AbSyn.ColorT> Color
 %type <MangoUI.Core.AbSyn.Size> Size
 %type <MangoUI.Core.AbSyn.FunctionT> Function
@@ -98,7 +86,7 @@ Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], $1) }
 UIElement :
     BUTTON STRINGLIT                                                                { Button (fst $2, None, $1) }
   | BUTTON STRINGLIT LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET              { Button (fst $2, Some $4, $1) }
-  | TEXT STRINGLIT                                                                  { TextBlock (fst $2, None, None, $1) }
+  | TEXT STRINGLIT                                                                  { TextBlock (fst $2, None, $1) }
   | TEXTBOX STRINGLIT                                                               { TextBox (fst $2, $1) }
   | CHECKBOX STRINGLIT                                                              { CheckBox (fst $2, $1) }
   | RADIOBUTTON STRINGLIT                                                           { RadioButton (fst $2, $1) }

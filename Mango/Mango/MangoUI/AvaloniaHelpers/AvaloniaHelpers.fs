@@ -13,6 +13,7 @@ open AvaloniaBorderHelpers
 open MangoUI.Core.AbSyn
 open MangoUI
 open MangoUI.Core.Types
+open AvaloniaCommonHelpers
 
 let doesWrapExist props = props |> List.exists(fun prop -> match prop with | Wrap (true,_)-> true |  _ -> false)
 
@@ -82,6 +83,7 @@ and createWrapPanel orientation elements props tab =
     WrapPanel.create (
             [   WrapPanel.orientation orientation
                 WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
+            @ applyCommonProps props
             @ applyContainerProperties props
         )
 
@@ -89,7 +91,7 @@ and createStackPanel orientation elements props tab =
     StackPanel.create (
         [StackPanel.orientation orientation
          StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) 
-        ] @ applyContainerProperties props
+        ] @ applyCommonProps props @ applyContainerProperties props
     )
 
 and createContainer (orientation: Orientation) (props: Property list) (elements: UIElement list)  (tab : TreeEnv) : IView =
@@ -100,7 +102,7 @@ and createContainer (orientation: Orientation) (props: Property list) (elements:
 and createBorderElement (props: Property list) (element: UIElement) (tab : TreeEnv): IView = 
   Border.create([
     Border.child (convertUIElementToIView element tab)
-  ] @ applyBorderProperties props)
+  ] @ applyCommonProps props @ applyBorderProperties props)
 
 let setWindowContent elements (tab : TreeEnv) (window: HostWindow) =
     window.Content <-
