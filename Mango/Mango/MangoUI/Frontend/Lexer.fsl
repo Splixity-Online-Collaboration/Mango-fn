@@ -1,6 +1,4 @@
 {
-module Lexer
-
 open System.Text
 open MangoUI.Core
 open FSharp.Text.Lexing
