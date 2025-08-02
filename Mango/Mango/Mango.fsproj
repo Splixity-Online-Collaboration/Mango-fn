@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -33,14 +33,13 @@
 		<Compile Include="MangoUI\Frontend\Lexer.fs" />
 		<Compile Include="MangoUI\Frontend\ParserWrapper.fs" />
 		<Compile Include="MangoUI\Frontend\FileIO.fs" />
-    <Compile Include="MangoUI\AvaloniaHelpers\AvaloniaCommonHelpers.fs" />
 		<Compile Include="MangoUI\AvaloniaHelpers\ColorConverter.fs" />
-		<Compile Include="MangoUI\AvaloniaHelpers\ViewHelpers.fs" />
+		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaCommonHelpers.fs" />
 		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaBorderHelpers.fs" />
-    <Compile Include="MangoUI\AvaloniaHelpers\AvaloniaButtonHelpers.fs" />
-		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaContainerHelpers.fs" />
+		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaButtonHelpers.fs" />
 		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaTextBlockHelpers.fs" />
 		<Compile Include="MangoUI\AvaloniaHelpers\AvaloniaHelpers.fs" />
+		<Compile Include="MangoUI\Core\PropertyValidator.fs" />
 		<Compile Include="MangoUI\Core\Interpreter.fs" />
 		<Compile Include="MangoUI\Core\Mango.fs" />
 	</ItemGroup>

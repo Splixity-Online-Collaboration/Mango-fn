@@ -19,9 +19,17 @@ let rec tryRegisterElement element commonProps pos childElements elements tab =
 and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIElement list * TreeEnv =
     List.fold (fun (accElements, accTab) element ->
         match element with
-        | Button(_, propsOpt, pos) -> tryRegisterElement element (Option.defaultValue [] propsOpt) pos None accElements accTab
-        | TextBlock(_, props, pos) -> tryRegisterElement element (Option.defaultValue [] props) pos None accElements accTab
+        | Button(_, propsOpt, pos) -> 
+            if not (PropertyValidator.validateProperties element) then
+                do printfn $"Failed to validate properties for element at row: {fst pos}, col: {snd pos}"
+            tryRegisterElement element (Option.defaultValue [] propsOpt) pos None accElements accTab
+        | TextBlock(_, props, pos) -> 
+            if not (PropertyValidator.validateProperties element) then
+                do printfn $"Failed to validate properties for element at row: {fst pos}, col: {snd pos}"
+            tryRegisterElement element (Option.defaultValue [] props) pos None accElements accTab
         | Row (props, elements, pos) ->
+            if not (PropertyValidator.validateProperties element) then
+                do printfn $"Failed to validate properties for element at row: {fst pos}, col: {snd pos}"
             let rowId = getId (Option.defaultValue [] props)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match rowId with
@@ -31,6 +39,8 @@ and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIEl
             | None -> 
                 accElements @ [Row (props, subElements, pos)], tab'
         | Column (props, elements, pos) ->
+            if not (PropertyValidator.validateProperties element) then
+                do printfn $"Failed to validate properties for element at row: {fst pos}, col: {snd pos}"
             let columnId = getId (Option.defaultValue [] props)
             let subElements, tab' = storeElementsMarkedWithId elements accTab
             match columnId with
@@ -46,11 +56,10 @@ and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIEl
 let rec interpret (window: HostWindow) program (tab : TreeEnv) : HostWindow =
     match program with
     | Window (name,width, height, icon, elements, _, _) ->
-        do printfn "elements: %A" elements
-        do printfn "tab: %A" tab
+        do printfn "Beginning semantic validation of properties..."
         let elements', tab' = storeElementsMarkedWithId elements tab
-        do printfn "elements': %A" elements'
-        do printfn "tab': %A" tab'
+        do printfn "Semantic validation has been completed"
+        do printfn "Beginning interpretation"
         window |>
         setWindowProperties name width height icon |>
         setWindowContent elements' tab'

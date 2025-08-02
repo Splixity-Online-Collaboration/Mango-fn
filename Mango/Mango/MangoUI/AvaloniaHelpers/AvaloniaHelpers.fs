@@ -8,7 +8,6 @@ open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
 open Avalonia.FuncUI.Types
 open Avalonia.Layout
-open AvaloniaContainerHelpers
 open AvaloniaBorderHelpers
 open MangoUI.Core.AbSyn
 open MangoUI
@@ -84,14 +83,13 @@ and createWrapPanel orientation elements props tab =
             [   WrapPanel.orientation orientation
                 WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
             @ applyCommonProps props
-            @ applyContainerProperties props
         )
 
 and createStackPanel orientation elements props tab =
     StackPanel.create (
         [StackPanel.orientation orientation
          StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) 
-        ] @ applyCommonProps props @ applyContainerProperties props
+        ] @ applyCommonProps props
     )
 
 and createContainer (orientation: Orientation) (props: Property list) (elements: UIElement list)  (tab : TreeEnv) : IView =

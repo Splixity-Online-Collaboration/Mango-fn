@@ -6,6 +6,7 @@ open Avalonia.FuncUI.Builder
 open Avalonia
 open MangoUI.Core.AbSyn
 open Avalonia.Layout
+open MangoUI.AvaloniaHelpers.ColorConverter
 
 let hasProp props tryExtract =
     props
@@ -62,9 +63,15 @@ let applyHidden<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a
         | Hidden (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
         | _ -> None)
 
+let applyBackgroundColor props applied =
+    applyProp props applied (function
+        | BackgroundColor (c, _) -> Some (AttrBuilder<'a>.CreateProperty(Panel.BackgroundProperty, fromColor c, ValueNone))
+        | _ -> None)
+
 let applyCommonProps props = 
     []
     |> applyHidden props
     |> applyWidth props
     |> applyHeight props
     |> applyMargin props
+    |> applyBackgroundColor props
