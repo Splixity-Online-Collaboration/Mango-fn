@@ -43,13 +43,13 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
 
 // Keywords
 %token <Position> WINDOW COLUMN ROW BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH BORDER
-%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT CORNER DENSITY FUNCTION LET
+%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT CORNER DENSITY FUNCTION LET UPDATE SET
 %token <Position> COLOR BACKGROUNDCOLOR FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE MARGIN LINEHEIGHT TEXTALIGN TEXTTRIM TEXTWRAP
 %token <Position> ITALIC UNDERLINE STRIKETHROUGH
 %token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
 %token <Position> CENTER LEFT RIGHT FILL HUG
 %token <Position> OVERFLOW WRAP FORCEWRAP
-%token <Position> WORD CHARACTER NOTRIM IDENTIFIER
+%token <Position> WORD CHARACTER NOTRIM IDENTIFIER LABEL ONCLICK
 
 // Symbols
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON LEFT_PAR RIGHT_PAR EQUAL
@@ -99,31 +99,58 @@ UIElement :
   | ROW LEFT_CURLY_BRACKET Properties OptionalUIElements RIGHT_CURLY_BRACKET        { Row (Some $3, $4, $1) }
 ;
 
+PropertyName : 
+    BACKGROUNDCOLOR { BackgroundColor None }
+  | WRAP            { Wrap None }
+  | CORNER          { Corner None }
+  | COLOR           { Color None }
+  | DENSITY         { Density None }
+  | HIDDEN          { Hidden None }
+  | WIDTH           { Width None }
+  | HEIGHT          { Height None }
+  | MARGIN          { Margin None }
+  | IDENTIFIER      { Id None }
+  | FONTFAMILY      { FontFamily None }
+  | FONTSIZE        { FontSize None }
+  | FONTWEIGHT      { FontWeight None }
+  | FONTSTYLE       { FontStyle None }
+  | LINEHEIGHT      { LineHeight None }
+  | TEXTALIGN       { TextAlign None }
+  | TEXTWRAP        { TextWrap None }
+  | TEXTTRIM        { TextTrim None }
+  | LABEL           { Label None }
+  | ONCLICK         { Onclick None }
+;
+
 Properties : 
     Property Properties { $1 :: $2 }
   | Property            { [$1] }
+;
 
 Property : 
-  BACKGROUNDCOLOR COLON Color     { BackgroundColor ($3, $1) }
-  | WRAP COLON TRUE               { Wrap (true, $1) }
-  | WRAP COLON FALSE              { Wrap (false, $1) }
-  | CORNER COLON Thickness        { Corner ($3, $1) }
-  | COLOR COLON Color             { Color ($3, $1) }
-  | DENSITY COLON Thickness       { Density ($3, $1)}
-  | HIDDEN COLON TRUE             { Hidden (true, $1) }
-  | HIDDEN COLON FALSE            { Hidden (false, $1) }
-  | WIDTH COLON Size              { Width ($3, $1) }
-  | HEIGHT COLON Size             { Height ($3, $1) }
-  | MARGIN COLON Thickness        { Margin ($3, $1) }
-  | IDENTIFIER COLON ID           { Id (fst $3, $1) }
-  | FONTFAMILY COLON STRINGLIT    { FontFamily (fst $3, $1) }
-  | FONTSIZE COLON NUM            { FontSize (fst $3, $1) }
-  | FONTWEIGHT COLON NUM          { FontWeight (fst $3, $1) }
-  | FONTSTYLE COLON FontStyles    { FontStyle (List.rev $3, $1) }
-  | LINEHEIGHT COLON NUM          { LineHeight (fst $3, $1) }
-  | TEXTALIGN COLON TextAlign     { TextAlign ($3, $1) }
-  | TEXTWRAP COLON TextWrap       { TextWrap ($3, $1) }
-  | TEXTTRIM COLON TextTrim       { TextTrim ($3, $1) }
+  BACKGROUNDCOLOR COLON Color     { BackgroundColor (Some ($3, $1)) }
+  | WRAP COLON TRUE               { Wrap (Some (true, $1)) }
+  | WRAP COLON FALSE              { Wrap (Some (false, $1)) }
+  | CORNER COLON Thickness        { Corner (Some ($3, $1)) }
+  | COLOR COLON Color             { Color (Some ($3, $1)) }
+  | DENSITY COLON Thickness       { Density (Some ($3, $1)) }
+  | HIDDEN COLON TRUE             { Hidden (Some (true, $1)) }
+  | HIDDEN COLON FALSE            { Hidden (Some (false, $1)) }
+  | WIDTH COLON Size              { Width (Some ($3, $1)) }
+  | HEIGHT COLON Size             { Height (Some ($3, $1)) }
+  | MARGIN COLON Thickness        { Margin (Some ($3, $1)) }
+  | IDENTIFIER COLON ID           { Id (Some (fst $3, $1)) }
+  | FONTFAMILY COLON STRINGLIT    { FontFamily (Some (fst $3, $1)) }
+  | FONTSIZE COLON NUM            { FontSize (Some (fst $3, $1)) }
+  | FONTWEIGHT COLON NUM          { FontWeight (Some (fst $3, $1)) }
+  | FONTSTYLE COLON FontStyles    { FontStyle (Some (List.rev $3, $1)) }
+  | LINEHEIGHT COLON NUM          { LineHeight (Some (fst $3, $1)) }
+  | TEXTALIGN COLON TextAlign     { TextAlign (Some ($3, $1)) }
+  | TEXTWRAP COLON TextWrap       { TextWrap (Some ($3, $1)) }
+  | TEXTTRIM COLON TextTrim       { TextTrim (Some ($3, $1)) }
+  | LABEL COLON STRINGLIT         { Label (Some (fst $3, $1)) }
+  | ONCLICK COLON ID              { Onclick (Some (fst $3, $1)) }
+;
 
 UIElements :
     UIElement UIElements { $1 :: $2 }
@@ -133,11 +160,6 @@ UIElements :
 OptionalUIElements :
     UIElements { $1 }
   |            { [] }
-;
-
-// Functions
-Funcs : Function Funcs { $1 :: $2 }
-      | Function       { [$1] }
 ;
 
 Thickness :
@@ -172,6 +194,7 @@ FontStyle : ITALIC        { Italic }
 Size: NUM { Pixels (fst $1) }
   | FILL  { Fill }
   | HUG   { Hug }
+;
 
 FontStyles : FontStyle FontStyles { $1 :: $2 }
   | FontStyle           { [$1] }
@@ -195,6 +218,7 @@ TextTrim : WORD      { Word }
 
 Functions : Function Functions { $1 :: $2 }
           | Function           { [$1] }
+;
 
 // Functions and Statements
 Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { Function (fst $2, $6, $1) }
@@ -204,7 +228,8 @@ Statements : Stmt Statements { $1 :: $2 }
            | Stmt            { [$1] }
 ;
 
-Stmt : LET ID EQUAL Exp { Let (fst $2, $4, $1) }
+Stmt : SET LEFT_PAR PropertyName COMMA ID COMMA Exp RIGHT_PAR { Set ($3, fst $5, $7, $1) }
+     | UPDATE LEFT_PAR ID COMMA LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET RIGHT_PAR { Update (fst $3, $6, $1) }
      | Exp              { ExprStmt ($1, match $1 with Constant(_,pos) | Var(_,pos) | Call(_,pos) -> pos) }
 ;
 

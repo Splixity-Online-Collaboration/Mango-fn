@@ -1,0 +1,32 @@
+window "Counter Example" 600 400 "icon.png" {
+	column {
+		id: mainColumn
+
+		text "Count: 0" {
+			id: counterText
+			fontsize: 24
+		}
+
+		row {
+      id: test
+
+      button "Increment counter" {
+        onclick: increment
+      }
+
+      button "Reset counter" {
+        onclick: reset
+      }
+		}
+	}
+
+  function reset() {
+    update(counterText, {
+      label: "Count: 0"
+    })
+  }
+
+	function increment() {
+		set(label, counterText, "Count: 1")
+	}
+}

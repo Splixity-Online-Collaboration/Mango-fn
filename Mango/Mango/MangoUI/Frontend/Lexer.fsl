@@ -64,6 +64,8 @@ let keyword (s, pos) =
     | "width"         -> Parser.WIDTH pos
     | "height"        -> Parser.HEIGHT pos
     | "id"            -> Parser.IDENTIFIER pos
+    | "label"         -> Parser.LABEL pos
+    | "onclick"       -> Parser.ONCLICK pos
 
     // Border Props
     | "corner"        -> Parser.CORNER pos
@@ -100,6 +102,8 @@ let keyword (s, pos) =
     // General Language Keywords
     | "let"           -> Parser.LET pos
     | "function"      -> Parser.FUNCTION pos
+    | "update"        -> Parser.UPDATE pos
+    | "set"           -> Parser.SET pos
 
     // Fallback
     | _               -> Parser.ID (s, pos)

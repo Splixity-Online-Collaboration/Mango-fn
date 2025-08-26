@@ -1,7 +1,6 @@
 ﻿namespace MangoUI.Core
 
 open MangoUI
-
 module Globals =
     let filepath = ref None
 
@@ -41,6 +40,12 @@ module Program =
     let main (args: string[]) =
         let path = if args.Length > 0 then args[0] else "examples/window.mango"
         Globals.filepath.Value <- Some path
+
+        let verboseFlag = if (Array.contains "--verbose" args) || (Array.contains "-v" args) then true else false
+
+        if verboseFlag then
+            MangoUI.Util.Logger.verbose <- true
+
         AppBuilder
             .Configure<App>()
             .UsePlatformDetect()

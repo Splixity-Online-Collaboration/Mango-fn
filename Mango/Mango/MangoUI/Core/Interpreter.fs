@@ -6,6 +6,7 @@ open MangoUI.Core.Types
 open AbSyn
 open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 open MangoUI
+open MangoUI.Util.Logger
 
 let rec tryRegisterElement element commonProps pos childElements elements tab =
     let buttonId = getId commonProps
@@ -53,13 +54,26 @@ and storeElementsMarkedWithId (elements : UIElement list) (tab : TreeEnv) : UIEl
             accElements @ [element], accTab
     ) ([], tab) elements
 
+let initFuncEnv (funcs: FunctionT list) : FuncEnv =
+    List.fold (fun acc func ->
+        match func with
+            | Function (name, body, _) -> SymTab.bind name body acc
+    ) (SymTab.empty ()) funcs
+
 let rec interpret (window: HostWindow) program (tab : TreeEnv) : HostWindow =
     match program with
-    | Window (name,width, height, icon, elements, _, _) ->
-        do printfn "Beginning semantic validation of properties..."
+    | Window (name,width, height, icon, elements, funcs, _) ->
+        info funcs
+
+        info "Beginning function environment initialization..."
+        let funcEnv = initFuncEnv funcs
+        info "Function environment initialization has been completed"
+        info $"Function environment: %A{funcEnv}"
+
+        info "Beginning semantic validation of properties..."
         let elements', tab' = storeElementsMarkedWithId elements tab
-        do printfn "Semantic validation has been completed"
-        do printfn "Beginning interpretation"
+        info "Semantic validation has been completed"
+        info "Beginning interpretation"
         window |>
         setWindowProperties name width height icon |>
         setWindowContent elements' tab'

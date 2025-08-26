@@ -14,7 +14,7 @@ open MangoUI
 open MangoUI.Core.Types
 open AvaloniaCommonHelpers
 
-let doesWrapExist props = props |> List.exists(fun prop -> match prop with | Wrap (true,_)-> true |  _ -> false)
+let doesWrapExist props = props |> List.exists(fun prop -> match prop with | Wrap (Some (true,_)) -> true |  _ -> false)
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with

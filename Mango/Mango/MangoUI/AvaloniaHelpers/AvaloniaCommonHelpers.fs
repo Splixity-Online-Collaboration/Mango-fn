@@ -16,7 +16,7 @@ let hasProp props tryExtract =
 let getId props =
     props
     |> List.tryPick (function
-        | Id (id, _) -> Some id
+        | Id (Some (id, _)) -> Some id
         | _ -> None)
 
 // Thickness helper function
@@ -36,13 +36,13 @@ let applyProp props applied tryExtract =
 
 let applyMargin<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Margin (m, _) ->
+        | Margin (Some (m, _)) ->
             Some (AttrBuilder<'a>.CreateProperty(Control.MarginProperty, createThickness m, ValueNone))
         | _ -> None)
 
 let applyWidth<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Width (size, _) -> 
+        | Width (Some (size, _)) -> 
             match size with
             | Size.Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
             | Size.Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone))
@@ -51,7 +51,7 @@ let applyWidth<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a>
 
 let applyHeight<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Height (size, _) -> 
+        | Height (Some (size, _)) -> 
             match size with
             | Size.Pixels num -> Some (AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
             | Size.Fill -> Some (AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone))
@@ -60,12 +60,12 @@ let applyHeight<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a
 
 let applyHidden<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
     applyProp props applied (function
-        | Hidden (b, _) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
+        | Hidden (Some (b, _)) -> Some (AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty,not b, ValueNone))
         | _ -> None)
 
 let applyBackgroundColor props applied =
     applyProp props applied (function
-        | BackgroundColor (c, _) -> Some (AttrBuilder<'a>.CreateProperty(Panel.BackgroundProperty, fromColor c, ValueNone))
+        | BackgroundColor (Some (c, _)) -> Some (AttrBuilder<'a>.CreateProperty(Panel.BackgroundProperty, fromColor c, ValueNone))
         | _ -> None)
 
 let applyCommonProps props = 

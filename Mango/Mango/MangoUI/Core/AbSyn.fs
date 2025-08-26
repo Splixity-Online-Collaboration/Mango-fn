@@ -50,13 +50,6 @@ type Exp =
     | Var of string * Position
     | Call of string * Position
 
-type Stmt =
-    | Let of string * Exp * Position
-    | ExprStmt of Exp * Position
-
-type FunctionT = 
-    | Function of string * Stmt list * Position
-
 type FontStyleT = 
     | Italic
     | StrikeThrough
@@ -78,24 +71,26 @@ type TextTrimT =
     | NoTrim
 
 type Property =
-    | Hidden of bool * Position
-    | Margin of Thickness * Position
-    | Width of Size * Position
-    | Height of Size * Position
-    | Id of string * Position
-    | Color of ColorT * Position
-    | BackgroundColor of ColorT * Position
-    | FontFamily of string * Position
-    | FontSize of int * Position
-    | FontWeight of int * Position
-    | FontStyle of FontStyleT list * Position
-    | LineHeight of int * Position
-    | TextAlign of TextAlignT * Position
-    | TextTrim of TextTrimT * Position
-    | TextWrap of TextWrapT * Position
-    | Corner of Thickness * Position
-    | Density of Thickness * Position
-    | Wrap of bool * Position
+    | Hidden of (bool * Position) option
+    | Margin of (Thickness * Position) option
+    | Width of (Size * Position) option
+    | Height of (Size * Position) option
+    | Id of (string * Position) option
+    | Color of (ColorT * Position) option
+    | BackgroundColor of (ColorT * Position) option
+    | FontFamily of (string * Position) option
+    | FontSize of (int * Position) option
+    | FontWeight of (int * Position) option
+    | FontStyle of (FontStyleT list * Position) option
+    | LineHeight of (int * Position) option
+    | TextAlign of (TextAlignT * Position) option
+    | TextTrim of (TextTrimT * Position) option
+    | TextWrap of (TextWrapT * Position) option
+    | Corner of (Thickness * Position) option
+    | Density of (Thickness * Position) option
+    | Wrap of (bool * Position) option
+    | Label of (string * Position) option
+    | Onclick of (string * Position) option
 
 type UIElement = 
     | Button of string * Property list option * Position
@@ -110,5 +105,14 @@ type UIElement =
     | Column of Property list option * UIElement list * Position
     | Border of Property list option * UIElement * Position
     | Identifier of string * Position
+
+type Stmt =
+    | Let of string * Exp * Position
+    | Set of Property * string * Exp * Position // (propertyName, elementId, elementValue, position)
+    | Update of string * Property list * Position // (elementId, updatedProperties, position)
+    | ExprStmt of Exp * Position
+
+type FunctionT = 
+    | Function of string * Stmt list * Position
 
 type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

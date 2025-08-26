@@ -17,17 +17,17 @@ let createCornerRadius (t) =
 
 let applyCorner props applied =
     applyProp props applied (function
-        |  Corner (m,_) -> Some(Border.cornerRadius(createCornerRadius m))     
+        |  Corner (Some (m, _)) -> Some(Border.cornerRadius(createCornerRadius m))     
         | _ -> None )
 
 let applyColor props applied =
     applyProp props applied (function
-        |  Color(c, _) -> Some(Border.borderBrush(fromColor c))
+        |  Color(Some (c, _)) -> Some(Border.borderBrush(fromColor c))
         | _ -> None )
 
 let applyThickness props applied =
     applyProp props applied (function
-        |   Density(t,_) -> Some(Border.borderThickness(createThickness t))
+        |   Density(Some (t, _)) -> Some(Border.borderThickness(createThickness t))
         | _ -> None )
 
 let applyBorderProperties (props: Property list) =

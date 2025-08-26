@@ -21,8 +21,6 @@ window "Counter Example" 400 300 "icon.png" {
 
       button "Reset counter" {
         onclick -> {
-          update(counterText) label "Count 0"
-
           update(counterText) {
             label: "Count: 0"
             fontsize: 24

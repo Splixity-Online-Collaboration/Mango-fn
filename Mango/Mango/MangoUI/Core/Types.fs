@@ -4,3 +4,5 @@ open MangoUI.SymTab
 open AbSyn
 
 type TreeEnv = SymTab<UIElement>
+
+type FuncEnv = SymTab<Stmt list>

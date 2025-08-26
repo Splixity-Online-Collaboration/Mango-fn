@@ -7,6 +7,11 @@
 		<FsLexOutputFolder>$(IntermediateOutputPath)MangoUI/Frontend/</FsLexOutputFolder>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>bin\Debug\net9.0\MangoUI.xml</DocumentationFile>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.3.2" />
 		<PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
@@ -16,6 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="MangoUI\Util\Logger.fs" />
 		<Compile Include="MangoUI\Core\AbSyn.fs" />
 		<Compile Include="MangoUI\Structures\SymTab.fsi" />
 		<Compile Include="MangoUI\Structures\SymTab.fs" />
