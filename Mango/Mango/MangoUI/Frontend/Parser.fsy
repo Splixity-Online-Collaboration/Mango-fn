@@ -151,6 +151,7 @@ Property :
   | LABEL COLON STRINGLIT         { Label (Some (fst $3, $1)) }
   | ONCLICK COLON ID              { Onclick (Some (fst $3, $1)) }
   | ONCLICK LAMBDA_ARROW LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { OnclickLambda (Some ($4, $1)) }
+  | ONCLICK LAMBDA_ARROW Stmt     { OnclickLambda (Some ([$3], $1)) }
 ;
 
 UIElements :

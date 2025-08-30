@@ -89,7 +89,9 @@ module AppMain =
         inherit HostWindow()
         do
             let source = Frontend.FileIO.readContent Globals.filepath.Value.Value |> Result.defaultValue ""
-            let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, Some "", [], [], (-1, -1)))
+            let parseRes = Frontend.ParserWrapper.parseString source
+            printfn "%A" parseRes
+            let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, None, [], [], (-1, -1)))
             match syntaxTree with
             | AbSyn.Window (title, Some width, Some height, Some filepath, _, _, _) -> 
                 base.Title <- title

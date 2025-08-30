@@ -61,4 +61,5 @@ let initFuncEnv (funcs: FunctionT list) : FuncEnv =
     List.fold (fun acc func ->
         match func with
             | Function (name, body, _) -> SymTab.bind name body acc
+            | _ -> acc
     ) (SymTab.empty ()) funcs
