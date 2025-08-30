@@ -68,6 +68,9 @@ module Evaluator =
         | EvalFunc funcName -> 
             info (sprintf "Evaluating function %A" funcName)
             evaluateFunction funcName state
+        | EvalLambda stmts ->
+            info (sprintf "Evaluating lambda %A" stmts)
+            evaluateStatements stmts state
 
     let view (state: AppState) dispatch = 
         convertFromAbSynToAvaloniaTree state dispatch

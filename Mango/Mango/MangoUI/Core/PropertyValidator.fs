@@ -23,13 +23,13 @@ type PropertyKind =
     | FontSize | FontWeight | FontStyle
     | LineHeight | TextAlign | TextTrim 
     | TextWrap | Corner | Density | Wrap
-    | Label | OnClick
+    | Label | OnClick | OnClickLambda
 
 /// <summary>
 /// A set of properties common to most UI elements,
 /// such as layout and visibility controls.
 /// </summary>
-let commonProps = set [Hidden; Margin; Width; Height; Id; OnClick]
+let commonProps = set [Hidden; Margin; Width; Height; Id; OnClick; OnClickLambda]
 
 /// <summary>
 /// Converts an abstract property (from the Mango AST) 
@@ -62,6 +62,7 @@ let propertyKind property =
     | AbSyn.Id              _ -> Id
     | AbSyn.Label           _ -> Label
     | AbSyn.Onclick         _ -> OnClick
+    | AbSyn.OnclickLambda   _ -> OnClickLambda
 
 /// <summary>
 /// Maps each <see cref="UIElementKind"/> to the set of 

@@ -158,6 +158,7 @@ rule Token = parse
     | ')'                                  { Parser.RIGHT_PAR (getPos lexbuf) }
     | ':'                                  { Parser.COLON (getPos lexbuf) }
     | '='                                  { Parser.EQUAL (getPos lexbuf) }
+    | "->"                                 { Parser.LAMBDA_ARROW (getPos lexbuf) }
     | eof                                  { Parser.EOF (getPos lexbuf) }
 
   | _ { raise (LexicalError($"Unexpected character", (lexbuf.StartPos.Line, lexbuf.StartPos.Column))) 

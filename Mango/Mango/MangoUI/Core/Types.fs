@@ -12,5 +12,6 @@ type Msg =
     | UpdateTreeEnv of TreeEnv * string * UIElement
     | UpdateUIElements of UIElement list
     | EvalFunc of string
+    | EvalLambda of Stmt list
 
 type AppState = { treeEnv: TreeEnv; funcEnv: FuncEnv; uiElements: UIElement list }

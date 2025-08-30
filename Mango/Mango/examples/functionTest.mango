@@ -11,22 +11,16 @@ window "Counter Example" 600 400 "icon.png" {
       id: test
 
       button "Increment counter" {
-        onclick: increment
+        onclick -> {
+          set(label, counterText, "Count: 1")
+        }
       }
 
       button "Reset counter" {
-        onclick: reset
+        onclick -> {
+          set(label, counterText, "Count: 0")
+        }
       }
 		}
-	}
-
-  function reset() {
-    update(counterText, {
-      label: "Count: 0"
-    })
-  }
-
-	function increment() {
-		set(label, counterText, "Count: 1")
 	}
 }

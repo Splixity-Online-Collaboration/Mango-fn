@@ -49,7 +49,7 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
 %token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
 %token <Position> CENTER LEFT RIGHT FILL HUG
 %token <Position> OVERFLOW WRAP FORCEWRAP
-%token <Position> WORD CHARACTER NOTRIM IDENTIFIER LABEL ONCLICK
+%token <Position> WORD CHARACTER NOTRIM IDENTIFIER LABEL ONCLICK LAMBDA_ARROW
 
 // Symbols
 %token <Position> EOF COMMA LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET COLON LEFT_PAR RIGHT_PAR EQUAL
@@ -150,6 +150,7 @@ Property :
   | TEXTTRIM COLON TextTrim       { TextTrim (Some ($3, $1)) }
   | LABEL COLON STRINGLIT         { Label (Some (fst $3, $1)) }
   | ONCLICK COLON ID              { Onclick (Some (fst $3, $1)) }
+  | ONCLICK LAMBDA_ARROW LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { OnclickLambda (Some ($4, $1)) }
 ;
 
 UIElements :

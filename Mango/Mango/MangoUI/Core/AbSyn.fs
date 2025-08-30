@@ -91,8 +91,9 @@ type Property =
     | Wrap of (bool * Position) option
     | Label of (string * Position) option
     | Onclick of (string * Position) option
+    | OnclickLambda of (Stmt list * Position) option
 
-type UIElement = 
+and UIElement = 
     | Button of Property list option * Position
     | TextBlock of Property list option * Position
     | TextBox of string * Position 
@@ -106,13 +107,14 @@ type UIElement =
     | Border of Property list option * UIElement * Position
     | Identifier of string * Position
 
-type Stmt =
+and Stmt =
     | Let of string * Exp * Position
     | Set of Property * string * Exp * Position // (propertyName, elementId, elementValue, position)
     | Update of string * Property list * Position // (elementId, updatedProperties, position)
     | ExprStmt of Exp * Position
 
-type FunctionT = 
+and FunctionT = 
     | Function of string * Stmt list * Position
+    | Lambda of Stmt list * Position
 
 type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

@@ -12,6 +12,11 @@ let applyOnClick props dispatch applied =
         | Onclick(Some (funcName, _)) -> Some (Button.onClick (fun _ -> dispatch (EvalFunc funcName)))
         | _ -> None)
 
+let applyOnClickLambda props dispatch applied =
+    applyProp props applied (function
+        | OnclickLambda(Some (stmts, _)) -> Some (Button.onClick (fun _ -> dispatch (EvalLambda stmts)))
+        | _ -> None)
+
 let applyLabel props applied =
     applyProp props applied (function
         | Label(Some (text, _)) -> Some (Button.content text)
@@ -20,6 +25,7 @@ let applyLabel props applied =
 let applyButtonProperties props dispatch =
     []
     |> applyOnClick props dispatch
+    |> applyOnClickLambda props dispatch
     |> applyLabel props
 
 let createButton (props: Property list) treeEnv funcEnv dispatch : IView =
