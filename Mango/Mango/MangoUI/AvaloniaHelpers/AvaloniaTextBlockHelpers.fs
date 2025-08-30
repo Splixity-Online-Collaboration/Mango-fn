@@ -27,12 +27,18 @@ let applyFontSize props applied =
         | FontSize(Some (i, _)) -> Some(TextBlock.fontSize (float i))
         | _ -> None)
 
+let applyLabel props applied =
+    applyProp props applied (function
+        | Label (Some (l, _)) -> Some (TextBlock.text l)
+        | _ -> None)
+
 let applyTextBlockProperties props =
     []
     |> applyColor props
     |> applyBackgroundColor props
     |> applyFontFamily props
     |> applyFontSize props
+    |> applyLabel props
 
-let createTextBlock (text: string) (props: Property list) : IView =
-    TextBlock.create ([ TextBlock.text text ] @ applyCommonProps props @ applyTextBlockProperties props)
+let createTextBlock (props: Property list) : IView =
+    TextBlock.create (applyCommonProps props @ applyTextBlockProperties props)

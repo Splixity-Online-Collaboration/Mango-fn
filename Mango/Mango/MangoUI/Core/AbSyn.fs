@@ -93,8 +93,8 @@ type Property =
     | Onclick of (string * Position) option
 
 type UIElement = 
-    | Button of string * Property list option * Position
-    | TextBlock of string * Property list option * Position
+    | Button of Property list option * Position
+    | TextBlock of Property list option * Position
     | TextBox of string * Position 
     | CheckBox of string * Position
     | RadioButton of string * Position

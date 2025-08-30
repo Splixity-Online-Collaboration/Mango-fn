@@ -84,16 +84,16 @@ Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], $1) }
 ;
 
 UIElement :
-    BUTTON STRINGLIT                                                                { Button (fst $2, None, $1) }
-  | BUTTON STRINGLIT LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET              { Button (fst $2, Some $4, $1) }
-  | TEXT STRINGLIT                                                                  { TextBlock (fst $2, None, $1) }
+    BUTTON STRINGLIT                                                                { Button (Some [Label (Some $2)], $1) }
+  | BUTTON STRINGLIT LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET              { Button (Some ([Label (Some $2)] @ $4), $1) }
+  | TEXT STRINGLIT                                                                  { TextBlock (Some [Label (Some $2)], $1) }
   | TEXTBOX STRINGLIT                                                               { TextBox (fst $2, $1) }
   | CHECKBOX STRINGLIT                                                              { CheckBox (fst $2, $1) }
   | RADIOBUTTON STRINGLIT                                                           { RadioButton (fst $2, $1) }
   | TOGGLESWITCH STRINGLIT                                                          { ToggleSwitch (fst $2, $1) }
   | CALENDAR                                                                        { Calendar $1 }
   | TOGGLEBUTTON                                                                    { ToggleButton $1 }
-  | TEXT STRINGLIT LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET                { TextBlock (fst $2, Some $4, $1) }
+  | TEXT STRINGLIT LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET                { TextBlock (Some ([Label (Some $2)] @ $4), $1) }
   | BORDER LEFT_CURLY_BRACKET Properties UIElement RIGHT_CURLY_BRACKET              { Border (Some $3, $4, $1) }
   | COLUMN LEFT_CURLY_BRACKET Properties OptionalUIElements RIGHT_CURLY_BRACKET     { Column (Some $3, $4, $1) }
   | ROW LEFT_CURLY_BRACKET Properties OptionalUIElements RIGHT_CURLY_BRACKET        { Row (Some $3, $4, $1) }

@@ -1,4 +1,4 @@
-﻿module PropertyValidator
+﻿module MangoUI.Core.PropertyValidator
 
 open MangoUI.Core
 
@@ -70,8 +70,8 @@ let propertyKind property =
 /// </summary>
 let elementPropertyMap : Map<UIElementKind, Set<PropertyKind>> =
     Map.ofList [
-        Button, commonProps
-        TextBlock, Set.union commonProps (set [Color; BackgroundColor; FontFamily; FontSize; FontWeight; FontStyle; LineHeight; TextAlign; TextTrim; TextWrap])
+        Button, Set.union commonProps (set [Label])
+        TextBlock, Set.union commonProps (set [Color; BackgroundColor; FontFamily; FontSize; FontWeight; FontStyle; LineHeight; TextAlign; TextTrim; TextWrap; Label])
         TextBox, set []
         CheckBox, set []
         RadioButton, set []
@@ -108,19 +108,19 @@ let elementPropertyMap : Map<UIElementKind, Set<PropertyKind>> =
 /// </code>
 /// </example>
 let validateProperties (element : AbSyn.UIElement) =
-    let kind, props, name =
+    let kind, props =
         match element with
-        | AbSyn.Button (name, ps, _) -> Button, ps, name
-        | AbSyn.TextBlock (name, ps, _) -> TextBlock, ps, name
-        | AbSyn.TextBox (name, _) -> TextBox, Some [], name
-        | AbSyn.CheckBox (name, _) -> CheckBox, Some [], name
-        | AbSyn.RadioButton (name, _) -> RadioButton, Some [], name
-        | AbSyn.ToggleSwitch (name, _) -> ToggleSwitch, Some [], name
-        | AbSyn.Calendar _ -> Calendar, Some [], ""
-        | AbSyn.ToggleButton _ -> ToggleButton, Some [], ""
-        | AbSyn.Row (ps, _, _) -> Row, ps, ""
-        | AbSyn.Column (ps, _, _) -> Column, ps, ""
-        | AbSyn.Border (ps, _, _) -> Border, ps, ""
+        | AbSyn.Button (ps, _) -> Button, ps
+        | AbSyn.TextBlock (ps, _) -> TextBlock, ps
+        | AbSyn.TextBox (name, _) -> TextBox, Some []
+        | AbSyn.CheckBox (name, _) -> CheckBox, Some []
+        | AbSyn.RadioButton (name, _) -> RadioButton, Some []
+        | AbSyn.ToggleSwitch (name, _) -> ToggleSwitch, Some []
+        | AbSyn.Calendar _ -> Calendar, Some []
+        | AbSyn.ToggleButton _ -> ToggleButton, Some []
+        | AbSyn.Row (ps, _, _) -> Row, ps
+        | AbSyn.Column (ps, _, _) -> Column, ps
+        | AbSyn.Border (ps, _, _) -> Border, ps
         | AbSyn.Identifier _ -> failwith "This should never happen..."
 
     let allowed = elementPropertyMap.[kind]
@@ -132,7 +132,32 @@ let validateProperties (element : AbSyn.UIElement) =
             let pk = propertyKind p
             if Set.contains pk allowed then false
             else 
-                do printf $"Property {pk} not allowed on {name}"
+                do printf $"Property {pk} not allowed on "
                 true)
         |> not
     | None -> true
+
+/// Replace or append a property in the list
+let upsertProperty (newProp: AbSyn.Property) (props: AbSyn.Property list) =
+    let kindToReplace = propertyKind newProp
+
+    // Split into matching and non-matching
+    let withoutMatch, matchFound =
+        props 
+        |> List.fold (fun (acc, found) p ->
+            if propertyKind p = kindToReplace then (acc, true)
+            else (p :: acc, found)
+        ) ([], false)
+
+    if matchFound then
+        // If found, just replace by adding the newProp back
+        newProp :: List.rev withoutMatch
+    else
+        // If not found, append newProp at the end
+        props @ [newProp]
+
+let createProp propertyKind exp =
+    match propertyKind, exp with
+    | Hidden, AbSyn.Constant (AbSyn.Bool b, _) -> AbSyn.Hidden (Some (b, (0,0)))
+    | Label, AbSyn.Constant (AbSyn.String s, _) -> AbSyn.Label (Some (s, (0,0)))
+    | _ -> failwith "Invalid property kind or expression or not implemented yet"

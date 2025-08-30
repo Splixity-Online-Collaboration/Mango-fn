@@ -55,12 +55,12 @@ let createToggleSwitch (label: string) : IView =
 let createCalendar : IView = Calendar.create []
 let createToggleButton = ToggleButton.create []
 
-let rec convertUIElementToIView element (tab : TreeEnv) =
+let rec convertUIElementToIView element (tab : TreeEnv) (funcEnv : FuncEnv) dispatch =
     match element with
-    | Button(label, propsOpt, _) ->
-        createButton label (Option.defaultValue [] propsOpt)
-    | TextBlock(label, propsOpt, _) ->
-        createTextBlock label (Option.defaultValue [] propsOpt)
+    | Button(propsOpt, _) ->
+        createButton (Option.defaultValue [] propsOpt) tab funcEnv dispatch
+    | TextBlock(propsOpt, _) ->
+        createTextBlock (Option.defaultValue [] propsOpt)
     | TextBox(label, _) -> createTextBox label
     | CheckBox(label, _) -> createCheckbox label
     | RadioButton(label, _) -> createRadioButton label
@@ -68,46 +68,43 @@ let rec convertUIElementToIView element (tab : TreeEnv) =
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
     | Row(propsOpt, elements, _) ->
-        createContainer Orientation.Horizontal (Option.defaultValue [] propsOpt) elements tab
+        createContainer Orientation.Horizontal (Option.defaultValue [] propsOpt) elements tab funcEnv dispatch
     | Column(propsOpt, elements, _) ->
-        createContainer Orientation.Vertical (Option.defaultValue [] propsOpt) elements tab
+        createContainer Orientation.Vertical (Option.defaultValue [] propsOpt) elements tab funcEnv dispatch
     | Identifier (id, _) ->
         match SymTab.lookup id tab with
-        | Some storedElement -> convertUIElementToIView storedElement tab
+        | Some storedElement -> convertUIElementToIView storedElement tab funcEnv dispatch
         | None -> failwithf "Identifier '%s' not found in symbol table." id
     | Border(propsOpt, element, _) ->
-        createBorderElement (Option.defaultValue [] propsOpt)element tab
+        createBorderElement (Option.defaultValue [] propsOpt)element tab funcEnv dispatch
 
-and createWrapPanel orientation elements props tab =
+and createWrapPanel orientation elements props tab funcEnv dispatch =
     WrapPanel.create (
             [   WrapPanel.orientation orientation
-                WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
+                WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
             @ applyCommonProps props
         )
 
-and createStackPanel orientation elements props tab =
+and createStackPanel orientation elements props tab funcEnv dispatch =
     StackPanel.create (
         [StackPanel.orientation orientation
-         StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) 
+         StackPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements)
         ] @ applyCommonProps props
     )
 
-and createContainer (orientation: Orientation) (props: Property list) (elements: UIElement list)  (tab : TreeEnv) : IView =
+and createContainer (orientation: Orientation) (props: Property list) (elements: UIElement list) (tab : TreeEnv) (funcEnv : FuncEnv) dispatch : IView =
     let hasWrap = doesWrapExist props
-    if hasWrap then createWrapPanel orientation elements props tab
-    else createStackPanel orientation elements props tab
+    if hasWrap then createWrapPanel orientation elements props tab funcEnv dispatch
+    else createStackPanel orientation elements props tab funcEnv dispatch
 
-and createBorderElement (props: Property list) (element: UIElement) (tab : TreeEnv): IView = 
+and createBorderElement (props: Property list) (element: UIElement) (tab : TreeEnv) (funcEnv : FuncEnv) dispatch : IView =
   Border.create([
-    Border.child (convertUIElementToIView element tab)
+    Border.child (convertUIElementToIView element tab funcEnv dispatch)
   ] @ applyCommonProps props @ applyBorderProperties props)
 
-let setWindowContent elements (tab : TreeEnv) (window: HostWindow) =
-    window.Content <-
-        Component(fun _ ->
-            ScrollViewer.create
-                [ ScrollViewer.content (
-                      StackPanel.create [ StackPanel.children (List.map (fun e -> convertUIElementToIView e tab) elements) ]
-                  ) ])
-
-    window
+let convertFromAbSynToAvaloniaTree (state: AppState) dispatch = 
+    ScrollViewer.create
+        [ ScrollViewer.content (
+                    StackPanel.create [ StackPanel.children (List.map (fun e -> convertUIElementToIView e state.treeEnv state.funcEnv dispatch) state.uiElements) ]
+                  ) 
+                ]

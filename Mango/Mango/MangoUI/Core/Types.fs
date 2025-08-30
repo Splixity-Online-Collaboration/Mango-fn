@@ -6,3 +6,11 @@ open AbSyn
 type TreeEnv = SymTab<UIElement>
 
 type FuncEnv = SymTab<Stmt list>
+
+type Msg =
+    | UpdateFuncEnv of FuncEnv * string * Stmt list
+    | UpdateTreeEnv of TreeEnv * string * UIElement
+    | UpdateUIElements of UIElement list
+    | EvalFunc of string
+
+type AppState = { treeEnv: TreeEnv; funcEnv: FuncEnv; uiElements: UIElement list }
