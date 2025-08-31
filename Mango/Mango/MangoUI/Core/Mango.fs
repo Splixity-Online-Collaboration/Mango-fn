@@ -42,6 +42,10 @@ module Evaluator =
         | _ -> state
 
     let evaluateStatements (stmts: Stmt list) state : AppState =
+        // let mutable temp = state
+        // for i in stmts do
+        //   temp <- evaluateStatement stmts[i] temp
+        // return temp
         List.fold (fun acc stmt -> evaluateStatement stmt acc) state stmts
 
     let evaluateFunction (handle: string) state : AppState =

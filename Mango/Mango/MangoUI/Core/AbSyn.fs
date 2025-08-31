@@ -109,7 +109,7 @@ and UIElement =
 
 and Stmt =
     | Let of string * Exp * Position
-    | Set of Property * string * Exp * Position // (propertyName, elementId, elementValue, position)
+    | Set of Property * string * Exp * Position   // (propertyName, elementId, elementValue, position)
     | Update of string * Property list * Position // (elementId, updatedProperties, position)
     | ExprStmt of Exp * Position
 
