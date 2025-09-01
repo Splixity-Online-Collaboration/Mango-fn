@@ -45,6 +45,8 @@ type Value =
     | String of string
     | Bool of bool
 
+type Variable = string * Value
+
 type Exp =
     | Constant of Value * Position
     | Var of string * Position
@@ -112,9 +114,13 @@ and Stmt =
     | Set of Property * string * Exp * Position   // (propertyName, elementId, elementValue, position)
     | Update of string * Property list * Position // (elementId, updatedProperties, position)
     | ExprStmt of Exp * Position
+    | StateDecl of State * Position
 
 and FunctionT = 
     | Function of string * Stmt list * Position
     | Lambda of Stmt list * Position
+
+and State = string * Variable list * Position
+
 
 type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * Position

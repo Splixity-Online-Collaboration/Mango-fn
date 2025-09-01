@@ -7,6 +7,8 @@ type TreeEnv = SymTab<UIElement>
 
 type FuncEnv = SymTab<Stmt list>
 
+type VarEnv = SymTab<Value list>
+
 type Msg =
     | UpdateFuncEnv of FuncEnv * string * Stmt list
     | UpdateTreeEnv of TreeEnv * string * UIElement
@@ -14,4 +16,4 @@ type Msg =
     | EvalFunc of string
     | EvalLambda of Stmt list
 
-type AppState = { treeEnv: TreeEnv; funcEnv: FuncEnv; uiElements: UIElement list }
+type AppState = { treeEnv: TreeEnv; funcEnv: FuncEnv; varEnv: VarEnv; uiElements: UIElement list }

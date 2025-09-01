@@ -58,7 +58,7 @@ module Evaluator =
         | Window (_, _, _, _, elements, funcs, _) ->
             let funcEnv' = initFuncEnv funcs
             let elements', treeEnv' = storeElementsMarkedWithId elements (empty ())
-            { treeEnv = treeEnv'; funcEnv = funcEnv'; uiElements = elements' }
+            { treeEnv = treeEnv'; funcEnv = funcEnv'; varEnv = failwith "Not Implemented"; uiElements = elements'}
 
     let update (msg: Msg) (state: AppState) : AppState =
         info (sprintf "Updating state with message %A" msg)
