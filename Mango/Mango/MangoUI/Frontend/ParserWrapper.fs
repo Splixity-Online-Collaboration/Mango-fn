@@ -5,63 +5,17 @@ open FSharp.Text.Lexing
 open FSharp.Text.Parsing
 open MangoUI.Core.Types
 
-let keywords =
-    [ "window"
-      "column"
-      "row"
-      "button"
-      "text"
-      "textbox"
-      "checkbox"
-      "radiobutton"
-      "toggleswitch"
-      "calendar"
-      "togglebutton"
-      "border"
-      "true"
-      "false"
-      "hidden"
-      "wrap"
-      "fontfamily"
-      "fontsize"
-      "fontweight"
-      "fontstyle"
-      "lineheight"
-      "textalign"
-      "textwrap"
-      "texttrim"
-      "color"
-      "bgcolor"
-      "margin"
-      "width"
-      "height"
-      "id"
-      "label"
-      "onclick"
-      "corner"
-      "density"
-      "fill"
-      "hug"
-      "italic"
-      "underline"
-      "strikethrough"
-      "center"
-      "left"
-      "right"
-      "word"
-      "character"
-      "notrim"
-      "red"
-      "blue"
-      "green"
-      "yellow"
-      "pink"
-      "black"
-      "white"
-      "let"
-      "function"
-      "update"
-      "set" ]
+let keywords = [
+    "window"; "column"; "row"; "button"; "text"; "textbox";
+    "checkbox"; "radiobutton"; "toggleswitch"; "calendar"; 
+    "togglebutton"; "border"; "true"; "false"; "hidden"; 
+    "wrap"; "fontfamily"; "fontsize"; "fontweight"; "fontstyle";
+    "lineheight"; "textalign"; "textwrap"; "texttrim"; "color";
+    "bgcolor"; "margin"; "width"; "height"; "id"; "label"; "onclick";
+    "corner"; "density"; "fill"; "hug"; "italic"; "underline"; 
+    "strikethrough"; "center"; "left"; "right"; "word"; "character";
+    "notrim"; "red"; "blue"; "green"; "yellow"; "pink"; "black"; "white";
+    "let"; "function"; "update"; "set"]
 
 // See: https://en.wikipedia.org/wiki/Levenshtein_distance
 let rec levenshtein_distance (a: string) (b: string) =
