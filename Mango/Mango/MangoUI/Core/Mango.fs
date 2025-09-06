@@ -71,9 +71,9 @@ module Evaluator =
         info (sprintf "Updating state with message %A" msg)
 
         match msg with
-        | UpdateFuncEnv(currentEnv, id, body') -> { state with funcEnv = state.funcEnv }
-        | UpdateTreeEnv(currentEnv, id, element) -> { state with treeEnv = state.treeEnv }
-        | UpdateUIElements(newElements) -> { state with uiElements = newElements }
+        | UpdateFuncEnv(_, _, _) -> { state with funcEnv = state.funcEnv }
+        | UpdateTreeEnv(_, _, _) -> { state with treeEnv = state.treeEnv }
+        | UpdateUIElements newElements -> { state with uiElements = newElements }
         | EvalFunc funcName ->
             info (sprintf "Evaluating function %A" funcName)
             evaluateFunction funcName state
@@ -161,4 +161,4 @@ module Program =
         if verboseFlag then
             Util.Logger.verbose <- true
 
-        AppBuilder.Configure<App>().UsePlatformDetect().UseSkia().StartWithClassicDesktopLifetime(args)
+        AppBuilder.Configure<App>().UsePlatformDetect().UseSkia().StartWithClassicDesktopLifetime args

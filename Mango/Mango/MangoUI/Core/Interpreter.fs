@@ -1,14 +1,12 @@
 module MangoUI.Core.Interpreter
 
-open Avalonia.FuncUI.Hosts
-open MangoUI.AvaloniaHelpers.AvaloniaHelpers
 open MangoUI.Core.Types
 open AbSyn
 open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 open MangoUI
 open MangoUI.Util.Logger
 
-let rec tryRegisterElement element commonProps pos childElements elements tab =
+let rec tryRegisterElement element commonProps pos elements tab =
     let elementId = getId commonProps
 
     match elementId with
@@ -26,12 +24,12 @@ and storeElementsMarkedWithId (elements: UIElement list) (tab: TreeEnv) : UIElem
                 if not (PropertyValidator.validateProperties element) then
                     do printfn $"Failed to validate properties for element at row: {fst pos}, col: {snd pos}"
 
-                tryRegisterElement element (Option.defaultValue [] propsOpt) pos None accElements accTab
+                tryRegisterElement element (Option.defaultValue [] propsOpt) pos accElements accTab
             | TextBlock(props, pos) ->
                 if not (PropertyValidator.validateProperties element) then
                     do printfn $"Failed to validate properties for element at row: {fst pos}, col: {snd pos}"
 
-                tryRegisterElement element (Option.defaultValue [] props) pos None accElements accTab
+                tryRegisterElement element (Option.defaultValue [] props) pos accElements accTab
             | Row(props, elements, pos) ->
                 if not (PropertyValidator.validateProperties element) then
                     do printfn $"Failed to validate properties for element at row: {fst pos}, col: {snd pos}"

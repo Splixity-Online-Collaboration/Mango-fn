@@ -2,7 +2,6 @@
 
 open MangoUI.SymTab
 open AbSyn
-open FSharp.Text.Parsing
 
 type TreeEnv = SymTab<UIElement>
 

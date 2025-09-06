@@ -10,9 +10,9 @@ open Avalonia.Controls
 let createCornerRadius (t) =
     let thickness =
         match t with
-        | Thickness.Uniform x -> CornerRadius(float x)
-        | Thickness.Symmetric(x, y) -> CornerRadius(float x, float y, float x, float y)
-        | Thickness.Custom(l, t, r, b) -> CornerRadius(float l, float t, float r, float b)
+        | Uniform x -> CornerRadius(float x)
+        | Symmetric(x, y) -> CornerRadius(float x, float y, float x, float y)
+        | Custom(l, t, r, b) -> CornerRadius(float l, float t, float r, float b)
 
     thickness
 

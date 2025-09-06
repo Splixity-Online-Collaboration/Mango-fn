@@ -21,9 +21,9 @@ let getId props =
 let createThickness (t: Thickness) =
     let thickness =
         match t with
-        | Thickness.Uniform x -> Thickness(float x)
-        | Thickness.Symmetric(x, y) -> Thickness(float x, float y, float x, float y)
-        | Thickness.Custom(l, t, r, b) -> Thickness(float l, float t, float r, float b)
+        | Uniform x -> Thickness(float x)
+        | Symmetric(x, y) -> Thickness(float x, float y, float x, float y)
+        | Custom(l, t, r, b) -> Thickness(float l, float t, float r, float b)
 
     thickness
 
@@ -43,13 +43,13 @@ let applyWidth<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a>
     applyProp props applied (function
         | Width(Some(size, _)) ->
             match size with
-            | Size.Pixels num -> Some(AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
-            | Size.Fill ->
+            | Pixels num -> Some(AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
+            | Fill ->
                 Some(
                     AttrBuilder<'a>
                         .CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone)
                 )
-            | Size.Hug ->
+            | Hug ->
                 Some(
                     AttrBuilder<'a>
                         .CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Left, ValueNone)
@@ -60,13 +60,13 @@ let applyHeight<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a
     applyProp props applied (function
         | Height(Some(size, _)) ->
             match size with
-            | Size.Pixels num -> Some(AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
-            | Size.Fill ->
+            | Pixels num -> Some(AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
+            | Fill ->
                 Some(
                     AttrBuilder<'a>
                         .CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone)
                 )
-            | Size.Hug ->
+            | Hug ->
                 Some(
                     AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Top, ValueNone)
                 )

@@ -1,6 +1,5 @@
 ﻿module MangoUI.AvaloniaHelpers.AvaloniaHelpers
 
-open Avalonia.FuncUI.Hosts
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL
 open AvaloniaButtonHelpers
@@ -19,31 +18,6 @@ let doesWrapExist props =
         match prop with
         | Wrap(Some(true, _)) -> true
         | _ -> false)
-
-let setWindowIcon (icon: string option) (window: HostWindow) =
-    match icon with
-    | Some filename ->
-        window.Icon <- new WindowIcon(filename)
-        window
-    | None -> window
-
-let setWindowWidthAndHeight width height (window: HostWindow) =
-    match width, height with
-    | Some w, Some h ->
-        window.Width <- float w
-        window.Height <- float h
-        window
-    | _ -> window
-
-let setWindowName name (window: HostWindow) =
-    window.Name <- name
-    window
-
-let setWindowProperties name width height icon (window: HostWindow) =
-    window
-    |> setWindowName name
-    |> setWindowWidthAndHeight width height
-    |> setWindowIcon icon
 
 let createTextBox text : IView = TextBox.create [ TextBox.text text ]
 
