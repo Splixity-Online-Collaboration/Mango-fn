@@ -7,31 +7,29 @@ open MangoUI.Core.AbSyn
 open Avalonia
 open Avalonia.Controls
 
-let createCornerRadius (t) = 
+let createCornerRadius (t) =
     let thickness =
-        match t with 
+        match t with
         | Thickness.Uniform x -> CornerRadius(float x)
-        | Thickness.Symmetric (x,y) -> CornerRadius(float x, float y, float x, float y)
-        | Thickness.Custom (l,t,r,b) -> CornerRadius(float l,float t, float r,float b)
+        | Thickness.Symmetric(x, y) -> CornerRadius(float x, float y, float x, float y)
+        | Thickness.Custom(l, t, r, b) -> CornerRadius(float l, float t, float r, float b)
+
     thickness
 
 let applyCorner props applied =
     applyProp props applied (function
-        |  Corner (Some (m, _)) -> Some(Border.cornerRadius(createCornerRadius m))     
-        | _ -> None )
+        | Corner(Some(m, _)) -> Some(Border.cornerRadius (createCornerRadius m))
+        | _ -> None)
 
 let applyColor props applied =
     applyProp props applied (function
-        |  Color(Some (c, _)) -> Some(Border.borderBrush(fromColor c))
-        | _ -> None )
+        | Color(Some(c, _)) -> Some(Border.borderBrush (fromColor c))
+        | _ -> None)
 
 let applyThickness props applied =
     applyProp props applied (function
-        |   Density(Some (t, _)) -> Some(Border.borderThickness(createThickness t))
-        | _ -> None )
+        | Density(Some(t, _)) -> Some(Border.borderThickness (createThickness t))
+        | _ -> None)
 
 let applyBorderProperties (props: Property list) =
-    []
-    |> applyCorner props
-    |> applyColor props
-    |> applyThickness props
+    [] |> applyCorner props |> applyColor props |> applyThickness props

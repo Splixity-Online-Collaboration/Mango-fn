@@ -9,17 +9,17 @@ open MangoUI.Core.Types
 
 let applyOnClick props dispatch applied =
     applyProp props applied (function
-        | Onclick(Some (funcName, _)) -> Some (Button.onClick (fun _ -> dispatch (EvalFunc funcName)))
+        | Onclick(Some(funcName, _)) -> Some(Button.onClick (fun _ -> dispatch (EvalFunc funcName)))
         | _ -> None)
 
 let applyOnClickLambda props dispatch applied =
     applyProp props applied (function
-        | OnclickLambda(Some (stmts, _)) -> Some (Button.onClick (fun _ -> dispatch (EvalLambda stmts)))
+        | OnclickLambda(Some(stmts, _)) -> Some(Button.onClick (fun _ -> dispatch (EvalLambda stmts)))
         | _ -> None)
 
 let applyLabel props applied =
     applyProp props applied (function
-        | Label(Some (text, _)) -> Some (Button.content text)
+        | Label(Some(text, _)) -> Some(Button.content text)
         | _ -> None)
 
 let applyButtonProperties props dispatch =

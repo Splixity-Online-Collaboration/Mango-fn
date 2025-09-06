@@ -2,7 +2,6 @@
 
 open Avalonia.FuncUI.Hosts
 open Avalonia.Controls
-open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
 open AvaloniaButtonHelpers
 open AvaloniaTextBlockHelpers
@@ -14,7 +13,12 @@ open MangoUI
 open MangoUI.Core.Types
 open AvaloniaCommonHelpers
 
-let doesWrapExist props = props |> List.exists(fun prop -> match prop with | Wrap (Some (true,_)) -> true |  _ -> false)
+let doesWrapExist props =
+    props
+    |> List.exists (fun prop ->
+        match prop with
+        | Wrap(Some(true, _)) -> true
+        | _ -> false)
 
 let setWindowIcon (icon: string option) (window: HostWindow) =
     match icon with
@@ -52,15 +56,13 @@ let createRadioButton (label: string) : IView =
 let createToggleSwitch (label: string) : IView =
     ToggleSwitch.create [ ToggleSwitch.content label ]
 
-let createCalendar : IView = Calendar.create []
+let createCalendar: IView = Calendar.create []
 let createToggleButton = ToggleButton.create []
 
-let rec convertUIElementToIView element (tab : TreeEnv) (funcEnv : FuncEnv) dispatch =
+let rec convertUIElementToIView element (tab: TreeEnv) (funcEnv: FuncEnv) dispatch =
     match element with
-    | Button(propsOpt, _) ->
-        createButton (Option.defaultValue [] propsOpt) tab funcEnv dispatch
-    | TextBlock(propsOpt, _) ->
-        createTextBlock (Option.defaultValue [] propsOpt)
+    | Button(propsOpt, _) -> createButton (Option.defaultValue [] propsOpt) tab funcEnv dispatch
+    | TextBlock(propsOpt, _) -> createTextBlock (Option.defaultValue [] propsOpt)
     | TextBox(label, _) -> createTextBox label
     | CheckBox(label, _) -> createCheckbox label
     | RadioButton(label, _) -> createRadioButton label
@@ -71,40 +73,55 @@ let rec convertUIElementToIView element (tab : TreeEnv) (funcEnv : FuncEnv) disp
         createContainer Orientation.Horizontal (Option.defaultValue [] propsOpt) elements tab funcEnv dispatch
     | Column(propsOpt, elements, _) ->
         createContainer Orientation.Vertical (Option.defaultValue [] propsOpt) elements tab funcEnv dispatch
-    | Identifier (id, _) ->
+    | Identifier(id, _) ->
         match SymTab.lookup id tab with
         | Some storedElement -> convertUIElementToIView storedElement tab funcEnv dispatch
         | None -> failwithf "Identifier '%s' not found in symbol table." id
-    | Border(propsOpt, element, _) ->
-        createBorderElement (Option.defaultValue [] propsOpt)element tab funcEnv dispatch
+    | Border(propsOpt, element, _) -> createBorderElement (Option.defaultValue [] propsOpt) element tab funcEnv dispatch
 
 and createWrapPanel orientation elements props tab funcEnv dispatch =
     WrapPanel.create (
-            [   WrapPanel.orientation orientation
-                WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
-            @ applyCommonProps props
-        )
+        [ WrapPanel.orientation orientation
+          WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
+        @ applyCommonProps props
+    )
 
 and createStackPanel orientation elements props tab funcEnv dispatch =
     StackPanel.create (
-        [StackPanel.orientation orientation
-         StackPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements)
-        ] @ applyCommonProps props
+        [ StackPanel.orientation orientation
+          StackPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
+        @ applyCommonProps props
     )
 
-and createContainer (orientation: Orientation) (props: Property list) (elements: UIElement list) (tab : TreeEnv) (funcEnv : FuncEnv) dispatch : IView =
+and createContainer
+    (orientation: Orientation)
+    (props: Property list)
+    (elements: UIElement list)
+    (tab: TreeEnv)
+    (funcEnv: FuncEnv)
+    dispatch
+    : IView =
     let hasWrap = doesWrapExist props
-    if hasWrap then createWrapPanel orientation elements props tab funcEnv dispatch
-    else createStackPanel orientation elements props tab funcEnv dispatch
 
-and createBorderElement (props: Property list) (element: UIElement) (tab : TreeEnv) (funcEnv : FuncEnv) dispatch : IView =
-  Border.create([
-    Border.child (convertUIElementToIView element tab funcEnv dispatch)
-  ] @ applyCommonProps props @ applyBorderProperties props)
+    if hasWrap then
+        createWrapPanel orientation elements props tab funcEnv dispatch
+    else
+        createStackPanel orientation elements props tab funcEnv dispatch
 
-let convertFromAbSynToAvaloniaTree (state: AppState) dispatch = 
+and createBorderElement (props: Property list) (element: UIElement) (tab: TreeEnv) (funcEnv: FuncEnv) dispatch : IView =
+    Border.create (
+        [ Border.child (convertUIElementToIView element tab funcEnv dispatch) ]
+        @ applyCommonProps props
+        @ applyBorderProperties props
+    )
+
+let convertFromAbSynToAvaloniaTree (state: AppState) dispatch =
     ScrollViewer.create
         [ ScrollViewer.content (
-                    StackPanel.create [ StackPanel.children (List.map (fun e -> convertUIElementToIView e state.treeEnv state.funcEnv dispatch) state.uiElements) ]
-                  ) 
-                ]
+              StackPanel.create
+                  [ StackPanel.children (
+                        List.map
+                            (fun e -> convertUIElementToIView e state.treeEnv state.funcEnv dispatch)
+                            state.uiElements
+                    ) ]
+          ) ]
