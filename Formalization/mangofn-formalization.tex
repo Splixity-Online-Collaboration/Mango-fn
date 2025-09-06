@@ -70,4 +70,17 @@ The following are \textit{reserved words} in Mangofn. These keywords are part of
     \item \texttt{\{ \}}, \texttt{( )}, \texttt{:}, \texttt{,}, \texttt{=}
 \end{itemize}
 
+\section{AbSyn}
+\begin{verbatim}
+Prog = Window { UIElements* Functions* }
+\end{verbatim}
+
+\begin{verbatim}
+Window = "window" | "window" INT INT | "window" Int Int String
+\end{verbatim}
+
+\begin{verbatim}
+UIElement = "button"
+\end{verbatim}
+
 \end{document}

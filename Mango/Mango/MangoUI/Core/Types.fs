@@ -2,6 +2,7 @@
 
 open MangoUI.SymTab
 open AbSyn
+open FSharp.Text.Parsing
 
 type TreeEnv = SymTab<UIElement>
 
@@ -15,3 +16,5 @@ type Msg =
     | EvalLambda of Stmt list
 
 type AppState = { treeEnv: TreeEnv; funcEnv: FuncEnv; uiElements: UIElement list }
+
+exception SyntaxError of obj (* ParseErrorContext<_> *)

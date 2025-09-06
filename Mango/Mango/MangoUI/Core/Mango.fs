@@ -93,28 +93,33 @@ module AppMain =
         inherit HostWindow()
         do
             let source = Frontend.FileIO.readContent Globals.filepath.Value.Value |> Result.defaultValue ""
+            
             let parseRes = Frontend.ParserWrapper.parseString source
-            printfn "%A" parseRes
-            let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, None, [], [], (-1, -1)))
-            match syntaxTree with
-            | AbSyn.Window (title, Some width, Some height, Some filepath, _, _, _) -> 
-                base.Title <- title
-                base.Width <- width
-                base.Height <- height
-                base.Icon <- WindowIcon filepath
-            | AbSyn.Window (title, Some width, Some height, None, _, _, _) ->
-                base.Title <- title
-                base.Width <- width
-                base.Height <- height
-            | AbSyn.Window (title, None, None, None, _, _, _) ->
-                base.Title <- title
-                base.Width <- 800
-                base.Height <- 600
-            | _ -> failwith "Window should not be able to have other combinations"
-            Program.mkSimple (Evaluator.init syntaxTree) Evaluator.update Evaluator.view
-            |> Program.withHost this
-            |> Program.withConsoleTrace
-            |> Program.run
+
+            match parseRes with
+            | Ok window ->
+                match window with
+                | AbSyn.Window (title, Some width, Some height, Some filepath, _, _, _) -> 
+                    base.Title <- title
+                    base.Width <- width
+                    base.Height <- height
+                    base.Icon <- WindowIcon filepath
+                | AbSyn.Window (title, Some width, Some height, None, _, _, _) ->
+                    base.Title <- title
+                    base.Width <- width
+                    base.Height <- height
+                | AbSyn.Window (title, None, None, None, _, _, _) ->
+                    base.Title <- title
+                    base.Width <- 800
+                    base.Height <- 600
+                | _ -> failwith "Window should not be able to have other combinations"
+
+                Program.mkSimple (Evaluator.init window) Evaluator.update Evaluator.view
+                |> Program.withHost this
+                |> Program.withConsoleTrace
+                |> Program.run
+            | Error msg ->
+                failwith msg            
 
     type App() =
         inherit Application()
