@@ -43,7 +43,7 @@ let rec get_most_likely_keyword (identifier: string) (keywords: string list) (se
 // and use pure fsharp piping operators to be really cool! 😎
 let get_most_likely_keyword_V2 (identifier: string) (keywords: string list) : string =
     keywords
-    |> List.map (fun s -> (levenshtein_distance s identifier, s))
+    |> List.map (fun s -> levenshtein_distance s identifier, s)
     |> List.sortBy fst
     |> List.map snd
     |> List.head
