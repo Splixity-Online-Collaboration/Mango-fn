@@ -126,7 +126,9 @@ module AppMain =
                 |> Program.withHost this
                 |> Program.withConsoleTrace
                 |> Program.run
-            | Error msg -> failwith msg
+            | Error msg -> 
+                do printfn "%s" msg
+                System.Environment.Exit 1
 
     type App() =
         inherit Application()
