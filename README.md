@@ -1,5 +1,13 @@
 # Mango-fn
 
+# Setting up unified code formatter
+This repo has scripts that will setup a pre-commit hook for git. This will ensure
+that everyone contributing to this repo will have the same coding style. To install
+for windows just run `.\setup-precommit.ps1` in PowerShell, or for Linux just run
+`./setup-precommit.sh` and the rest will be done. Next time you commit file
+from this repo, the formatter will run through all files changed, and format
+it according to our format configuration.
+
 # Passing file-arguments using `dotnet run` command
 To pass an argument for which file to use consider the following example where we want to interpret
 the window.mango file placed in the examples folder:

@@ -9,27 +9,27 @@ open MangoUI.Core.AbSyn
 
 let applyColor props applied =
     applyProp props applied (function
-        | Color (Some (c, _)) -> Some (TextBlock.foreground (fromColor c))
+        | Color(Some(c, _)) -> Some(TextBlock.foreground (fromColor c))
         | _ -> None)
 
 let applyBackgroundColor props applied =
     applyProp props applied (function
-        | BackgroundColor (Some (c, _)) -> Some (TextBlock.background (fromColor c))
+        | BackgroundColor(Some(c, _)) -> Some(TextBlock.background (fromColor c))
         | _ -> None)
 
 let applyFontFamily props applied =
     applyProp props applied (function
-        | FontFamily(Some (s, _)) -> Some(TextBlock.fontFamily s)
+        | FontFamily(Some(s, _)) -> Some(TextBlock.fontFamily s)
         | _ -> None)
 
 let applyFontSize props applied =
     applyProp props applied (function
-        | FontSize(Some (i, _)) -> Some(TextBlock.fontSize (float i))
+        | FontSize(Some(i, _)) -> Some(TextBlock.fontSize (float i))
         | _ -> None)
 
 let applyLabel props applied =
     applyProp props applied (function
-        | Label (Some (l, _)) -> Some (TextBlock.text l)
+        | Label(Some(l, _)) -> Some(TextBlock.text l)
         | _ -> None)
 
 let applyTextBlockProperties props =

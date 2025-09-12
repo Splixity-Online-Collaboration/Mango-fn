@@ -1,6 +1,7 @@
 ﻿namespace MangoUI.Core
 
 open MangoUI
+
 module Globals =
     let filepath = ref None
 
@@ -25,9 +26,9 @@ module Evaluator =
 
     let evaluateStatement (stmt: Stmt) (state: AppState) : AppState =
         match stmt with
-        | SetProperty (prop, id, exp, _) -> 
+        | SetProperty(prop, id, exp, _) ->
             match lookup id state.treeEnv with
-            | Some element -> 
+            | Some element ->
                 let currentProps = getProperties element
                 let evaluatedValue = evaluateExp exp state
                 let newProp = createProp (propertyKind prop) evaluatedValue
@@ -35,7 +36,7 @@ module Evaluator =
                 let updatedElement = insertProperties element updatedProps
                 let treeEnv' = remove id state.treeEnv |> bind id updatedElement
                 { state with treeEnv = treeEnv' }
-            | None -> 
+            | None ->
                 info (sprintf "Element %A not found" id)
                 state
         | SetVariable (name, exp, _) ->
@@ -43,13 +44,16 @@ module Evaluator =
             { state with varEnv = varEnv' }
         | Update (id, props, _) ->
             match lookup id state.treeEnv with
-            | Some element -> 
+            | Some element ->
                 let currentProps = getProperties element
-                let updatedProps = List.fold (fun acc prop -> upsertProperty prop acc) currentProps props
+
+                let updatedProps =
+                    List.fold (fun acc prop -> upsertProperty prop acc) currentProps props
+
                 let updatedElement = insertProperties element updatedProps
                 let treeEnv' = remove id state.treeEnv |> bind id updatedElement
                 { state with treeEnv = treeEnv' }
-            | None -> 
+            | None ->
                 info (sprintf "Element %A not found" id)
                 state
         | _ -> state
@@ -66,7 +70,7 @@ module Evaluator =
         | Some body -> evaluateStatements body state
         | None -> failwithf "Function %s not found" handle
 
-    let init window () = 
+    let init window () =
         match window with
         | Window (_, _, _, _, elements, funcs, vars, _) ->
             let funcEnv' = initFuncEnv funcs
@@ -76,21 +80,19 @@ module Evaluator =
 
     let update (msg: Msg) (state: AppState) : AppState =
         info (sprintf "Updating state with message %A" msg)
+
         match msg with
-        | UpdateFuncEnv (currentEnv, id, body') -> 
-            { state with funcEnv = state.funcEnv }
-        | UpdateTreeEnv (currentEnv, id, element) -> 
-            { state with treeEnv = state.treeEnv }
-        | UpdateUIElements (newElements) -> 
-            { state with uiElements = newElements }
-        | EvalFunc funcName -> 
+        | UpdateFuncEnv(_, _, _) -> { state with funcEnv = state.funcEnv }
+        | UpdateTreeEnv(_, _, _) -> { state with treeEnv = state.treeEnv }
+        | UpdateUIElements newElements -> { state with uiElements = newElements }
+        | EvalFunc funcName ->
             info (sprintf "Evaluating function %A" funcName)
             evaluateFunction funcName state
         | EvalLambda stmts ->
             info (sprintf "Evaluating lambda %A" stmts)
             evaluateStatements stmts state
 
-    let view (state: AppState) dispatch = 
+    let view (state: AppState) dispatch =
         convertFromAbSynToAvaloniaTree state dispatch
 
 module AppMain =
@@ -105,8 +107,12 @@ module AppMain =
 
     type MainWindow() as this =
         inherit HostWindow()
+
         do
-            let source = Frontend.FileIO.readContent Globals.filepath.Value.Value |> Result.defaultValue ""
+            let source =
+                Frontend.FileIO.readContent Globals.filepath.Value.Value
+                |> Result.defaultValue ""
+
             let parseRes = Frontend.ParserWrapper.parseString source
             printfn "%A" parseRes
             let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, None, [], [], [], (-1, -1)))
@@ -132,8 +138,9 @@ module AppMain =
 
     type App() =
         inherit Application()
+
         override this.Initialize() =
-            this.Styles.Add (FluentTheme())
+            this.Styles.Add(FluentTheme())
             this.RequestedThemeVariant <- Styling.ThemeVariant.Dark
 
         override this.OnFrameworkInitializationCompleted() =
@@ -153,13 +160,13 @@ module Program =
         let path = if args.Length > 0 then args[0] else "examples/window.mango"
         Globals.filepath.Value <- Some path
 
-        let verboseFlag = if Array.contains "--verbose" args || Array.contains "-v" args then true else false
+        let verboseFlag =
+            if Array.contains "--verbose" args || Array.contains "-v" args then
+                true
+            else
+                false
 
         if verboseFlag then
             Util.Logger.verbose <- true
 
-        AppBuilder
-            .Configure<App>()
-            .UsePlatformDetect()
-            .UseSkia()
-            .StartWithClassicDesktopLifetime(args)
+        AppBuilder.Configure<App>().UsePlatformDetect().UseSkia().StartWithClassicDesktopLifetime args

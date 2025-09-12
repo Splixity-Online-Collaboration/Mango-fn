@@ -4,11 +4,11 @@ module MangoUI.Core.AbSyn
 let fromCString (s: string) : string =
     let rec unescape l : char list =
         match l with
-        | []                -> []
+        | [] -> []
         | '\\' :: 'n' :: l' -> '\n' :: unescape l'
         | '\\' :: 't' :: l' -> '\t' :: unescape l'
-        | '\\' :: c   :: l' -> c    :: unescape l'
-        | c    :: l'        -> c    :: unescape l'
+        | '\\' :: c :: l' -> c :: unescape l'
+        | c :: l' -> c :: unescape l'
 
     Seq.toList s |> unescape |> System.String.Concat
 
@@ -19,8 +19,8 @@ type Thickness =
     | Symmetric of int * int
     | Custom of int * int * int * int
 
-type PredefinedColor = 
-    | Blue 
+type PredefinedColor =
+    | Blue
     | Red
     | Yellow
     | Pink
@@ -52,7 +52,7 @@ type Exp =
     | Var of string * Position
     | Call of string * Position
 
-type FontStyleT = 
+type FontStyleT =
     | Italic
     | StrikeThrough
     | Underline
@@ -95,10 +95,10 @@ type Property =
     | Onclick of (string * Position) option
     | OnclickLambda of (Stmt list * Position) option
 
-and UIElement = 
+and UIElement =
     | Button of Property list option * Position
     | TextBlock of Property list option * Position
-    | TextBox of string * Position 
+    | TextBox of string * Position
     | CheckBox of string * Position
     | RadioButton of string * Position
     | ToggleSwitch of string * Position
@@ -117,7 +117,7 @@ and Stmt =
     | ExprStmt of Exp * Position
     | StateDecl of State * Position
 
-and FunctionT = 
+and FunctionT =
     | Function of string * Stmt list * Position
     | Lambda of Stmt list * Position
 
