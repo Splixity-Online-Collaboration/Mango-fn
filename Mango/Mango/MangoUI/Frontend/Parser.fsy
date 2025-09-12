@@ -3,21 +3,11 @@ let p0 = (0,0)
 
 open MangoUI.Core.AbSyn
 open FSharp.Text.Parsing
-
-(* parse-error function *)
-let mutable ErrorContextDescriptor : string = ""
-
-let parse_error_rich : (ParseErrorContext<'tok> -> unit) option =
-  Some (fun ctxt ->
-    ErrorContextDescriptor <-
-        match ctxt.CurrentToken with
-        | Some tok -> $"Syntax error at token {tok}. {ctxt.Message}"
-        | None -> "Syntax error at beginning of file"
-  )
+open MangoUI.Core.Types
 
 let construct_window window elements functions = 
-    match window with
-    | Window (name, width, height, icon, _, _, pos) -> Window (name, width, height, icon, elements, functions, pos)
+  match window with
+  | Window (name, width, height, icon, _, _, pos) -> Window (name, width, height, icon, elements, functions, pos)
 
 let add_ui_elements window elements = 
   match window with
@@ -35,6 +25,8 @@ let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
       if rOk && gOk && bOk && aOk then Some (r, g, b, a) else None
   | _ -> None
 
+let parse_error_rich : (ParseErrorContext<'tok> -> unit) option =
+  Some (fun ctxt -> raise (SyntaxError (box ctxt)))
 %}
 
 // Tokens with values

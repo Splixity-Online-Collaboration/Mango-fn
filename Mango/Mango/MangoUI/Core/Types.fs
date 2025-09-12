@@ -14,4 +14,9 @@ type Msg =
     | EvalFunc of string
     | EvalLambda of Stmt list
 
-type AppState = { treeEnv: TreeEnv; funcEnv: FuncEnv; uiElements: UIElement list }
+type AppState =
+    { treeEnv: TreeEnv
+      funcEnv: FuncEnv
+      uiElements: UIElement list }
+
+exception SyntaxError of obj (* ParseErrorContext<_> *)

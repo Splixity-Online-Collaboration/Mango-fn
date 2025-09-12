@@ -13,23 +13,19 @@ list.
 let empty () = SymTab []
 
 let rec lookup n tab =
-  match tab with
+    match tab with
     | SymTab [] -> None
-    | SymTab ((n1,i1)::remtab) ->
-        if n = n1
-        then Some i1
-        else lookup n (SymTab remtab)
+    | SymTab((n1, i1) :: remtab) -> if n = n1 then Some i1 else lookup n (SymTab remtab)
 
-let bind n i (SymTab stab) = SymTab ((n,i)::stab)
+let bind n i (SymTab stab) = SymTab((n, i) :: stab)
 
 let remove n (SymTab stab) =
-    SymTab (List.filter (fun (x, _) -> x <> n) stab)
+    SymTab(List.filter (fun (x, _) -> x <> n) stab)
 
 let removeMany ns (SymTab stab) =
-  SymTab (List.filter (fun (x, _) ->
-            not (List.exists (fun y -> y = x) ns)) stab)
+    SymTab(List.filter (fun (x, _) -> not (List.exists (fun y -> y = x) ns)) stab)
 
-let combine (SymTab t1) (SymTab t2) = SymTab (t1 @ t2)
+let combine (SymTab t1) (SymTab t2) = SymTab(t1 @ t2)
 
 let fromList l = SymTab l
 
