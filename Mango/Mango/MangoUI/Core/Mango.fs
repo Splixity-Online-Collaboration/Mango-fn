@@ -14,13 +14,23 @@ module Evaluator =
     open MangoUI.Core.UIElementHelpers
     open MangoUI.AvaloniaHelpers.AvaloniaHelpers
 
+    let evaluateExp (exp: Exp) (state: AppState): Value =
+        match exp with
+        | Constant (value, _) -> value // direct literal value
+        | Var (name, _) -> 
+            match SymTab.lookup name state.varEnv with
+            | Some value -> value
+            | None -> failwithf "Variable '%s' not found" name
+        | Call (name, _) -> failwithf "Functions lookup not implemented yet"
+
     let evaluateStatement (stmt: Stmt) (state: AppState) : AppState =
         match stmt with
-        | Set (prop, id, exp, _) -> 
+        | SetProperty (prop, id, exp, _) -> 
             match lookup id state.treeEnv with
             | Some element -> 
                 let currentProps = getProperties element
-                let newProp = createProp (propertyKind prop) exp
+                let evaluatedValue = evaluateExp exp state
+                let newProp = createProp (propertyKind prop) evaluatedValue
                 let updatedProps = upsertProperty newProp currentProps
                 let updatedElement = insertProperties element updatedProps
                 let treeEnv' = remove id state.treeEnv |> bind id updatedElement
@@ -28,6 +38,9 @@ module Evaluator =
             | None -> 
                 info (sprintf "Element %A not found" id)
                 state
+        | SetVariable (name, exp, _) ->
+            let varEnv' = SymTab.bind name (evaluateExp exp state) state.varEnv
+            { state with varEnv = varEnv' }
         | Update (id, props, _) ->
             match lookup id state.treeEnv with
             | Some element -> 
@@ -55,10 +68,11 @@ module Evaluator =
 
     let init window () = 
         match window with
-        | Window (_, _, _, _, elements, funcs, _) ->
+        | Window (_, _, _, _, elements, funcs, vars, _) ->
             let funcEnv' = initFuncEnv funcs
             let elements', treeEnv' = storeElementsMarkedWithId elements (empty ())
-            { treeEnv = treeEnv'; funcEnv = funcEnv'; varEnv = failwith "Not Implemented"; uiElements = elements'}
+            let varEnv' = initVarEnv vars
+            { treeEnv = treeEnv'; funcEnv = funcEnv'; varEnv = varEnv'; uiElements = elements'}
 
     let update (msg: Msg) (state: AppState) : AppState =
         info (sprintf "Updating state with message %A" msg)
@@ -95,18 +109,18 @@ module AppMain =
             let source = Frontend.FileIO.readContent Globals.filepath.Value.Value |> Result.defaultValue ""
             let parseRes = Frontend.ParserWrapper.parseString source
             printfn "%A" parseRes
-            let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, None, [], [], (-1, -1)))
+            let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, None, [], [], [], (-1, -1)))
             match syntaxTree with
-            | AbSyn.Window (title, Some width, Some height, Some filepath, _, _, _) -> 
+            | AbSyn.Window (title, Some width, Some height, Some filepath, _, _, _, _) -> 
                 base.Title <- title
                 base.Width <- width
                 base.Height <- height
                 base.Icon <- WindowIcon filepath
-            | AbSyn.Window (title, Some width, Some height, None, _, _, _) ->
+            | AbSyn.Window (title, Some width, Some height, None, _, _, _, _) ->
                 base.Title <- title
                 base.Width <- width
                 base.Height <- height
-            | AbSyn.Window (title, None, None, None, _, _, _) ->
+            | AbSyn.Window (title, None, None, None, _, _, _, _) ->
                 base.Title <- title
                 base.Width <- 800
                 base.Height <- 600

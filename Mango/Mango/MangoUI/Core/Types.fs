@@ -7,7 +7,7 @@ type TreeEnv = SymTab<UIElement>
 
 type FuncEnv = SymTab<Stmt list>
 
-type VarEnv = SymTab<Value list>
+type VarEnv = SymTab<Value>
 
 type Msg =
     | UpdateFuncEnv of FuncEnv * string * Stmt list
