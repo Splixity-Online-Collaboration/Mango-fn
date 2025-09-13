@@ -28,5 +28,5 @@ let applyButtonProperties props dispatch =
     |> applyOnClickLambda props dispatch
     |> applyLabel props
 
-let createButton (props: Property list) treeEnv funcEnv dispatch : IView =
+let createButton (props: Property list) varEnv treeEnv funcEnv dispatch : IView =
     Button.create (applyCommonProps props @ applyButtonProperties props dispatch)

@@ -33,9 +33,9 @@ let createToggleSwitch (label: string) : IView =
 let createCalendar: IView = Calendar.create []
 let createToggleButton = ToggleButton.create []
 
-let rec convertUIElementToIView element (tab: TreeEnv) (funcEnv: FuncEnv) dispatch =
+let rec convertUIElementToIView element (varEnv: VarEnv) (tab: TreeEnv) (funcEnv: FuncEnv) dispatch =
     match element with
-    | Button(propsOpt, _) -> createButton (Option.defaultValue [] propsOpt) tab funcEnv dispatch
+    | Button(propsOpt, _) -> createButton (Option.defaultValue [] propsOpt) varEnv tab funcEnv dispatch
     | TextBlock(propsOpt, _) -> createTextBlock (Option.defaultValue [] propsOpt)
     | TextBox(label, _) -> createTextBox label
     | CheckBox(label, _) -> createCheckbox label
@@ -44,26 +44,26 @@ let rec convertUIElementToIView element (tab: TreeEnv) (funcEnv: FuncEnv) dispat
     | Calendar _ -> createCalendar
     | ToggleButton _ -> createToggleButton
     | Row(propsOpt, elements, _) ->
-        createContainer Orientation.Horizontal (Option.defaultValue [] propsOpt) elements tab funcEnv dispatch
+        createContainer Orientation.Horizontal (Option.defaultValue [] propsOpt) elements varEnv tab funcEnv dispatch
     | Column(propsOpt, elements, _) ->
-        createContainer Orientation.Vertical (Option.defaultValue [] propsOpt) elements tab funcEnv dispatch
+        createContainer Orientation.Vertical (Option.defaultValue [] propsOpt) elements varEnv tab funcEnv dispatch
     | Identifier(id, _) ->
         match SymTab.lookup id tab with
-        | Some storedElement -> convertUIElementToIView storedElement tab funcEnv dispatch
+        | Some storedElement -> convertUIElementToIView storedElement varEnv tab funcEnv dispatch
         | None -> failwithf "Identifier '%s' not found in symbol table." id
-    | Border(propsOpt, element, _) -> createBorderElement (Option.defaultValue [] propsOpt) element tab funcEnv dispatch
+    | Border(propsOpt, element, _) -> createBorderElement (Option.defaultValue [] propsOpt) element varEnv tab funcEnv dispatch
 
-and createWrapPanel orientation elements props tab funcEnv dispatch =
+and createWrapPanel orientation elements props varEnv tab funcEnv dispatch =
     WrapPanel.create (
         [ WrapPanel.orientation orientation
-          WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
+          WrapPanel.children (List.map (fun e -> convertUIElementToIView e varEnv tab funcEnv dispatch) elements) ]
         @ applyCommonProps props
     )
 
-and createStackPanel orientation elements props tab funcEnv dispatch =
+and createStackPanel orientation elements props varEnv tab funcEnv dispatch =
     StackPanel.create (
         [ StackPanel.orientation orientation
-          StackPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
+          StackPanel.children (List.map (fun e -> convertUIElementToIView e varEnv tab funcEnv dispatch) elements) ]
         @ applyCommonProps props
     )
 
@@ -71,6 +71,7 @@ and createContainer
     (orientation: Orientation)
     (props: Property list)
     (elements: UIElement list)
+    (varEnv: VarEnv)
     (tab: TreeEnv)
     (funcEnv: FuncEnv)
     dispatch
@@ -78,13 +79,13 @@ and createContainer
     let hasWrap = doesWrapExist props
 
     if hasWrap then
-        createWrapPanel orientation elements props tab funcEnv dispatch
+        createWrapPanel orientation elements props varEnv tab funcEnv dispatch
     else
-        createStackPanel orientation elements props tab funcEnv dispatch
+        createStackPanel orientation elements props varEnv tab funcEnv dispatch
 
-and createBorderElement (props: Property list) (element: UIElement) (tab: TreeEnv) (funcEnv: FuncEnv) dispatch : IView =
+and createBorderElement (props: Property list) (element: UIElement) (varEnv: VarEnv) (tab: TreeEnv) (funcEnv: FuncEnv) dispatch : IView =
     Border.create (
-        [ Border.child (convertUIElementToIView element tab funcEnv dispatch) ]
+        [ Border.child (convertUIElementToIView element varEnv tab funcEnv dispatch) ]
         @ applyCommonProps props
         @ applyBorderProperties props
     )
@@ -95,7 +96,7 @@ let convertFromAbSynToAvaloniaTree (state: AppState) dispatch =
               StackPanel.create
                   [ StackPanel.children (
                         List.map
-                            (fun e -> convertUIElementToIView e state.treeEnv state.funcEnv dispatch)
+                            (fun e -> convertUIElementToIView e state.varEnv state.treeEnv state.funcEnv dispatch)
                             state.uiElements
                     ) ]
           ) ]
