@@ -72,10 +72,10 @@ module Evaluator =
 
     let init window () =
         match window with
-        | Window (_, _, _, _, elements, funcs, vars, _) ->
-            let funcEnv' = initFuncEnv funcs
-            let elements', treeEnv' = storeElementsMarkedWithId elements (empty ())
+        | Window (_, _, _, _, vars, elements, funcs, _) ->
             let varEnv' = initVarEnv vars
+            let elements', treeEnv' = storeElementsMarkedWithId elements (empty ())
+            let funcEnv' = initFuncEnv funcs
             { treeEnv = treeEnv'; funcEnv = funcEnv'; varEnv = varEnv'; uiElements = elements'}
 
     let update (msg: Msg) (state: AppState) : AppState =

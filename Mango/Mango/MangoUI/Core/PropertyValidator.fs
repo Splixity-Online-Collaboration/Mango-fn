@@ -198,8 +198,8 @@ let upsertProperty (newProp: AbSyn.Property) (props: AbSyn.Property list) =
         // If not found, append newProp at the end
         props @ [ newProp ]
 
-let createProp propertyKind (value: Value) =
+let createProp propertyKind (value: AbSyn.Value) = // using value instead of exp
     match propertyKind, value with
-    | Hidden, AbSyn.Constant (AbSyn.Bool b, _) -> AbSyn.Hidden (Some (b, (0,0)))
-    | Label, AbSyn.Constant (AbSyn.String s, _) -> AbSyn.Label (Some (s, (0,0)))
-    | _ -> failwith "Invalid property kind or expression or not implemented yet"
+    | Hidden, AbSyn.Bool b -> AbSyn.Hidden (Some (b, (0,0)))
+    | Label, AbSyn.String s -> AbSyn.Label (Some (s, (0,0)))
+    | _ -> failwith "Invalid property kind or expression or not implemented, yet"

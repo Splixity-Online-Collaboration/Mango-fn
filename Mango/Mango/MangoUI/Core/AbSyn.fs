@@ -115,13 +115,10 @@ and Stmt =
     | SetVariable of string * Exp * Position // (variableName, variableValue, position)
     | Update of string * Property list * Position // (elementId, updatedProperties, position)
     | ExprStmt of Exp * Position
-    | StateDecl of State * Position
+    | StateDecl of Variable list * Position
 
 and FunctionT =
     | Function of string * Stmt list * Position
     | Lambda of Stmt list * Position
 
-and State = Variable list * Position
-
-
-type Window = Window of string * int option * int option * string option * UIElement list * FunctionT list * State * Position
+type Window = Window of string * int option * int option * string option * Variable list * UIElement list * FunctionT list * Position
