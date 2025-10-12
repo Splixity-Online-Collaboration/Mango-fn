@@ -1,5 +1,12 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
+\usepackage{syntax}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  keepspaces=true
+}
 
 \title{Mangofn formalization}
 \author{Mangofn Development Team}
@@ -70,17 +77,180 @@ The following are \textit{reserved words} in Mangofn. These keywords are part of
     \item \texttt{\{ \}}, \texttt{( )}, \texttt{:}, \texttt{,}, \texttt{=}
 \end{itemize}
 
-\section{AbSyn}
+\section{Lexical Grammar}
+\begin{lstlisting}[language={},caption={Lexical rules}]
+<ID> ::=  [a-zA-Z] [a-zA-Z0-9_]* ;
+<INT> ::= 0 |  [1-9] [0-9]* ;
+<STRINGLIT> : '"' (~["\\] | '\\' .)* '"' ;
+<BOOL> ::= 'true' | 'false' ;
+<HEX> ::= '#' [0-9a-fA-F]{8} ;
+\end{lstlisting}
+
+\subsection{Lexical Conventions}
+Mangofn source files are interpreted as sequences of ASCII characters. Whitespace and comments are ignored except where required to separate tokens. Identifiers and keywords are case-sensitive. 
+
+\section{Syntactic Grammar}
 \begin{verbatim}
-Prog = Window { UIElements* Functions* }
+Prog        = Window  [ "{" { UIElem } { Func } "}" ] ;
+Window = "window" STRINGLIT [ INT INT [ STRINGLIT ] ] ;
+
+UIElem      = "button" STRINGLIT [ "{" { Prop }+ "}" ]
+             | "text" STRINGLIT [ "{" { Prop }+ "}" ]
+             | "textbox" STRINGLIT
+             | "checkbox" STRINGLIT
+             | "radiobutton" STRINGLIT
+             | "toggleswitch" STRINGLIT
+             | "calendar"
+             | "togglebutton"
+             | "border" "{" { Prop }+ UIElem "}"
+             | "column" "{" { Prop }+ { UIElem } "}"
+             | "row" "{" { Prop }+ { UIElem } "}" ;
+
+Prop        = PropName ":" PropValue
+             | "onclick" ( ":" ID | "->" "{" { Stmt }+ "}" | "->" Stmt ) ;
+
+PropName    = "bgcolor" | "wrap" | "corner" | "color" | "density" | "hidden"
+             | "width" | "height" | "margin" | "id" | "fontfamily" | "fontsize"
+             | "fontweight" | "fontstyle" | "lineheight" | "textalign" | "textwrap"
+             | "texttrim" | "label" | "onclick" ;
+
+PropValue   = Color | BOOL | Thickness | Size | STRINGLIT | INT
+             | FontStyle | TextAlign | TextWrap | TextTrim ;
+
+Func        = "function" ID "()" "{" { Stmt }+ "}" ;
+
+Stmt        = "set" "(" PropName "," ID "," Exp ")"
+             | "update" "(" ID "," "{" { Prop }+ "}" ")"
+             | Exp ;
+
+Exp         = INT | STRINGLIT | ID | BOOL | ID "()" ;
+
+Thickness   = INT | INT "," INT | INT "," INT "," INT "," INT ;
+Color       = "red" | "blue" | "green" | "yellow" | "pink"
+             | "black" | "white" | HEX ;
+Size        = INT | "fill" | "hug" ;
+FontStyle   = "underline" | "italic" | "strikethrough" ;
+TextAlign   = "center" | "left" | "right" ;
+TextWrap    = "overflow" | "wrap" | "forcewrap" ;
+TextTrim    = "word" | "character" | "notrim" ;
 \end{verbatim}
 
+\section{Semantics of Mangofn}
+\subsection{Denotational Semantics}
+Start with the clean, compositional part:
 \begin{verbatim}
-Window = "window" | "window" INT INT | "window" Int Int String
+[ button(label, props) ] : Env \rightarrow Node
+[ column(props, elems) ] : Env \rightarrow Tree
 \end{verbatim}
+Each syntactic form denotes a pure value in your domain of UI trees. Here you can play with
+\begin{enumerate}
+\item Fix-point definitions (recursive layouts)
+\item Domain equations (UI = elem x Props x [UI])
+\item Functional mappings ([Prog] : Env -> UIState)
+\end{enumerate}
 
+\subsection{Constraint / Attribute Grammar Semantics - Layout}
+Model layout as attribute propagation or constraint solving.
 \begin{verbatim}
-UIElement = "button"
+attribute inherited availableWidth : Int
+attribute synthesized layoutBoxes : [Rect]
+
+rule Column:
+	distribute(children, availableWidth)
+\end{verbatim}
+Use an attribute grammar formalism or an explicit constraint system:
+\begin{verbatim}
+child2.top = child1.bottom + margin
+width(child) \leq parent.width
+\end{verbatim}
+This lets you experiment with:
+\begin{enumerate}
+\item Constraint satisfaction semantics
+\item Fix-point evaluation of attribute grammars
+\item Declarative layout solvers (Cassowary-style)
+\end{enumerate}
+
+\subsection{Operational Semantics - Dynamic behaviour}
+Model the runtime transitions for interaction and statements.
+\begin{verbatim}
+( UI, Env, click(id) ) \rightarrow ( UI', Env' )
+\end{verbatim}
+or for command execution:
+\begin{verbatim}
+( set(prop, id, v), \sigma ) \rightarrow \sigma[id.prop \mapsto v]
+\end{verbatim}
+Here you can explore:
+\begin{enumerate}
+\item Small-step vs. big-step semantics
+\item Confluence and determinism proofs
+\item Modeling reactivity as a labelled transition system (LTS)
+\end{enumerate}
+\subsection{Static Semantics - Type Rules}
+Specify rules like:
+\begin{verbatim}
+\gamma \turnstile width : Int \lor {fill, hug}
+\gamma \turnstile onclick : Function | Block
+\end{verbatim}
+You can practice:
+\begin{enumerate}
+\item Typing derivations and inference
+\item Rule-based validation of props
+\item Developing a kind of system for style/value categories
+\end{enumerate}
+
+\subsection{Axiomatic Semantics - Reasoning About Programs}
+Once you have an operational semantics, you can add Hoare-style reasoning:
+\begin{verbatim}
+{ hasProp(id, color, old) } set(color, id, red) { hasProp(id, color, red) }
+\end{verbatim}
+or temporal logic:
+- $\box(button.clicked \to \diamond(dialog.open))$
+
+That gives you experience writing and proving correctness properties over UI behaviour. 
+
+\subsection{Abstract Interpretation - Static Analysis Playground}
+Use this layer to practice static reasoning or optimization techniques:
+- Prove that all color balues are valid hex codes.
+- Infer possible sizes of elements before layout.
+- Approximate event dependency graphs.
+
+This connects formal semantics with program analysis.
+%\subsection{Evaluation Model}
+%\subsection{Event Handling}
+%\subsection{Layout Resolution}
+
+\appendix
+\section{Examples}
+\begin{verbatim}
+window "Mango UI Test" 600 400 "icon.png" {
+    text "Welcome to Mango UI!" {
+        fontsize: 40
+        color: #ff00ff
+    }
+    column {
+        margin: 0
+
+        button "Click me" {
+            width: 1000
+        }
+        button "Another button"
+        checkbox "Enable advanced mode"
+    }
+    row {
+        margin: 20
+
+        text "Horizontal layout preview" {
+            color: white
+            bgcolor: red
+        }
+        radiobutton "Option A"
+        text "Additional details" {
+            color: yellow
+            bgcolor: blue
+        }
+    }
+}
+
 \end{verbatim}
 
 \end{document}

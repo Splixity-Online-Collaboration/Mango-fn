@@ -11,6 +11,7 @@ open MangoUI.Core.AbSyn
 open MangoUI
 open MangoUI.Core.Types
 open AvaloniaCommonHelpers
+open MangoUI.Util.MonadTesting
 
 let doesWrapExist props =
     props
@@ -35,7 +36,7 @@ let createToggleButton = ToggleButton.create []
 
 let rec convertUIElementToIView element (tab: TreeEnv) (funcEnv: FuncEnv) dispatch =
     match element with
-    | Button(propsOpt, _) -> createButton (Option.defaultValue [] propsOpt) tab funcEnv dispatch
+    | Button(propsOpt, _) -> createButton (Option.defaultValue [] propsOpt) dispatch
     | TextBlock(propsOpt, _) -> createTextBlock (Option.defaultValue [] propsOpt)
     | TextBox(label, _) -> createTextBox label
     | CheckBox(label, _) -> createCheckbox label
@@ -55,16 +56,25 @@ let rec convertUIElementToIView element (tab: TreeEnv) (funcEnv: FuncEnv) dispat
 
 and createWrapPanel orientation elements props tab funcEnv dispatch =
     WrapPanel.create (
-        [ WrapPanel.orientation orientation
-          WrapPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
-        @ applyCommonProps props
+        attrsFor {
+            yield WrapPanel.orientation orientation
+            yield WrapPanel.children (ui {
+                for e in elements -> convertUIElementToIView e tab funcEnv dispatch
+            })
+            yield! applyCommonProps props
+        }
     )
 
 and createStackPanel orientation elements props tab funcEnv dispatch =
     StackPanel.create (
-        [ StackPanel.orientation orientation
-          StackPanel.children (List.map (fun e -> convertUIElementToIView e tab funcEnv dispatch) elements) ]
-        @ applyCommonProps props
+        attrsFor {
+            yield StackPanel.orientation orientation
+            yield StackPanel.children (ui {
+                for e in elements do
+                    yield convertUIElementToIView e tab funcEnv dispatch
+            })
+            yield! applyCommonProps props
+        }
     )
 
 and createContainer
@@ -84,18 +94,27 @@ and createContainer
 
 and createBorderElement (props: Property list) (element: UIElement) (tab: TreeEnv) (funcEnv: FuncEnv) dispatch : IView =
     Border.create (
-        [ Border.child (convertUIElementToIView element tab funcEnv dispatch) ]
-        @ applyCommonProps props
-        @ applyBorderProperties props
+        attrsFor {
+            yield Border.child (convertUIElementToIView element tab funcEnv dispatch)
+            yield! applyBorderProperties props
+            yield! applyCommonProps props
+        }
     )
 
+let createScrollViewerWithContent (content: IView) = 
+    ScrollViewer.create [ 
+        ScrollViewer.content content
+    ]
+
+let createStackPanelWithContent (content: IView list) =
+    StackPanel.create [
+        StackPanel.children content
+    ]
+
 let convertFromAbSynToAvaloniaTree (state: AppState) dispatch =
-    ScrollViewer.create
-        [ ScrollViewer.content (
-              StackPanel.create
-                  [ StackPanel.children (
-                        List.map
-                            (fun e -> convertUIElementToIView e state.treeEnv state.funcEnv dispatch)
-                            state.uiElements
-                    ) ]
-          ) ]
+    createScrollViewerWithContent (
+        createStackPanelWithContent (ui {
+            for e in state.uiElements do
+            yield convertUIElementToIView e state.treeEnv state.funcEnv dispatch
+        })
+    )

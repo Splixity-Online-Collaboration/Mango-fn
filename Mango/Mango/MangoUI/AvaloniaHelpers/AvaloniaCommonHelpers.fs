@@ -7,9 +7,7 @@ open Avalonia
 open MangoUI.Core.AbSyn
 open Avalonia.Layout
 open MangoUI.AvaloniaHelpers.ColorConverter
-
-let hasProp props tryExtract =
-    props |> List.tryPick tryExtract |> Option.isSome
+open MangoUI.Util
 
 let getId props =
     props
@@ -27,66 +25,22 @@ let createThickness (t: Thickness) =
 
     thickness
 
-let applyProp props applied tryExtract =
-    props
-    |> List.tryPick tryExtract
-    |> Option.map (fun attr -> applied @ [ attr ])
-    |> Option.defaultValue applied
-
-let applyMargin<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
-    applyProp props applied (function
-        | Margin(Some(m, _)) ->
-            Some(AttrBuilder<'a>.CreateProperty(Control.MarginProperty, createThickness m, ValueNone))
-        | _ -> None)
-
-let applyWidth<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
-    applyProp props applied (function
-        | Width(Some(size, _)) ->
-            match size with
-            | Pixels num -> Some(AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone))
-            | Fill ->
-                Some(
-                    AttrBuilder<'a>
-                        .CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone)
-                )
-            | Hug ->
-                Some(
-                    AttrBuilder<'a>
-                        .CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Left, ValueNone)
-                )
-        | _ -> None)
-
-let applyHeight<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
-    applyProp props applied (function
-        | Height(Some(size, _)) ->
-            match size with
-            | Pixels num -> Some(AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone))
-            | Fill ->
-                Some(
-                    AttrBuilder<'a>
-                        .CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone)
-                )
-            | Hug ->
-                Some(
-                    AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Top, ValueNone)
-                )
-        | _ -> None)
-
-let applyHidden<'a when 'a :> Control> (props: Property list) (applied: IAttr<'a> list) : IAttr<'a> list =
-    applyProp props applied (function
-        | Hidden(Some(b, _)) -> Some(AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty, not b, ValueNone))
-        | _ -> None)
-
-let applyBackgroundColor props applied =
-    applyProp props applied (function
-        | BackgroundColor(Some(c, _)) ->
-            Some(AttrBuilder<'a>.CreateProperty(Panel.BackgroundProperty, fromColor c, ValueNone))
-        | _ -> None)
-
 let applyCommonProps props =
-    []
-    |> applyHidden props
-    |> applyWidth props
-    |> applyHeight props
-    |> applyMargin props
-    |> applyBackgroundColor props
+    MonadTesting.attrsFor {
+        for prop in props do
+            match prop with
+            | BackgroundColor(Some(c, _)) -> AttrBuilder<'a>.CreateProperty(Panel.BackgroundProperty, fromColor c, ValueNone)
+            | Hidden(Some(b, _)) -> AttrBuilder<'a>.CreateProperty(Control.IsVisibleProperty, not b, ValueNone)
+            | Height(Some(size, _)) -> 
+                match size with
+                | Pixels num -> AttrBuilder<'a>.CreateProperty(Control.HeightProperty, float num, ValueNone)
+                | Fill -> AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Stretch, ValueNone)
+                | Hug -> AttrBuilder<'a>.CreateProperty(Control.VerticalAlignmentProperty, VerticalAlignment.Top, ValueNone)      
+            | Width(Some(size, _)) ->
+                match size with
+                | Pixels num -> AttrBuilder<'a>.CreateProperty(Control.WidthProperty, float num, ValueNone)
+                | Fill -> AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Stretch, ValueNone)
+                | Hug -> AttrBuilder<'a>.CreateProperty(Control.HorizontalAlignmentProperty, HorizontalAlignment.Left, ValueNone)
+            | Margin(Some(m, _)) -> AttrBuilder<'a>.CreateProperty(Control.MarginProperty, createThickness m, ValueNone)
+            | _ -> ()
+    }
