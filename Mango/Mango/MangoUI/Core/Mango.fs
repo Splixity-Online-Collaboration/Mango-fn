@@ -114,7 +114,7 @@ module AppMain =
                 |> Result.defaultValue ""
 
             let parseRes = Frontend.ParserWrapper.parseString source
-            printfn "%A" parseRes
+            
             let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, None, [], [], [], (-1, -1)))
             match syntaxTree with
             | AbSyn.Window (title, Some width, Some height, Some filepath, _, _, _, _) -> 

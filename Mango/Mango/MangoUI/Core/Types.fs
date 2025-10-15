@@ -18,4 +18,4 @@ type Msg =
 
 type AppState = { treeEnv: TreeEnv; funcEnv: FuncEnv; varEnv: VarEnv; uiElements: UIElement list }
 
-exception SyntaxError of obj
+exception SyntaxError of obj (* ParseErrorContext<_> *)
