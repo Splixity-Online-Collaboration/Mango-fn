@@ -1,6 +1,5 @@
 ﻿module MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 
-open Avalonia.FuncUI.Types
 open Avalonia.Controls
 open Avalonia.FuncUI.Builder
 open Avalonia

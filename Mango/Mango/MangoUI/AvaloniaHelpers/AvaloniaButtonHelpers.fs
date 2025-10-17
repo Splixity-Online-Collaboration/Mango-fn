@@ -13,13 +13,13 @@ let buttonAttrs (props: Property list) dispatch =
         for prop in props do
             match prop with
             | Onclick(Some(funcName, _)) ->
-                yield Button.onClick (fun _ -> dispatch (EvalFunc funcName))
+                Button.onClick (fun _ -> dispatch (EvalFunc funcName))
 
             | OnclickLambda(Some(stmts, _)) ->
-                yield Button.onClick (fun _ -> dispatch (EvalLambda stmts))
+                Button.onClick (fun _ -> dispatch (EvalLambda stmts))
 
             | Label(Some(text, _)) ->
-                yield Button.content text
+                Button.content text
 
             | _ -> ()
     }

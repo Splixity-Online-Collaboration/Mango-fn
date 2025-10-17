@@ -146,7 +146,7 @@ Each syntactic form denotes a pure value in your domain of UI trees. Here you ca
 \begin{enumerate}
 \item Fix-point definitions (recursive layouts)
 \item Domain equations (UI = elem x Props x [UI])
-\item Functional mappings ([Prog] : Env -> UIState)
+\item Functional mappings ([Prog] : Env -$>$ UIState)
 \end{enumerate}
 
 \subsection{Constraint / Attribute Grammar Semantics - Layout}
@@ -204,7 +204,7 @@ Once you have an operational semantics, you can add Hoare-style reasoning:
 { hasProp(id, color, old) } set(color, id, red) { hasProp(id, color, red) }
 \end{verbatim}
 or temporal logic:
-- $\box(button.clicked \to \diamond(dialog.open))$
+% - $\box(button.clicked \to \diamond(dialog.open))$
 
 That gives you experience writing and proving correctness properties over UI behaviour. 
 

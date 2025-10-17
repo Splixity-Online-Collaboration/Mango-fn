@@ -57,8 +57,8 @@ let rec convertUIElementToIView element (tab: TreeEnv) (funcEnv: FuncEnv) dispat
 and createWrapPanel orientation elements props tab funcEnv dispatch =
     WrapPanel.create (
         attrsFor {
-            yield WrapPanel.orientation orientation
-            yield WrapPanel.children (ui {
+            WrapPanel.orientation orientation
+            WrapPanel.children (ui {
                 for e in elements -> convertUIElementToIView e tab funcEnv dispatch
             })
             yield! applyCommonProps props
@@ -68,10 +68,10 @@ and createWrapPanel orientation elements props tab funcEnv dispatch =
 and createStackPanel orientation elements props tab funcEnv dispatch =
     StackPanel.create (
         attrsFor {
-            yield StackPanel.orientation orientation
-            yield StackPanel.children (ui {
+            StackPanel.orientation orientation
+            StackPanel.children (ui {
                 for e in elements do
-                    yield convertUIElementToIView e tab funcEnv dispatch
+                    convertUIElementToIView e tab funcEnv dispatch
             })
             yield! applyCommonProps props
         }
@@ -95,7 +95,7 @@ and createContainer
 and createBorderElement (props: Property list) (element: UIElement) (tab: TreeEnv) (funcEnv: FuncEnv) dispatch : IView =
     Border.create (
         attrsFor {
-            yield Border.child (convertUIElementToIView element tab funcEnv dispatch)
+            Border.child (convertUIElementToIView element tab funcEnv dispatch)
             yield! applyBorderProperties props
             yield! applyCommonProps props
         }
@@ -115,6 +115,6 @@ let convertFromAbSynToAvaloniaTree (state: AppState) dispatch =
     createScrollViewerWithContent (
         createStackPanelWithContent (ui {
             for e in state.uiElements do
-            yield convertUIElementToIView e state.treeEnv state.funcEnv dispatch
+                convertUIElementToIView e state.treeEnv state.funcEnv dispatch
         })
     )
