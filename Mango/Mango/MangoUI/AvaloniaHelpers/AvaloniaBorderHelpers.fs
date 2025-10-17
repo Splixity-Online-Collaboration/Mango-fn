@@ -6,6 +6,7 @@ open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 open MangoUI.Core.AbSyn
 open Avalonia
 open Avalonia.Controls
+open MangoUI.Util.MonadTesting
 
 let createCornerRadius (t) =
     let thickness =
@@ -16,20 +17,12 @@ let createCornerRadius (t) =
 
     thickness
 
-let applyCorner props applied =
-    applyProp props applied (function
-        | Corner(Some(m, _)) -> Some(Border.cornerRadius (createCornerRadius m))
-        | _ -> None)
-
-let applyColor props applied =
-    applyProp props applied (function
-        | Color(Some(c, _)) -> Some(Border.borderBrush (fromColor c))
-        | _ -> None)
-
-let applyThickness props applied =
-    applyProp props applied (function
-        | Density(Some(t, _)) -> Some(Border.borderThickness (createThickness t))
-        | _ -> None)
-
 let applyBorderProperties (props: Property list) =
-    [] |> applyCorner props |> applyColor props |> applyThickness props
+    attrsFor {
+        for prop in props do
+            match prop with
+            | Corner (Some(m, _)) -> Border.cornerRadius (createCornerRadius m)
+            | Color(Some(c, _)) -> Border.borderBrush (fromColor c)
+            | Density(Some(t, _)) -> Border.borderThickness (createThickness t)
+            | _ -> ()
+    }
