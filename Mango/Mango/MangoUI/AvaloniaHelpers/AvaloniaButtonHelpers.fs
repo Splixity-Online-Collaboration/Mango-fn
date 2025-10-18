@@ -6,27 +6,28 @@ open Avalonia.Controls
 open MangoUI.AvaloniaHelpers.AvaloniaCommonHelpers
 open MangoUI.Core.AbSyn
 open MangoUI.Core.Types
+open MangoUI.Util.MonadTesting
 
-let applyOnClick props dispatch applied =
-    applyProp props applied (function
-        | Onclick(Some(funcName, _)) -> Some(Button.onClick (fun _ -> dispatch (EvalFunc funcName)))
-        | _ -> None)
+let buttonAttrs (props: Property list) dispatch =
+    attrsFor {
+        for prop in props do
+            match prop with
+            | Onclick(Some(funcName, _)) ->
+                Button.onClick (fun _ -> dispatch (EvalFunc funcName))
 
-let applyOnClickLambda props dispatch applied =
-    applyProp props applied (function
-        | OnclickLambda(Some(stmts, _)) -> Some(Button.onClick (fun _ -> dispatch (EvalLambda stmts)))
-        | _ -> None)
+            | OnclickLambda(Some(stmts, _)) ->
+                Button.onClick (fun _ -> dispatch (EvalLambda stmts))
 
-let applyLabel props applied =
-    applyProp props applied (function
-        | Label(Some(text, _)) -> Some(Button.content text)
-        | _ -> None)
+            | Label(Some(text, _)) ->
+                Button.content text
 
-let applyButtonProperties props dispatch =
-    []
-    |> applyOnClick props dispatch
-    |> applyOnClickLambda props dispatch
-    |> applyLabel props
+            | _ -> ()
+    }
 
-let createButton (props: Property list) varEnv treeEnv funcEnv dispatch : IView =
-    Button.create (applyCommonProps props @ applyButtonProperties props dispatch)
+let createButton (props: Property list) dispatch : IView =
+    Button.create (
+        attrsFor {
+            yield! applyCommonProps props
+            yield! buttonAttrs props dispatch
+        }
+    )
