@@ -30,7 +30,7 @@ button "OK" at (10,10)
 
 - **Simplicity over cleverness**.
 
-Example: If you write `on click -> show_message("hi")`, you know it will exactly bind to a click — no surprises.
+Example: If you write `on click -> show_message("hi")`, you know it will exactly bind to a click - no surprises.
 
 ## 4. Fast Edit-Run Cycle
 "Edit a file, save it, see the change immediately."
@@ -48,10 +48,10 @@ Example: Mango editor or CLI could have a `mango myapp.mg` and instantly relaunc
 
 - Mango syntax should *mirror the GUI tree*.
 
-- If a `button` is inside a `window` block, it appears inside the window — simple.
+- If a `button` is inside a `window` block, it appears inside the window - simple.
 
 Example:
-```mango
+```mg
 window "Main" {
   button "OK"
   button "Cancel"
@@ -97,7 +97,7 @@ Example: If the user forgets a `{ }`, show:\
 
 Example:
 
-```mango
+```mg
 theme dark
 window "Main" {
   label "Welcome!"
