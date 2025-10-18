@@ -1,6 +1,8 @@
 # Generated parser and lexer files
 **/bin/
 **/.vs/
+**/.vscode/
+**/.fsdocs/
 **/obj/
 **/Parser.fsyacc.output
 **/Lexer.fs

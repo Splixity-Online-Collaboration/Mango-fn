@@ -15,13 +15,23 @@ module Evaluator =
     open MangoUI.Core.UIElementHelpers
     open MangoUI.AvaloniaHelpers.AvaloniaHelpers
 
+    let evaluateExp (exp: Exp) (state: AppState): Value =
+        match exp with
+        | Constant (value, _) -> value // direct literal value
+        | Var (name, _) -> 
+            match SymTab.lookup name state.varEnv with
+            | Some value -> value
+            | None -> failwithf "Variable '%s' not found" name
+        | Call (name, _) -> failwithf "Functions lookup not implemented yet"
+
     let evaluateStatement (stmt: Stmt) (state: AppState) : AppState =
         match stmt with
-        | Set(prop, id, exp, _) ->
+        | SetProperty(prop, id, exp, _) ->
             match lookup id state.treeEnv with
             | Some element ->
                 let currentProps = getProperties element
-                let newProp = createProp (propertyKind prop) exp
+                let evaluatedValue = evaluateExp exp state
+                let newProp = createProp (propertyKind prop) evaluatedValue
                 let updatedProps = upsertProperty newProp currentProps
                 let updatedElement = insertProperties element updatedProps
                 let treeEnv' = remove id state.treeEnv |> bind id updatedElement
@@ -29,7 +39,10 @@ module Evaluator =
             | None ->
                 info (sprintf "Element %A not found" id)
                 state
-        | Update(id, props, _) ->
+        | SetVariable (name, exp, _) ->
+            let varEnv' = SymTab.bind name (evaluateExp exp state) state.varEnv
+            { state with varEnv = varEnv' }
+        | Update (id, props, _) ->
             match lookup id state.treeEnv with
             | Some element ->
                 let currentProps = getProperties element
@@ -59,13 +72,11 @@ module Evaluator =
 
     let init window () =
         match window with
-        | Window(_, _, _, _, elements, funcs, _) ->
-            let funcEnv' = initFuncEnv funcs
+        | Window (_, _, _, _, vars, elements, funcs, _) ->
+            let varEnv' = initVarEnv vars
             let elements', treeEnv' = storeElementsMarkedWithId elements (empty ())
-
-            { treeEnv = treeEnv'
-              funcEnv = funcEnv'
-              uiElements = elements' }
+            let funcEnv' = initFuncEnv funcs
+            { treeEnv = treeEnv'; funcEnv = funcEnv'; varEnv = varEnv'; uiElements = elements'}
 
     let update (msg: Msg) (state: AppState) : AppState =
         info (sprintf "Updating state with message %A" msg)
@@ -103,32 +114,27 @@ module AppMain =
                 |> Result.defaultValue ""
 
             let parseRes = Frontend.ParserWrapper.parseString source
-
-            match parseRes with
-            | Ok window ->
-                match window with
-                | AbSyn.Window(title, Some width, Some height, Some filepath, _, _, _) ->
-                    base.Title <- title
-                    base.Width <- width
-                    base.Height <- height
-                    base.Icon <- WindowIcon filepath
-                | AbSyn.Window(title, Some width, Some height, None, _, _, _) ->
-                    base.Title <- title
-                    base.Width <- width
-                    base.Height <- height
-                | AbSyn.Window(title, None, None, None, _, _, _) ->
-                    base.Title <- title
-                    base.Width <- 800
-                    base.Height <- 600
-                | _ -> failwith "Window should not be able to have other combinations"
-
-                Program.mkSimple (Evaluator.init window) Evaluator.update Evaluator.view
-                |> Program.withHost this
-                |> Program.withConsoleTrace
-                |> Program.run
-            | Error msg -> 
-                do printfn "%s" msg
-                System.Environment.Exit 1
+            
+            let syntaxTree = Frontend.ParserWrapper.parseString source |> Result.defaultValue (AbSyn.Window ("", Some 800, Some 600, None, [], [], [], (-1, -1)))
+            match syntaxTree with
+            | AbSyn.Window (title, Some width, Some height, Some filepath, _, _, _, _) -> 
+                base.Title <- title
+                base.Width <- width
+                base.Height <- height
+                base.Icon <- WindowIcon filepath
+            | AbSyn.Window (title, Some width, Some height, None, _, _, _, _) ->
+                base.Title <- title
+                base.Width <- width
+                base.Height <- height
+            | AbSyn.Window (title, None, None, None, _, _, _, _) ->
+                base.Title <- title
+                base.Width <- 800
+                base.Height <- 600
+            | _ -> failwith "Window should not be able to have other combinations"
+            Program.mkSimple (Evaluator.init syntaxTree) Evaluator.update Evaluator.view
+            |> Program.withHost this
+            |> Program.withConsoleTrace
+            |> Program.run
 
     type App() =
         inherit Application()

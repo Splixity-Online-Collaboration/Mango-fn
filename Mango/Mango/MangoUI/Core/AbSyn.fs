@@ -96,6 +96,11 @@ type Value =
     | Bool of bool
 
 /// <summary>
+/// idk
+/// </summary>
+type Variable = string * Value
+
+/// <summary>
 /// Represents expressions within Mango-fn, such as constants,
 /// variable references, or function calls.
 /// </summary>
@@ -212,11 +217,13 @@ and Stmt =
     /// <summary>Declares a variable with a given expression value.</summary>
     | Let of string * Exp * Position
     /// <summary>Sets a specific property on a UI element by ID.</summary>
-    | Set of Property * string * Exp * Position // (propertyName, elementId, elementValue, position)
+    | SetProperty of Property * string * Exp * Position  // (propertyName, elementId, elementValue, position)
+    | SetVariable of string * Exp * Position // (variableName, variableValue, position)
     /// <summary>Updates an existing UI element with a list of modified properties.</summary>
     | Update of string * Property list * Position // (elementId, updatedProperties, position)
     /// <summary>Evaluates a standalone expression.</summary>
     | ExprStmt of Exp * Position
+    | StateDecl of Variable list * Position
 
 /// <summary>
 /// Represents Mango-fn functions, including named and anonymous lambdas.
@@ -239,10 +246,11 @@ and FunctionT =
 /// </remarks>
 type Window =
     | Window of
-        string *              // Name
+        string *               // Name
         int option *           // Width
         int option *           // Height
         string option *        // Background color (optional)
+        Variable list *        // Variables
         UIElement list *       // UI hierarchy
         FunctionT list *       // Functions
         Position               // Source position

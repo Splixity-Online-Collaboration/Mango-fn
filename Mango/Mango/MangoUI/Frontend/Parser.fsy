@@ -5,13 +5,31 @@ open MangoUI.Core.AbSyn
 open FSharp.Text.Parsing
 open MangoUI.Core.Types
 
-let construct_window window elements functions = 
-  match window with
-  | Window (name, width, height, icon, _, _, pos) -> Window (name, width, height, icon, elements, functions, pos)
+// Note: state gets filtered to only use fst, since it doesn't need position for the actual state state -> fst state
+
+let construct_window window state elements funcs = 
+    match window with
+    | Window (name, width, height, icon, _, _, _, pos) -> Window (name, width, height, icon, fst state, elements, funcs, pos)
 
 let add_ui_elements window elements = 
   match window with
-  | Window (name, width, height, icon, _, functions, pos) -> Window (name, width, height, icon, elements, functions, pos)
+  | Window (name, width, height, icon, state, _, funcs, pos) -> Window (name, width, height, icon, state, elements, funcs, pos)
+
+let add_funcs window funcs = 
+  match window with
+  | Window (name, width, height, icon, state, elements, _, pos) -> Window (name, width, height, icon, state, elements, funcs, pos)
+
+let add_state window state = 
+  match window with
+  | Window (name, width, height, icon, _, elements, funcs, pos) -> Window (name, width, height, icon, fst state, elements, funcs, pos)
+
+let add_ui_elements_and_funcs window elements funcs = 
+  match window with
+  | Window (name, width, height, icon, state, _, _, pos) -> Window (name, width, height, icon, state, elements, funcs, pos)
+
+let add_ui_elements_and_state window state elements = 
+  match window with
+  | Window (name, width, height, icon, _, _, funcs, pos) -> Window (name, width, height, icon, fst state, elements, funcs, pos)
 
 let parse_hex_code (s: string) : (byte * byte * byte * byte) option =
   let hex = if s.StartsWith("#") then s.Substring(1) else s
@@ -35,7 +53,7 @@ let parse_error_rich : (ParseErrorContext<'tok> -> unit) option =
 
 // Keywords
 %token <Position> WINDOW COLUMN ROW BUTTON TEXT TEXTBOX CHECKBOX RADIOBUTTON CALENDAR TOGGLEBUTTON TOGGLESWITCH BORDER
-%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT CORNER DENSITY FUNCTION LET UPDATE SET
+%token <Position> HIDDEN TRUE FALSE WIDTH HEIGHT CORNER DENSITY FUNCTION LET UPDATE SET STATE
 %token <Position> COLOR BACKGROUNDCOLOR FONTFAMILY FONTSIZE FONTWEIGHT FONTSTYLE MARGIN LINEHEIGHT TEXTALIGN TEXTTRIM TEXTWRAP
 %token <Position> ITALIC UNDERLINE STRIKETHROUGH
 %token <Position> RED BLUE GREEN YELLOW PINK BLACK WHITE
@@ -68,11 +86,15 @@ Prog : Window EOF { $1 }
 ;
 
 // Window Definition
-Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], $1) }
-  | WINDOW STRINGLIT NUM NUM { Window (fst $2, Some (fst $3), Some (fst $4), None, [], [], $1) }
-  | WINDOW STRINGLIT NUM NUM STRINGLIT { Window (fst $2, Some (fst $3), Some (fst $4), Some (fst $5), [], [], $1) }
+Window : WINDOW STRINGLIT { Window (fst $2, None, None, None, [], [], [], $1) }
+  | WINDOW STRINGLIT NUM NUM { Window (fst $2, Some (fst $3), Some (fst $4), None, [], [], [], $1) }
+  | WINDOW STRINGLIT NUM NUM STRINGLIT { Window (fst $2, Some (fst $3), Some (fst $4), Some (fst $5), [], [], [], $1) }
   | Window LEFT_CURLY_BRACKET UIElements RIGHT_CURLY_BRACKET { add_ui_elements $1 $3 }
-  | Window LEFT_CURLY_BRACKET UIElements Functions RIGHT_CURLY_BRACKET { construct_window $1 $3 $4 }
+  | Window LEFT_CURLY_BRACKET UIElements Functions RIGHT_CURLY_BRACKET { add_ui_elements_and_funcs $1 $3 $4 }
+  | Window LEFT_CURLY_BRACKET State UIElements Functions RIGHT_CURLY_BRACKET { construct_window $1 $3 $4 $5 }
+  | Window LEFT_CURLY_BRACKET State UIElements RIGHT_CURLY_BRACKET { add_ui_elements_and_state $1 $3 $4 }
+  | Window LEFT_CURLY_BRACKET State RIGHT_CURLY_BRACKET { add_state $1 $3 }
+  | Window LEFT_CURLY_BRACKET Functions RIGHT_CURLY_BRACKET { add_funcs $1 $3 }
 ;
 
 UIElement :
@@ -210,21 +232,37 @@ TextTrim : WORD      { Word }
   | NOTRIM    { NoTrim }
 ;
 
+// Functions
 Functions : Function Functions { $1 :: $2 }
           | Function           { [$1] }
 ;
 
-// Functions and Statements
 Function : FUNCTION ID LEFT_PAR RIGHT_PAR LEFT_CURLY_BRACKET Statements RIGHT_CURLY_BRACKET { Function (fst $2, $6, $1) }
 ;
 
-Statements : Stmt Statements { $1 :: $2 }
-           | Stmt            { [$1] }
+// State
+State: STATE LEFT_CURLY_BRACKET Variables RIGHT_CURLY_BRACKET { ($3, $1) } // use position for the declaration, not for the actual state tho
+
+// Variables
+Variables : Variable Variables { $1 :: $2 }
+          | Variable           { [$1] }
 ;
 
-Stmt : SET LEFT_PAR PropertyName COMMA ID COMMA Exp RIGHT_PAR { Set ($3, fst $5, $7, $1) }
-     | UPDATE LEFT_PAR ID COMMA LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET RIGHT_PAR { Update (fst $3, $6, $1) }
-     | Exp              { ExprStmt ($1, match $1 with Constant(_,pos) | Var(_,pos) | Call(_,pos) -> pos) }
+Variable : ID EQUAL Exp { 
+  match $3 with
+  | Constant (value, _) -> (fst $1, value)
+  | _ -> failwithf "Variable assignment only accepts constants for now. %A" (snd $1)
+}
+
+// Statements
+Statements : Stmt Statements { $1 :: $2 }
+           | Stmt            { [$1] }
+
+Stmt  : SET LEFT_PAR PropertyName COMMA ID COMMA Exp RIGHT_PAR                       { SetProperty ($3, fst $5, $7, $1) }
+      | SET LEFT_PAR ID COMMA Exp RIGHT_PAR                                               { SetVariable (fst $3, $5, $1)}
+      | UPDATE LEFT_PAR ID COMMA LEFT_CURLY_BRACKET Properties RIGHT_CURLY_BRACKET RIGHT_PAR  { Update (fst $3, $6, $1) }
+      | Exp                            { ExprStmt ($1, match $1 with Constant(_,pos) | Var(_,pos) | Call(_,pos) -> pos) }
+      | State                          { StateDecl $1 }
 ;
 
 // Expressions

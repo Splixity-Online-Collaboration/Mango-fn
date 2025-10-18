@@ -68,3 +68,8 @@ let initFuncEnv (funcs: FunctionT list) : FuncEnv =
             | _ -> acc)
         (SymTab.empty ())
         funcs
+
+let initVarEnv (vars: Variable list): VarEnv =
+    List.fold (fun acc (name, value) -> 
+        SymTab.bind name value acc
+    ) (SymTab.empty ()) vars

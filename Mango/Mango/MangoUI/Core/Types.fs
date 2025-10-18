@@ -34,6 +34,11 @@ type TreeEnv = SymTab<UIElement>
 type FuncEnv = SymTab<Stmt list>
 
 /// <summary>
+/// idk
+/// </summary>
+type VarEnv = SymTab<Value>
+
+/// <summary>
 /// Represents messages that can be dispatched in the MangoUI runtime.
 /// </summary>
 /// <remarks>
@@ -90,6 +95,11 @@ type AppState =
       /// The symbol table of all known UI element definitions.
       /// </summary>
       treeEnv: TreeEnv
+
+      /// <summary>
+      /// The symbol table of all known Mango-fn variable definitions.
+      /// </summary>
+      varEnv: VarEnv
 
       /// <summary>
       /// The symbol table of all known Mango-fn function definitions.

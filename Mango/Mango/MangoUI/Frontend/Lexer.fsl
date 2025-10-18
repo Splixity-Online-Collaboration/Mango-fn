@@ -41,6 +41,9 @@ let keyword (s, pos) =
     | "togglebutton"  -> Parser.TOGGLEBUTTON pos
     | "border"        -> Parser.BORDER pos
 
+    // State
+    | "state"         -> Parser.STATE pos
+
     // Boolean
     | "true"          -> Parser.TRUE pos
     | "false"         -> Parser.FALSE pos
